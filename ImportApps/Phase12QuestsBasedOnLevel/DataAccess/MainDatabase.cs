@@ -1,4 +1,4 @@
-﻿namespace Phase01SpeedSeeds.DataAccess.Core;
+﻿namespace Phase12QuestsBasedOnLevel.DataAccess;
 public static class MainDatabase
 {
     public static string DatabasePath =>
