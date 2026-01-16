@@ -10,6 +10,7 @@ public partial class SpeedSeedComponent(IToast toast)
     protected override void OnInitialized()
     {
         _list.AddRange(TreeManager.GetUnlockedTreeGrantItems());
+        _list.AddRange(CropManager.GetUnlockedCropGrantItems());
         //doing trees first.
         base.OnInitialized();
     }
@@ -35,6 +36,11 @@ public partial class SpeedSeedComponent(IToast toast)
         if (item.Category == EnumItemCategory.Tree)
         {
             TreeManager.GrantTreeItems(item, 1);
+            return;
+        }
+        if (item.Category == EnumItemCategory.Crop)
+        {
+            CropManager.GrantCropItems(item, 1);
             return;
         }
         toast.ShowWarningToast("Not supported yet");

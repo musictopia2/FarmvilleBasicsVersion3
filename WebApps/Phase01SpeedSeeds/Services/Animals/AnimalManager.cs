@@ -1,6 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿namespace Phase01SpeedSeeds.Services.Animals;
 
-namespace Phase01SpeedSeeds.Services.Animals;
 public class AnimalManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry
@@ -160,7 +159,7 @@ public class AnimalManager(InventoryManager inventory,
 
 
                 var instance = _animals.First(a => a.Name == animalName && a.Unlocked == false);
-                
+
 
                 instance.Unlocked = true;
                 instance.State = EnumAnimalState.Collecting;
@@ -267,7 +266,7 @@ public class AnimalManager(InventoryManager inventory,
         }
         AnimalInstance instance = GetAnimalById(animal);
         return CanCollect(instance);
-        
+
     }
     public void Collect(AnimalView animal)
     {

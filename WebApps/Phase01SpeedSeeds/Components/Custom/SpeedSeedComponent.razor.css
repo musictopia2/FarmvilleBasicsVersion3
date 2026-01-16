@@ -54,11 +54,17 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 0.8rem;
+    width: 100%;
+    justify-content: center; /* or space-between if you prefer */
 }
 
+/* the number itself */
 .ss-owned {
-    font-variant-numeric: tabular-nums; /* avoids digit shifting */
+    display: inline-block;
+    width: 4ch; /* holds up to 9999; use 3ch for 0–999 */
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
 
 .ss-use {

@@ -114,6 +114,47 @@ public class CropManager(InventoryManager inventory,
     {
         return _recipes.Exists(x => x.Item == item);
     }
+
+
+
+    public BasicList<GrantableItem> GetUnlockedCropGrantItems()
+    {
+
+        BasicList<GrantableItem> output = [];
+
+        _allCropDefinitions.ForConditionalItems(x => x.Unlocked, temp =>
+        {
+            output.Add(new()
+            {
+                Amount = 2,
+                Category = EnumItemCategory.Crop,
+                Item = temp.Item
+            });
+        });
+        return output;
+    }
+    public void GrantCropItems(GrantableItem item, int toUse)
+    {
+        if (toUse <= 0)
+        {
+            throw new CustomBasicException("Must use at least one speed seed");
+        }
+        if (item.Category != EnumItemCategory.Crop)
+        {
+            throw new CustomBasicException("This is not a crop");
+        }
+        if (inventory.Get(CurrencyKeys.SpeedSeed) < toUse)
+        {
+            throw new CustomBasicException("Not enough speed seeds.  Should had ran the required functions first");
+        }
+        int granted = toUse * item.Amount;
+        if (inventory.CanAdd(item.Item, granted) == false)
+        {
+            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
+        }
+        AddCrop(item.Item, granted);
+        inventory.Consume(CurrencyKeys.SpeedSeed, toUse);
+    }
     public void Plant(Guid id, string item)
     {
         lock (_lock)
@@ -157,8 +198,13 @@ public class CropManager(InventoryManager inventory,
         {
             throw new CustomBasicException("No crop");
         }
-        inventory.Add(crop.Crop, 2);
+        AddCrop(crop.Crop, 2);
         crop.Clear();
+        
+    }
+    private void AddCrop(string item, int amount)
+    {
+        inventory.Add(item, 2);
         _needsSaving = true;
     }
     public async Task SetStyleContextAsync(CropServicesContext context, FarmKey farm)
