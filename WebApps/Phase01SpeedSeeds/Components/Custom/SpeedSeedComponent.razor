@@ -1,0 +1,32 @@
+﻿@inherits FarmComponentBase
+<div class="ss-topbar">
+    <div class="ss-seed">
+        <ImageButtonComponent Name="@CurrencyKeys.SpeedSeed" Height="50" />
+        <span class="ss-seed-count">@InventoryManager.Get(CurrencyKeys.SpeedSeed)</span>
+    </div>
+</div>
+<div class="ss-scroll">
+    <StopClickPropagation>
+        <WrapLayout RenderList="_list" ColumnWidth="100px" Context="item">
+            <div class="ss-card">
+                <div class="ss-head">
+                    <ImageButtonComponent Name="@item.Item" Height="28" />
+                    <div class="ss-title">@item.Item</div>
+                </div>
+
+                <div class="ss-meta">
+                    <div class="ss-pill">@DisplayAmount(item)</div>
+
+                    <div class="ss-ownedrow">
+                        <img src="/Barn.png" height="18" />
+                        <span class="ss-owned">@InventoryManager.Get(item.Item)</span>
+                    </div>
+                </div>
+
+                <button class="ss-use" @onclick="() => TryToUse(item)">
+                    Use 1
+                </button>
+            </div>
+        </WrapLayout>
+    </StopClickPropagation>
+</div>

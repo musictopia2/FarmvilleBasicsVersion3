@@ -67,10 +67,15 @@ public partial class MainComponent(NavigationManager nav, OverlayService service
     private bool _showBarn = false;
     private bool _showSilo = false;
     private bool _showShop = false;
+    private bool _showSpeedSeeds = false;
 
     private async Task CloseAllPopupsAsync()
     {
         await service.CloseAllAsync();
+    }
+    private void ShowSpeedSeeds()
+    {
+        _showSpeedSeeds = true;
     }
     private void ShowShop()
     {

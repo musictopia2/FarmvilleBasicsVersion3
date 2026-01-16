@@ -26,7 +26,7 @@ internal static class ImportInventoryStorageUpgradesClass
     {
         UpgradeTier tier;
         BasicList<UpgradeTier> output = [];
-        int currentValue = 5; //must start with low number so you have to test it.
+        int currentValue = 300; //must start with low number so you have to test it.
         int increment = 5;
         tier = new()
         {
@@ -74,7 +74,7 @@ internal static class ImportInventoryStorageUpgradesClass
     {
         UpgradeTier tier;
         BasicList<UpgradeTier> output = [];
-        int currentValue = 30;
+        int currentValue = 300;
         int increment = 40; //a person is going to run out quickly this time.
         tier = new()
         {

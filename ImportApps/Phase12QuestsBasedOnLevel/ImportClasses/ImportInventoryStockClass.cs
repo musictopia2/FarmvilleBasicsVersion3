@@ -34,7 +34,7 @@ public static class ImportInventoryStockClass
             //amounts[rule.ItemName] = 10;
         });
         amounts.Add(CurrencyKeys.Coin, 18);
-        amounts.Add(CurrencyKeys.SpeedSeed, 10); //you get 10 speed seeds.  once gone, that is it.
+        amounts.Add(CurrencyKeys.SpeedSeed, 100); //you get 10 speed seeds.  once gone, that is it.
         return new()
         {
             Farm = farm,

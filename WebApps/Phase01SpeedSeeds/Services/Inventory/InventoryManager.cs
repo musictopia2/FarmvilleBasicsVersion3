@@ -80,7 +80,7 @@ public class InventoryManager(FarmKey farm, IInventoryRepository persist,
             && (siloCurrent + siloAdd) <= SiloSize;
     }
 
-
+    public bool CanAdd(GrantableItem item) => CanAdd(item.Item, item.Amount);
     public bool CanAdd(ItemAmount item) => CanAdd(item.Item, item.Amount);
     public bool CanAdd(string item, int amount)
     {

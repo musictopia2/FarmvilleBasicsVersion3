@@ -40,7 +40,12 @@
     >
         <ShopComponent />
     </PopupViewport>
-    
+    <PopupViewport ShowHeaders="true"
+                   HeaderTitle="Speed Seeds"
+                   TapToClose="true"
+                   @bind-Visible="_showSpeedSeeds">
+        <SpeedSeedComponent />
+    </PopupViewport>
 
     <NavigationBarContainer @ref="_nav"
                             AlwaysShowBar=true
@@ -100,6 +105,10 @@
                 return;
             }
             <OverlayHost />
+            <div>
+                <ImageButtonComponent OnClick="ShowSpeedSeeds" Name="@CurrencyKeys.SpeedSeed" Height="100" />
+            </div>
+
             <ImageButtonComponent OnClick="ShowShop" Name="CashRegister" Height="100" />
             <MainSectionLauncher ReadyCategory="EnumMainSection.Crops" />
             <MainSectionLauncher ReadyCategory="EnumMainSection.Trees" />

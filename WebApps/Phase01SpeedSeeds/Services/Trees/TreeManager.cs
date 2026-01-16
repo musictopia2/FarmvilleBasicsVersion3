@@ -91,7 +91,34 @@ public class TreeManager(InventoryManager inventory,
     public EnumTreeState GetTreeState(TreeView id) => GetTreeById(id).State;
     //this is when you collect only one item.
 
+    public BasicList<GrantableItem> GetUnlockedTreeGrantItems()
+    {
+        CustomBasicException.ThrowIfNull(_treeCollecting);
 
+        int amount = _treeCollecting.TreesCollectedAtTime;
+
+        // Distinct by TreeName (or Item) to guarantee no duplicates
+        var unlockedTreeNames = _trees
+            .Where(t => t.Unlocked)
+            .Select(t => t.Name)
+            .Distinct();
+
+        BasicList<GrantableItem> output = [];
+
+        foreach (var name in unlockedTreeNames)
+        {
+            //TreeRecipe recipe = _recipes.Single(r => r.TreeName == treeName);
+
+            output.Add(new GrantableItem
+            {
+                Item = name,
+                Amount = amount,
+                Category = EnumItemCategory.Tree
+            });
+        }
+
+        return output;
+    }
     public bool CanCollectFromTree(TreeView id)
     {
         TreeInstance instance = GetTreeById(id);
@@ -107,6 +134,33 @@ public class TreeManager(InventoryManager inventory,
         }
         return 1;
     }
+    //ai suggested having a new service for speed seeds.
+    //for now, chose not to do it.  may change my mind as i build out the feature more.
+    
+    public void GrantTreeItems(GrantableItem item, int toUse)
+    {
+        if (toUse <= 0)
+        {
+            throw new CustomBasicException("Must use at least one speed seed");
+        }
+        if (item.Category != EnumItemCategory.Tree)
+        {
+            throw new CustomBasicException("This is not a tree");
+        }
+        if (inventory.Get(CurrencyKeys.SpeedSeed) < toUse)
+        {
+            throw new CustomBasicException("Not enough speed seeds.  Should had ran the required functions first");
+        }
+        
+        int granted = toUse * item.Amount;
+        if (inventory.CanAdd(item.Item, granted) == false)
+        {
+            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
+        }
+
+        AddTreeToInventory(item.Item, granted);
+        inventory.Consume(CurrencyKeys.SpeedSeed, toUse);
+    }
     public void CollectFromTree(TreeView id)
     {
         if (CanCollectFromTree(id) == false)
@@ -119,7 +173,13 @@ public class TreeManager(InventoryManager inventory,
         {
             instance.CollectTree();
         });
-        inventory.Add(instance.Name, maxs);
+        AddTreeToInventory(instance.Name, maxs);
+    }
+
+    private void AddTreeToInventory(string name, int amount)
+    {
+        //this is used so if i ever have the ability of getting something else in future, will be here.
+        inventory.Add(name, amount);
         _needsSaving = true;
     }
 
