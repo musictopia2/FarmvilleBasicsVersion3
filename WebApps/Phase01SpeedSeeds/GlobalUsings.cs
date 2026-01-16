@@ -1,0 +1,37 @@
+﻿global using BasicBlazorLibrary.Components.BaseClasses;
+global using BasicBlazorLibrary.Components.Basic;
+global using BasicBlazorLibrary.Helpers;
+global using CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.BasicExtensions;
+global using CommonBasicLibraries.BasicDataSettingsAndProcesses; //so i can have access to the exceptions when needed.
+global using CommonBasicLibraries.CollectionClasses;
+global using Microsoft.AspNetCore.Components;
+global using Microsoft.Extensions.DependencyInjection;
+global using Phase01SpeedSeeds.Components;
+global using bb1 = CommonBasicLibraries.BasicDataSettingsAndProcesses.BasicDataFunctions;
+global using cc1 = CommonBasicLibraries.BasicDataSettingsAndProcesses.SColorString;
+global using css1 = BasicBlazorLibrary.CssHelpers.AllCssClasses; //so i can have intellisense completely from c# if i want.
+global using ff1 = CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.FileFunctions.FileFunctions;
+global using Phase01SpeedSeeds.Services.Crops;
+global using Phase01SpeedSeeds.Services.Trees;
+global using Phase01SpeedSeeds.Services.Animals;
+global using Phase01SpeedSeeds.Services.Workshops;
+global using Phase01SpeedSeeds.Services.Workers;
+global using Phase01SpeedSeeds.Services.Worksites;
+global using Phase01SpeedSeeds;
+global using CommonBasicLibraries.BasicUIProcesses;
+global using DocumentDbLibrary;
+global using CommonBasicLibraries.DatabaseHelpers.AbstractStaticInterfaces;
+global using dd1 = CommonBasicLibraries.DatabaseHelpers.MiscClasses.GlobalClass;
+global using SQLiteHelperLibraries;
+global using mm1 = Phase01SpeedSeeds.DataAccess.Core.MainDatabase;
+global using Phase01SpeedSeeds.Quests;
+global using Phase01SpeedSeeds.Services.Core;
+global using Phase01SpeedSeeds.Services.Balance;
+global using Phase01SpeedSeeds.Services.Inventory;
+global using Phase01SpeedSeeds.DataAccess.Inventory;
+global using Phase01SpeedSeeds.Utilities;
+global using Phase01SpeedSeeds.Services.Upgrades;
+global using Phase01SpeedSeeds.Services.Progression;
+global using Phase01SpeedSeeds.Services.Catalog;
+global using Phase01SpeedSeeds.Services.Store;
+global using Phase01SpeedSeeds.Services.Items;

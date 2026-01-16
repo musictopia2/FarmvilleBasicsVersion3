@@ -1,0 +1,5 @@
+﻿namespace Phase01SpeedSeeds.Services.Trees;
+public class PlayerTree
+{
+    public string Item { get; set; } = "";
+}
