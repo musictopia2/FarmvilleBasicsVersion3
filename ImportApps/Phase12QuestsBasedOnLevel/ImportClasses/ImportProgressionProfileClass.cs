@@ -12,7 +12,7 @@ public static class ImportProgressionProfileClass
             { 
                 Farm = farm,
                 PointsThisLevel = 0,
-                Level = 3 //must be level 3 so i can test different speed seeds.
+                Level = 18
             }
             );
         }
