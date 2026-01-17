@@ -30,7 +30,8 @@ public static class ImportCropInstanceClass
 
         var profile = await _levelProfile.GetProfileAsync(farm);
 
-
+        InstantUnlimitedInstanceDatabase db = new();
+        var list = await db.GetUnlockedItems(farm);
         foreach (var level in cropPlan.SlotLevelRequired)
         {
             bool unlocked = true;
@@ -50,6 +51,10 @@ public static class ImportCropInstanceClass
             if (item.LevelRequired > profile.Level)
             {
                 unlocked = false;
+            }
+            if (list.Any(x => x.Name == item.ItemName))
+            {
+                unlocked = false; //must be false because you are receiving from another source.
             }
             CropDataModel crop = new()
             {

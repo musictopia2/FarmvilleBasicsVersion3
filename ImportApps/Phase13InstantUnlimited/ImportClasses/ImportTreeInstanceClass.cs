@@ -18,6 +18,8 @@ public static class ImportTreeInstanceClass
     }
     private static async Task<TreeInstanceDocument> CreateInstanceAsync(FarmKey farm)
     {
+        InstantUnlimitedInstanceDatabase db = new();
+        var list = await db.GetUnlockedItems(farm);
         BasicList<TreeAutoResumeModel> trees = [];
         var plan = await _catalogOfferDatabase.GetCatalogAsync(farm, EnumCatalogCategory.Tree);
         //var treelPlan = await _treeProgression.GetPlanAsync(farm);
@@ -29,6 +31,10 @@ public static class ImportTreeInstanceClass
             if (item.Costs.Count > 0)
             {
                 unlocked = false; //you have to pay for it first.
+            }
+            if (list.Any(x => x.Name == item.TargetName))
+            {
+                unlocked = false; //must be false because you are receiving from another source.
             }
             trees.Add(new()
             {

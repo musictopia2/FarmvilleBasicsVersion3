@@ -27,6 +27,9 @@ public static class ImportAnimalInstanceClass
     }
     private static async Task<AnimalInstanceDocument> CreateInstanceAsync(FarmKey farm)
     {
+        InstantUnlimitedInstanceDatabase db = new();
+        var list = await db.GetUnlockedItems(farm);
+
         BasicList<AnimalAutoResumeModel> animals = [];
         var animalPlan = await _animalProgression.GetPlanAsync(farm);
         var current = await _catalogOfferDatabase.GetCatalogAsync(farm, EnumCatalogCategory.Animal);
@@ -38,6 +41,10 @@ public static class ImportAnimalInstanceClass
             if (item.Costs.Count > 0)
             {
                 unlocked = false; //you have to pay for it first.
+            }
+            if (list.Any(x => x.Name == item.TargetName))
+            {
+                unlocked = false; //must be false because you are receiving from another source.
             }
             var productionOptionsAllowed = animalPlan.UnlockRules.Count(x => x.LevelRequired <= level && x.ItemName == item.TargetName);
             productionOptionsAllowed += 1;
