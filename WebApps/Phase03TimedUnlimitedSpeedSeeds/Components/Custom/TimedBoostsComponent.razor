@@ -1,4 +1,29 @@
 ﻿@inherits FarmComponentBase
-<h3>TimedBoostsComponent</h3>
+<div class="boosts-root">
+    <div class="boosts-title">Power Boosts</div>
+    <StopClickPropagation>
+        <WrapLayout RenderList="_credits"
+                    ColumnWidth="200px"
+                    Context="boost">
+            <div class="boost-card">
+                <img class="boost-img"
+                     src="@GetBoostImage(boost.BoostKey)"
+                     alt="@boost.BoostKey" />
 
+                <div class="boost-name">@GetBoostTitle(boost.BoostKey)</div>
+
+                <div class="boost-meta">
+                    <div><b>Duration:</b> @boost.Duration.GetTimeString</div>
+                    <div><b>Quantity:</b> @boost.Quantity</div>
+                </div>
+
+                <button class="boost-btn"
+                        @onclick="() => ActivateBoostAsync(boost)">
+                    Activate
+                </button>
+            </div>
+        </WrapLayout>
+    </StopClickPropagation>
+    
+</div>
 

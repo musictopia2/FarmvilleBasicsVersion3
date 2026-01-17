@@ -14,6 +14,11 @@ public class TimedBoostManager
     }
 
 
+
+    public BasicList<TimedBoostCredit> GetBoosts()
+    {
+        return _profile.Credits.Where(x => x.Quantity > 0).ToBasicList();
+    }
     // Activate later from credits
     // Rule: if already active, EXTEND the current end time.
     public async Task ActiveBoostAsync(TimedBoostCredit credit)
