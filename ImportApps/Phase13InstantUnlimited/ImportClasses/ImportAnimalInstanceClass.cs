@@ -42,19 +42,22 @@ public static class ImportAnimalInstanceClass
             {
                 unlocked = false; //you have to pay for it first.
             }
-            if (list.Any(x => x.Name == item.TargetName))
-            {
-                unlocked = false; //must be false because you are receiving from another source.
-            }
+            
             var productionOptionsAllowed = animalPlan.UnlockRules.Count(x => x.LevelRequired <= level && x.ItemName == item.TargetName);
             productionOptionsAllowed += 1;
             EnumAnimalState state = EnumAnimalState.None;
             int ready = 0;
+            var recipe = _recipes.Single(x => x.Animal == item.TargetName);
+            if (list.Any(x => x.Name == recipe.Options.First().Output.Item))
+            {
+                unlocked = false; //must be false because you are receiving from another source.
+            }
+
             if (unlocked)
             {
                 
                 state = EnumAnimalState.Collecting;
-                var recipe = _recipes.Single(x => x.Animal == item.TargetName);
+                
                 ready = recipe.Options.First().Output.Amount;
             }
             animals.Add(new AnimalAutoResumeModel
