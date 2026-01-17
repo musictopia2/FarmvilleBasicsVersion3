@@ -218,7 +218,7 @@ public class CropManager(InventoryManager inventory,
     }
     private void AddCrop(string item, int amount)
     {
-        inventory.Add(item, 2);
+        inventory.Add(item, amount);
         _needsSaving = true;
     }
     public async Task SetStyleContextAsync(CropServicesContext context, FarmKey farm)

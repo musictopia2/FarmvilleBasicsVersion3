@@ -8,7 +8,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BasicBlazorLibrary" Version="10.0.142" />
+		<PackageReference Include="BasicBlazorLibrary" Version="10.0.146" />
 		<PackageReference Include="AdoNetHelpersLibrary" Version="10.0.8" />
 		<PackageReference Include="AndyCristinaBasicClasses" Version="1.0.116" />
 		<PackageReference Include="CommonBasicLibraries" Version="10.0.16" />

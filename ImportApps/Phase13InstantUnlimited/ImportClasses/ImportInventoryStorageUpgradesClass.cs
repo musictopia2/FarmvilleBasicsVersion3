@@ -74,7 +74,7 @@ internal static class ImportInventoryStorageUpgradesClass
     {
         UpgradeTier tier;
         BasicList<UpgradeTier> output = [];
-        int currentValue = 300;
+        int currentValue = 80;
         int increment = 40; //a person is going to run out quickly this time.
         tier = new()
         {
