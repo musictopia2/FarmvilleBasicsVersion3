@@ -1,9 +1,28 @@
-﻿@inherits FarmComponentBase
+﻿@inherits InventoryAwareComponentBase
+<PopupViewport ShowHeaders="true"
+               HeaderTitle="Animal Speed Seeds"
+               TapToClose="true"
+               @bind-Visible="_showAnimals">
+    <AnimalSpeedComponent />
+</PopupViewport>
+
 <div class="ss-topbar">
-    <div class="ss-seed">
-        <ImageButtonComponent Name="@CurrencyKeys.SpeedSeed" Height="50" />
-        <span class="ss-seed-count">@InventoryManager.Get(CurrencyKeys.SpeedSeed)</span>
-    </div>
+
+    <StackLayout>
+        <StackItem>
+            <ImageButtonComponent Name="@CurrencyKeys.SpeedSeed" Height="50" />
+        </StackItem>
+        <StackItem Length="8ch">
+            <span class="ss-seed-count">@InventoryManager.Get(CurrencyKeys.SpeedSeed)</span>
+        </StackItem>
+        <StackItem>
+            <PrimaryButton OnClick="ShowAnimals">
+                Show Animals
+            </PrimaryButton>
+        </StackItem>
+    </StackLayout>
+
+    
 </div>
 <div class="ss-scroll">
     <StopClickPropagation>
@@ -11,7 +30,7 @@
             <div class="ss-card">
                 <div class="ss-head">
                     <ImageButtonComponent Name="@item.Item" Height="28" />
-                    <div class="ss-title">@item.Item</div>
+                    <div class="ss-title">@item.Item.GetWords</div>
                 </div>
 
                 <div class="ss-meta">

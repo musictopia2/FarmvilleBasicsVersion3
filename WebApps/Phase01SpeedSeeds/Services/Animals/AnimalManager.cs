@@ -1,4 +1,6 @@
-﻿namespace Phase01SpeedSeeds.Services.Animals;
+﻿using Phase01SpeedSeeds.Services.Trees;
+
+namespace Phase01SpeedSeeds.Services.Animals;
 
 public class AnimalManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
@@ -205,6 +207,75 @@ public class AnimalManager(InventoryManager inventory,
         });
         return rets;
     }
+
+    public void GrantAnimalItems(AnimalGrantModel item, int toUse)
+    {
+        if (toUse <= 0)
+        {
+            throw new CustomBasicException("Must use at least one speed seed");
+        }
+        
+        if (inventory.Get(CurrencyKeys.SpeedSeed) < toUse)
+        {
+            throw new CustomBasicException("Not enough speed seeds.  Should had ran the required functions first");
+        }
+
+        if (inventory.Has(item.InputData.Item, item.InputData.Amount * toUse) == false)
+        {
+            throw new CustomBasicException("Did not have the requirements to produce it.  Should had ran the required functions first");
+        }
+
+        int granted = toUse * item.OutputData.Amount;
+        if (inventory.CanAdd(item.OutputData.Item, granted) == false)
+        {
+            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
+        }
+
+        AddAnimalToInventory(item.OutputData.Item, granted);
+        inventory.Consume(CurrencyKeys.SpeedSeed, toUse);
+    }
+
+
+
+    public BasicList<AnimalGrantModel> GetUnlockedAnimalGrantItems()
+    {
+        BasicList<AnimalGrantModel> output = [];
+        HashSet<string> seenAnimals = [];
+
+        foreach (var animal in _animals)
+        {
+            // skip locked animals
+            if (!animal.Unlocked)
+            {
+                continue;
+            }
+
+            // ensure each animal type is processed once, in original order
+            if (seenAnimals.Add(animal.Name) == false)
+            {
+                continue;
+            }
+
+            var options = animal.GetUnlockedProductionOptions();
+
+            foreach (var item in options)
+            {
+                output.Add(new AnimalGrantModel
+                {
+                    AnimalName = animal.Name,
+                    InputData = new ItemAmount
+                    {
+                        Item = item.Required,
+                        Amount = item.Input
+                    },
+                    OutputData = item.Output
+                });
+            }
+        }
+
+        return output;
+    }
+
     public BasicList<AnimalProductionOption> GetUnlockedProductionOptions(AnimalView animal)
     {
         AnimalInstance instance = GetAnimalById(animal);
@@ -288,7 +359,12 @@ public class AnimalManager(InventoryManager inventory,
         {
             animal.Collect();
         });
-        inventory.Add(selectedName, maxs);
+        AddAnimalToInventory(selectedName, maxs);
+        
+    }
+    private void AddAnimalToInventory(string name, int amount)
+    {
+        inventory.Add(name, amount);
         _needsSaving = true;
     }
     public EnumAnimalState GetState(AnimalView animal) => GetAnimalById(animal).State;

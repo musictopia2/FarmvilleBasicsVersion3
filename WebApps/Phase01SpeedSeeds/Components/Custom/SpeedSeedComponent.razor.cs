@@ -1,5 +1,5 @@
-namespace Phase01SpeedSeeds.Components.Custom;
 
+namespace Phase01SpeedSeeds.Components.Custom;
 public partial class SpeedSeedComponent(IToast toast)
 {
     //for quite a while, a person has to do one at a time.
@@ -7,6 +7,13 @@ public partial class SpeedSeedComponent(IToast toast)
 
     private BasicList<GrantableItem> _list = [];
 
+    private bool _showAnimals;
+
+
+    private void ShowAnimals()
+    {
+        _showAnimals = true;
+    }
     protected override void OnInitialized()
     {
         _list.AddRange(TreeManager.GetUnlockedTreeGrantItems());
@@ -14,16 +21,12 @@ public partial class SpeedSeedComponent(IToast toast)
         //doing trees first.
         base.OnInitialized();
     }
-    private string DisplayAmount(GrantableItem item) => $"+ {item.Amount}";
+    private static string DisplayAmount(GrantableItem item) => $"+ {item.Amount}";
     private void TryToUse(GrantableItem item)
     {
         if (InventoryManager.CanAdd(item) == false)
         {
-            if (item.Category == EnumItemCategory.Animal)
-            {
-                toast.ShowUserErrorToast($"Barn is full.  Unable to add {item.Item}");
-                return;
-            }
+            
             toast.ShowUserErrorToast($"Silot is full. Unable to add {item.Item}");
             return;
         }

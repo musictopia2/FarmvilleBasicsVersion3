@@ -1,5 +1,12 @@
 ﻿
 
+.ss-seed-count {
+    text-align: right;
+    font-size: 2rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
 .ss-scroll {
     height: 50vh;
     overflow-y: auto;
