@@ -8,6 +8,7 @@ public class TimedBoostManager
     public async Task SetTimedBoostStyleContextAsync(TimedBoostServicesContext context)
     {
         _profile = await context.TimedBoostProfile.LoadAsync();
+        _profileStore = context.TimedBoostProfile;
         CleanupExpired();
         await SaveAsync();
     }

@@ -16,6 +16,7 @@ public class BasicGameState : IGameTimer
     IStoreFactory storeFactory,
     IItemFactory itemFactory,
     IInstantUnlimitedFactory instantUnlimitedFactory,
+    ITimedBoostFactory timedBoostFactory,
     CropManager cropManager,
     TreeManager treeManager,
     AnimalManager animalManager,
@@ -27,7 +28,8 @@ public class BasicGameState : IGameTimer
     CatalogManager catalogManager,
     StoreManager storeManager,
     ItemManager itemManager,
-    InstantUnlimitedManager instantUnlimitedManager
+    InstantUnlimitedManager instantUnlimitedManager,
+    TimedBoostManager timedBoostManager
 )
     {
         _inventory = inventory;
@@ -45,6 +47,7 @@ public class BasicGameState : IGameTimer
         _storeFactory = storeFactory;
         _itemFactory = itemFactory;
         _instantUnlimitedFactory = instantUnlimitedFactory;
+        _timedBoostFactory = timedBoostFactory;
         _cropManager = cropManager;
         _treeManager = treeManager;
         _animalManager = animalManager;
@@ -57,6 +60,7 @@ public class BasicGameState : IGameTimer
         _storeManager = storeManager;
         _itemManager = itemManager;
         _instantUnlimitedManager = instantUnlimitedManager;
+        _timedBoostManager = timedBoostManager;
         _container = new MainFarmContainer
         {
             InventoryManager = inventory,
@@ -70,7 +74,8 @@ public class BasicGameState : IGameTimer
             ProgressionManager = progressionManager,
             CatalogManager = catalogManager,
             StoreManager = storeManager,
-            InstantUnlimitedManager = instantUnlimitedManager
+            InstantUnlimitedManager = instantUnlimitedManager,
+            TimedBoostManager = timedBoostManager
         };
     }
     readonly MainFarmContainer _container;
@@ -89,6 +94,7 @@ public class BasicGameState : IGameTimer
     private readonly IStoreFactory _storeFactory;
     private readonly IItemFactory _itemFactory;
     private readonly IInstantUnlimitedFactory _instantUnlimitedFactory;
+    private readonly ITimedBoostFactory _timedBoostFactory;
     private readonly CropManager _cropManager;
     private readonly TreeManager _treeManager;
     private readonly AnimalManager _animalManager;
@@ -101,6 +107,7 @@ public class BasicGameState : IGameTimer
     private readonly StoreManager _storeManager;
     private readonly ItemManager _itemManager;
     private readonly InstantUnlimitedManager _instantUnlimitedManager;
+    private readonly TimedBoostManager _timedBoostManager;
     private FarmKey? _farm;
     FarmKey? IGameTimer.FarmKey => _farm;
     MainFarmContainer IGameTimer.FarmContainer
@@ -148,6 +155,8 @@ public class BasicGameState : IGameTimer
         await _questManager.SetStyleContextAsync(questContext);
         InstantUnlimitedServicesContext instantUnlimitedContext = _instantUnlimitedFactory.GetInstantUnlimitedServices(farm);
         await _instantUnlimitedManager.SetInstantUnlimitedStyleContextAsync(instantUnlimitedContext);
+        TimedBoostServicesContext timedBoostContext = _timedBoostFactory.GetTimedBoostServices(farm);
+        await _timedBoostManager.SetTimedBoostStyleContextAsync(timedBoostContext);
         _init = true;
     }
     async Task IGameTimer.TickAsync()
@@ -161,5 +170,6 @@ public class BasicGameState : IGameTimer
         await _animalManager.UpdateTickAsync();
         await _workshopManager.UpdateTickAsync();
         await _worksiteManager.UpdateTickAsync();
+        await _timedBoostManager.UpdateTickAsync();
     }
 }

@@ -1,4 +1,5 @@
 ﻿
+
 namespace Phase03TimedUnlimitedSpeedSeeds.Services.Core;
 public class MainFarmContainer
 {
@@ -15,6 +16,7 @@ public class MainFarmContainer
     required public StoreManager StoreManager { get; set; }
 
     required public InstantUnlimitedManager InstantUnlimitedManager { get; set; }
+    required public TimedBoostManager TimedBoostManager { get; set; }
 
     //attempt to not require itemmanager here (since only the quest manager should require it.   if i am wrong, rethink).
 }

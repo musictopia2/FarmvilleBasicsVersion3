@@ -68,10 +68,15 @@ public partial class MainComponent(NavigationManager nav, OverlayService service
     private bool _showSilo = false;
     private bool _showShop = false;
     private bool _showSpeedSeeds = false;
+    private bool _showTimedBoosts = false;
 
     private async Task CloseAllPopupsAsync()
     {
         await service.CloseAllAsync();
+    }
+    private void ShowTimedBoosts()
+    {
+        _showTimedBoosts = true;
     }
     private void ShowSpeedSeeds()
     {

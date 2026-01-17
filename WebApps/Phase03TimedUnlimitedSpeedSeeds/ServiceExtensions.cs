@@ -9,6 +9,7 @@ using Phase03TimedUnlimitedSpeedSeeds.DataAccess.Items;
 using Phase03TimedUnlimitedSpeedSeeds.DataAccess.Progression;
 using Phase03TimedUnlimitedSpeedSeeds.DataAccess.Quests; //not common enough.
 using Phase03TimedUnlimitedSpeedSeeds.DataAccess.Store;
+using Phase03TimedUnlimitedSpeedSeeds.DataAccess.TimedBoosts;
 using Phase03TimedUnlimitedSpeedSeeds.DataAccess.Trees;
 using Phase03TimedUnlimitedSpeedSeeds.DataAccess.Upgrades;
 using Phase03TimedUnlimitedSpeedSeeds.DataAccess.Workers;
@@ -42,6 +43,7 @@ public static class ServiceExtensions
                 .AddSingleton<IStoreFactory, StoreFactory>()
                 .AddSingleton<IItemFactory, ItemFactory>()
                 .AddSingleton<IInstantUnlimitedFactory, InstantUnlimitedFactory>()
+                .AddSingleton<ITimedBoostFactory, TimedBoostFactory>()
                 .AddScoped<ReadyStatusService>()
                 .AddScoped<OverlayService>()
                 .AddScoped<FarmContext>()

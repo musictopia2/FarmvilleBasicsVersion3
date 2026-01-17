@@ -36,3 +36,4 @@ global using Phase03TimedUnlimitedSpeedSeeds.Services.Catalog;
 global using Phase03TimedUnlimitedSpeedSeeds.Services.Store;
 global using Phase03TimedUnlimitedSpeedSeeds.Services.Items;
 global using Phase03TimedUnlimitedSpeedSeeds.Services.InstantUnlimited;
+global using Phase03TimedUnlimitedSpeedSeeds.Services.TimedBoosts;

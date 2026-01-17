@@ -47,6 +47,14 @@
         <SpeedSeedComponent />
     </PopupViewport>
 
+    <PopupViewport ShowHeaders="true"
+                   HeaderTitle="Timed Boosts"
+                   TapToClose="true"
+                   @bind-Visible="_showTimedBoosts">
+        <TimedBoostsComponent />
+    </PopupViewport>
+
+
     <NavigationBarContainer @ref="_nav"
                             AlwaysShowBar=true
                             ShowBack="false"
@@ -107,6 +115,7 @@
             <OverlayHost />
             <div>
                 <ImageButtonComponent OnClick="ShowSpeedSeeds" Name="@CurrencyKeys.SpeedSeed" Height="100" />
+                <ImageButtonComponent OnClick="ShowTimedBoosts" Name="TimedBoost" Height="100" />
                 <InstantUnlimitedInstancesComponent />
             </div>
 

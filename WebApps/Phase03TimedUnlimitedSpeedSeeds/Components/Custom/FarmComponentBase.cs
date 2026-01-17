@@ -12,4 +12,5 @@ public abstract class FarmComponentBase : ComponentBase
     protected UpgradeManager UpgradeManager => Farm!.UpgradeManager;
     protected ProgressionManager ProgressionManager => Farm!.ProgressionManager;
     protected StoreManager StoreManager => Farm!.StoreManager;
+    protected TimedBoostManager TimedBoostManager => Farm!.TimedBoostManager;
 }
