@@ -27,6 +27,7 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
             ICatalogFactory catalogFactory = sp.GetRequiredService<ICatalogFactory>();
             IStoreFactory storeFactory = sp.GetRequiredService<IStoreFactory>();
             IItemFactory itemFactory = sp.GetRequiredService<IItemFactory>();
+            IInstantUnlimitedFactory instantUnlimitedFactory = sp.GetRequiredService<IInstantUnlimitedFactory>();
             CropManager cropManager = new(inventory, baseBalanceProvider, itemRegistry);
             TreeManager treeManager = new(inventory, baseBalanceProvider, itemRegistry);
             AnimalManager animalManager = new(inventory, baseBalanceProvider, itemRegistry);
@@ -34,6 +35,7 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
             WorksiteManager worksiteManager = new(inventory, baseBalanceProvider, itemRegistry);
             ItemManager itemManager = new();
             CatalogManager catalogManager = new();
+            InstantUnlimitedManager instantUnlimitedManager = new(cropManager, treeManager, animalManager, inventory, itemManager);
             var profile = starts.GetInventoryProfile(farm);
             UpgradeManager upgradeManager = new(inventory, profile, workshopManager);
             ProgressionManager progressionManager = new(inventory, cropManager,
@@ -47,10 +49,12 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
                 inventory, starts,
                 cropFactory, treeFactory, animalFactory, workshopFactory,
                 worksiteFactory, workerFactory, questFactory,
-                upgradeFactory, progressionFactory, catalogFactory, storeFactory, itemFactory,
+                upgradeFactory, progressionFactory, catalogFactory, 
+                storeFactory, itemFactory, instantUnlimitedFactory,
                 cropManager, treeManager, animalManager,
                 workshopManager, worksiteManager, questManager,
-                upgradeManager, progressionManager, catalogManager, storeManager, itemManager
+                upgradeManager, progressionManager, catalogManager, 
+                storeManager, itemManager, instantUnlimitedManager
                 );
             await gameRegistry.InitializeFarmAsync(timer, farm);
         }

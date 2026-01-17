@@ -35,3 +35,4 @@ global using Phase02InstantUnlimited.Services.Progression;
 global using Phase02InstantUnlimited.Services.Catalog;
 global using Phase02InstantUnlimited.Services.Store;
 global using Phase02InstantUnlimited.Services.Items;
+global using Phase02InstantUnlimited.Services.InstantUnlimited;

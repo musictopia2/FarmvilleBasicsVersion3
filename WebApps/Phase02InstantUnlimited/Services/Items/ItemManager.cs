@@ -7,4 +7,5 @@ public class ItemManager
         _items = await context.ItemPlanProvider.GetPlanAsync(farm);
     }
     public BasicList<ItemPlanModel> GetEligibleItems(int level) => _items.Where(x => x.MinLevel <= level).ToBasicList();
+    public EnumItemCategory GetItemCategory(string item) => _items.Single(x => x.ItemName == item).Category;
 }

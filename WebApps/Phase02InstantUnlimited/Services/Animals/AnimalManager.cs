@@ -222,8 +222,12 @@ public class AnimalManager(InventoryManager inventory,
         inventory.Consume(item.InputData.Item, item.InputData.Amount);
         AddAnimalToInventory(item.OutputData.Item, item.OutputData.Amount);
     }
-    public void GrantUnlimitedAnimalItems(ItemAmount item)
+    public void GrantUnlimitedAnimalItems(GrantableItem item)
     {
+        if (item.Category != EnumItemCategory.Animal)
+        {
+            throw new CustomBasicException("This is not an animal");
+        }
         //this will not use speed seeds or have any requirements.
         if (inventory.CanAdd(item) == false)
         {

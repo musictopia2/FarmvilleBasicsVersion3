@@ -2,7 +2,7 @@
 public abstract class FarmComponentBase : ComponentBase
 {
     [CascadingParameter]
-    protected MainFarmContainer? Farm { get; set; }
+    protected MainFarmContainer? Farm { get; set; } //not common enough for the instant unlimited.  just do farm then what is needed this time.
     protected CropManager CropManager => Farm!.CropManager;
     protected TreeManager TreeManager => Farm!.TreeManager;
     protected WorkshopManager WorkshopManager => Farm!.WorkshopManager;

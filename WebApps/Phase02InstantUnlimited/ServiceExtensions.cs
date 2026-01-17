@@ -4,6 +4,7 @@ using Phase02InstantUnlimited.DataAccess.Balance;
 using Phase02InstantUnlimited.DataAccess.Catalog;
 using Phase02InstantUnlimited.DataAccess.Core;
 using Phase02InstantUnlimited.DataAccess.Crops;
+using Phase02InstantUnlimited.DataAccess.InstantUnlimited;
 using Phase02InstantUnlimited.DataAccess.Items;
 using Phase02InstantUnlimited.DataAccess.Progression;
 using Phase02InstantUnlimited.DataAccess.Quests; //not common enough.
@@ -40,6 +41,7 @@ public static class ServiceExtensions
                 .AddSingleton<ICatalogFactory, CatalogFactory>()
                 .AddSingleton<IStoreFactory, StoreFactory>()
                 .AddSingleton<IItemFactory, ItemFactory>()
+                .AddSingleton<IInstantUnlimitedFactory, InstantUnlimitedFactory>()
                 .AddScoped<ReadyStatusService>()
                 .AddScoped<OverlayService>()
                 .AddScoped<FarmContext>()
