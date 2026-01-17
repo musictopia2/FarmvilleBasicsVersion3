@@ -48,18 +48,20 @@ public static class ImportCropInstanceClass
         foreach (var item in cropPlan.UnlockRules)
         {
             bool unlocked = true;
+            bool supressed = false;
             if (item.LevelRequired > profile.Level)
             {
                 unlocked = false;
             }
             if (list.Any(x => x.Name == item.ItemName))
             {
-                unlocked = false; //must be false because you are receiving from another source.
+                supressed = true;
             }
             CropDataModel crop = new()
             {
                 Item = item.ItemName,
                 Unlocked = unlocked,
+                IsSuppressed = supressed
             };
             crops.Add(crop);
         }

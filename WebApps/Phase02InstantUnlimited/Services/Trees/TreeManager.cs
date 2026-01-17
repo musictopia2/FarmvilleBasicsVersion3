@@ -20,7 +20,7 @@ public class TreeManager(InventoryManager inventory,
         get
         {
             BasicList<TreeView> output = [];
-            _trees.ForConditionalItems(x => x.Unlocked, t =>
+            _trees.ForConditionalItems(x => x.Unlocked && x.IsSuppressed == false, t =>
             {
                 TreeView summary = new()
                 {
@@ -44,7 +44,14 @@ public class TreeManager(InventoryManager inventory,
         instance.Unlocked = true;
         _needsSaving = true;
     }
-
+    public void SetTreeSuppressionByProducedItem(string itemName, bool supressed)
+    {
+        _trees.ForConditionalItems(x => x.Name == itemName, item =>
+        {
+            item.IsSuppressed = supressed;
+        });
+        _needsSaving = true;
+    }
     public void ApplyTreeUnlocksOnLevels(BasicList<CatalogOfferModel> offers, int level) //actually since this is from leveling, has to apply t
     {
         //only unlock current level.
@@ -230,7 +237,7 @@ public class TreeManager(InventoryManager inventory,
     // Tick method called by game timer
     public async Task UpdateTickAsync()
     {
-        _trees.ForConditionalItems(x => x.Unlocked, tree =>
+        _trees.ForConditionalItems(x => x.Unlocked && x.IsSuppressed == false, tree =>
         {
             tree.UpdateTick();
             if (tree.NeedsToSave)

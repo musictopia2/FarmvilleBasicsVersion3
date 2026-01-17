@@ -1,5 +1,5 @@
 namespace Phase02InstantUnlimited.Components.Custom;
-public partial class InstantUnlimitedInstancesComponent(IToast toast)
+public partial class InstantUnlimitedInstancesComponent(IToast toast) : IDisposable
 {
 
     private BasicList<string> _instances = [];
@@ -9,11 +9,21 @@ public partial class InstantUnlimitedInstancesComponent(IToast toast)
 
     protected override void OnInitialized()
     {
-        _instances = Farm!.InstantUnlimitedManager.UnlockedInstances;
+        LoadList();
+        Farm!.InstantUnlimitedManager.Changed += Refresh;
         base.OnInitialized();
     }
+    private void LoadList()
+    {
+        _instances = Farm!.InstantUnlimitedManager.UnlockedInstances;
+    }
+    private void Refresh()
+    {
+        LoadList();
+        InvokeAsync(StateHasChanged);
+    }
 
-    private string GetName(string instance) => $"{instance}Unlimited";
+    private static string GetName(string instance) => $"{instance}Unlimited";
 
     //i don't think this is quite a modal.
 
@@ -37,5 +47,9 @@ public partial class InstantUnlimitedInstancesComponent(IToast toast)
         _openOptions = false;
     }
 
-
+    public void Dispose()
+    {
+        Farm!.InstantUnlimitedManager.Changed -= Refresh;
+        GC.SuppressFinalize(this);
+    }
 }

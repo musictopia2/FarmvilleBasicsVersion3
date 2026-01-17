@@ -19,7 +19,7 @@ public class InstantUnlimitedInstanceDatabase(FarmKey farm) : ListDataAccess<Ins
     async Task<BasicList<UnlockModel>> IInstantUnlimitedProfile.LoadAsync()
     {
         var list = await GetDocumentsAsync();
-        return list.GetSingleDocument(farm).Items.Where(x => x.Unlocked).ToBasicList();
+        return list.GetSingleDocument(farm).Items.ToBasicList();
     }
 
     async Task IInstantUnlimitedProfile.SaveAsync(BasicList<UnlockModel> list)

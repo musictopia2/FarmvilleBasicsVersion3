@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Routing;
-
-namespace Phase02InstantUnlimited.Services.Crops;
+﻿namespace Phase02InstantUnlimited.Services.Crops;
 public class CropManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry
@@ -17,9 +15,18 @@ public class CropManager(InventoryManager inventory,
     private DateTime _lastSave = DateTime.MinValue;
     private bool _needsSaving;
     private readonly TimeSpan _harvestPolicyCacheDuration = TimeSpan.FromMinutes(5); //so if they change it, won't be reflected for 5 minutes or if server restarts.
-    public BasicList<string> UnlockedRecipes => _allCropDefinitions.Where(x => x.Unlocked).Select(x => x.Item).ToBasicList(); //so if you change the list, won't change this.
+    public BasicList<string> UnlockedRecipes => _allCropDefinitions.Where(x => x.Unlocked && x.IsSuppressed == false).Select(x => x.Item).ToBasicList(); //so if you change the list, won't change this.
     public BasicList<Guid> GetUnlockedCrops => _crops.Where(x => x.Unlocked).Select(x => x.Id).ToBasicList();
-    public bool HasUnlockedCrops => _crops.Count != 0;
+
+
+    public void SetCropSuppressionByProducedItem(string itemName, bool supressed)
+    {
+        _allCropDefinitions.ForConditionalItems(x => x.Item == itemName, item =>
+        {
+            item.IsSuppressed = supressed;
+        });
+        _needsSaving = true;
+    }
 
     public void ApplyCropProgressionUnlocks(CropProgressionPlanModel plan, int level)
     {
@@ -124,7 +131,7 @@ public class CropManager(InventoryManager inventory,
 
         BasicList<GrantableItem> output = [];
 
-        _allCropDefinitions.ForConditionalItems(x => x.Unlocked, temp =>
+        _allCropDefinitions.ForConditionalItems(x => x.Unlocked && x.IsSuppressed == false, temp =>
         {
             output.Add(new()
             {
@@ -214,7 +221,7 @@ public class CropManager(InventoryManager inventory,
         }
         AddCrop(crop.Crop, 2);
         crop.Clear();
-        
+
     }
     private void AddCrop(string item, int amount)
     {
@@ -303,7 +310,7 @@ public class CropManager(InventoryManager inventory,
                 Crop = crop.Crop,
                 State = crop.State,
                 PlantedAt = crop.PlantedAt,
-                RunMultiplier = crop.GetCurrentRun
+                RunMultiplier = crop.GetCurrentRun,
             }).ToBasicList();
             //has to figure out the other side (since you may unlock more slots).
             CropSystemState slate = new()

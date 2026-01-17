@@ -5,7 +5,7 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
 {
     public Guid Id { get; } = Guid.NewGuid();
     public bool Unlocked { get; set; } = true;
-
+    public bool IsSuppressed { get; set; } = false;
     public BasicList<AnimalProductionOption> GetUnlockedProductionOptions()
         => recipe.Options.Take(ProductionOptionsAllowed).ToBasicList();
 
@@ -41,7 +41,7 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
         ProductionOptionsAllowed = animal.ProductionOptionsAllowed;
         Unlocked = animal.Unlocked;
         _selected = animal.Selected;
-
+        IsSuppressed = animal.IsSuppressed;
         // Restore locked promise only (do NOT overwrite current multiplier)
         _runMultiplier = animal.RunMultiplier;
 
@@ -74,7 +74,7 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
                 ProductionOptionsAllowed = ProductionOptionsAllowed,
                 State = State,
                 Selected = _selected,
-
+                IsSuppressed = IsSuppressed,
                 // Save the promise only when a run exists; otherwise null
                 RunMultiplier = _selected is null ? null : _runMultiplier
             };

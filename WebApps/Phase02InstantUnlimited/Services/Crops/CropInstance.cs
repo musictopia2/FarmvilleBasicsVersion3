@@ -1,6 +1,4 @@
-﻿using Phase02InstantUnlimited.Services.Core;
-
-namespace Phase02InstantUnlimited.Services.Crops;
+﻿namespace Phase02InstantUnlimited.Services.Crops;
 public class CropInstance(double currentMultiplier, CropRecipe? currentRecipe)
 {
     public Guid Id { get; } = Guid.NewGuid(); // unique per instance
@@ -51,7 +49,6 @@ public class CropInstance(double currentMultiplier, CropRecipe? currentRecipe)
         State = slot.State;
         PlantedAt = slot.PlantedAt;
         Unlocked = slot.Unlocked;
-
         _runMultiplier = slot.RunMultiplier;
         // If something is/was planted, ensure a run multiplier exists
         if (Crop is not null && _runMultiplier is null)

@@ -8,5 +8,9 @@ public class TreeAutoResumeModel
     public DateTime? StartedAt { get; set; }
     public DateTime? TempStart { get; set; }
     public double? RunMultiplier { get; set; }
+
+    // Temporary override: something else is taking over the rule, so this tree shouldn't appear / be usable
+    public bool IsSuppressed { get; set; } = false;
+
     // Production timing is determined by the associated TreeRecipe.
 }

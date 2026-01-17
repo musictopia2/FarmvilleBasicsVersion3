@@ -19,7 +19,7 @@
 <TabButtonContainer ActiveKey="@StoreManager.CurrentCategory.ToString()"
                     ActiveKeyChanged="OnActiveKeyChanged">
 
-    @foreach (var tab in Tabs)
+    @foreach (var tab in _tabs)
     {
         <div class="shop-shell">
             <TabPage Text="@tab.Text" Key="@tab.Category.ToString()">

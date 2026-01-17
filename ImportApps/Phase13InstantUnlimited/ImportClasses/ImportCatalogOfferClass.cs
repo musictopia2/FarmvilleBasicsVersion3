@@ -47,25 +47,29 @@ public static class ImportCatalogOfferClass
         //this is where i set the prices
         BasicList<CatalogOfferModel> output = [];
         EnumCatalogCategory category = EnumCatalogCategory.InstantUnlimited;
+
+        //has to start with only trees to get this working.  then apply to the other domains.
+
         output.Add(new()
         {
             Category = category,
-            LevelRequired = 1,
-            Costs = FarmHelperClass.GetFreeCosts,
+            LevelRequired = 5,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
             TargetName = CountryItemList.Wheat
         });
+
         output.Add(new()
         {
             Category = category,
-            LevelRequired = 1,
-            Costs = FarmHelperClass.GetFreeCosts,
+            LevelRequired = 5,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
             TargetName = CountryItemList.Apple
         });
         output.Add(new()
         {
             Category = category,
-            LevelRequired = 1,
-            Costs = FarmHelperClass.GetFreeCosts,
+            LevelRequired = 12,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
             TargetName = CountryItemList.Milk
         });
         return output;
@@ -78,22 +82,22 @@ public static class ImportCatalogOfferClass
         output.Add(new()
         {
             Category = category,
-            LevelRequired = 1,
-            Costs = FarmHelperClass.GetFreeCosts,
+            LevelRequired = 5,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
             TargetName = TropicalItemList.Pineapple
         });
         output.Add(new()
         {
             Category = category,
-            LevelRequired = 1,
-            Costs = FarmHelperClass.GetFreeCosts,
+            LevelRequired = 5,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
             TargetName = TropicalItemList.Coconut
         });
         output.Add(new()
         {
             Category = category,
-            LevelRequired = 1,
-            Costs = FarmHelperClass.GetFreeCosts,
+            LevelRequired = 12,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
             TargetName = TropicalItemList.Fish
         });
         return output;

@@ -5,7 +5,8 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
     WorkshopManager workshopManager,
     WorksiteManager worksiteManager,
     CatalogManager catalogManager,
-    InventoryManager inventoryManager
+    InventoryManager inventoryManager,
+    InstantUnlimitedManager instantUnlimitedManager
     )
 {
     private int _currentLevel;
@@ -17,6 +18,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
     private BasicList<CatalogOfferModel> _workshopOffers = [];
     private BasicList<CatalogOfferModel> _worksiteOffers = [];
     private BasicList<CatalogOfferModel> _workerOffers = [];
+    private BasicList<CatalogOfferModel> _instantUnlimitedOffers = [];
     public EnumCatalogCategory CurrentCategory => _catalogCategory;
     public async Task SetProgressionStyleContextAsync(StoreServicesContext context)
     {
@@ -27,6 +29,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         _workshopOffers = catalogManager.GetAllOffers(EnumCatalogCategory.Workshop);
         _worksiteOffers = catalogManager.GetAllOffers(EnumCatalogCategory.Worksite);
         _workerOffers = catalogManager.GetAllOffers(EnumCatalogCategory.Worker);
+        _instantUnlimitedOffers = catalogManager.GetAllOffers(EnumCatalogCategory.InstantUnlimited);
         levelProgression.Changed += Refresh;
         Refresh();
     }
@@ -62,7 +65,25 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         {
             return GetWorksites();
         }
+        if (_catalogCategory == EnumCatalogCategory.InstantUnlimited)
+        {
+            return GetInstantUnlimitedItems();
+        }
         throw new CustomBasicException("Not supported yet");
+    }
+    private BasicList<StoreItemRowModel> GetInstantUnlimitedItems()
+    {
+        var offers = _instantUnlimitedOffers;
+        if (offers is null || offers.Count == 0)
+        {
+            return [];
+        }
+        var ownedLookup = BuildOwnedLookup(instantUnlimitedManager.UnlockedInstances, x => x);
+        return BuildRowsFromTieredOffers(
+            offers,
+            targetName => ownedLookup.TryGetValue(targetName, out int c) ? c : 0,
+            EnumCatalogCategory.InstantUnlimited
+        );
     }
     private BasicList<StoreItemRowModel> GetAnimals()
     {
@@ -233,7 +254,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         return tier.Costs.Count == 0;
     }
 
-
+    //hopefully still works
     private bool HasEligibleFreeTierNotYetOwned(
         BasicList<CatalogOfferModel> tiers,
         int ownedCount)
@@ -325,6 +346,13 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         {
             await worksiteManager.UnlockWorkerPaidForAsync(store);
             FinishAcquiring(store);
+            return;
+        }
+        if (store.Category == EnumCatalogCategory.InstantUnlimited)
+        {
+            await instantUnlimitedManager.SetLockStateAsync(store.TargetName, true);
+            FinishAcquiring(store);
+            return;
         }
     }
 

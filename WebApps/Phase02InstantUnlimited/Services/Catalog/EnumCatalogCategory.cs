@@ -6,5 +6,6 @@ public enum EnumCatalogCategory
     Animal,
     Workshop,
     Worksite,
-    Worker
+    Worker,
+    InstantUnlimited
 }

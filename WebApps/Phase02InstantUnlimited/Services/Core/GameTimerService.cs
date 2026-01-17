@@ -42,7 +42,7 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
                 animalManager, treeManager, workshopManager, worksiteManager, catalogManager);
             StoreManager storeManager = new(progressionManager, treeManager,
                 animalManager, workshopManager, worksiteManager,
-                catalogManager, inventory
+                catalogManager, inventory, instantUnlimitedManager
                 );
             QuestManager questManager = new(inventory, itemManager, progressionManager);
             IGameTimer timer = new BasicGameState(

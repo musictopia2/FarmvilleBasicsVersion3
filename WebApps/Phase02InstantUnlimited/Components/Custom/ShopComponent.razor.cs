@@ -21,13 +21,14 @@ public partial class ShopComponent(IToast toast)
     }
 
 
-    private readonly (EnumCatalogCategory Category, string Text)[] Tabs =
+    private readonly (EnumCatalogCategory Category, string Text)[] _tabs =
     [
         (EnumCatalogCategory.Tree,     "Trees"),
         (EnumCatalogCategory.Animal,   "Animals"),
         (EnumCatalogCategory.Workshop, "Workshops"),
         (EnumCatalogCategory.Worker,   "Workers"),
         (EnumCatalogCategory.Worksite, "Worksites"),
+        (EnumCatalogCategory.InstantUnlimited, "Instant Unlimited"),
     ];
 
     private StoreItemRowModel? _currentItem;

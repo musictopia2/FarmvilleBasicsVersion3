@@ -29,7 +29,6 @@ public static class ImportAnimalInstanceClass
     {
         InstantUnlimitedInstanceDatabase db = new();
         var list = await db.GetUnlockedItems(farm);
-
         BasicList<AnimalAutoResumeModel> animals = [];
         var animalPlan = await _animalProgression.GetPlanAsync(farm);
         var current = await _catalogOfferDatabase.GetCatalogAsync(farm, EnumCatalogCategory.Animal);
@@ -42,15 +41,15 @@ public static class ImportAnimalInstanceClass
             {
                 unlocked = false; //you have to pay for it first.
             }
-            
             var productionOptionsAllowed = animalPlan.UnlockRules.Count(x => x.LevelRequired <= level && x.ItemName == item.TargetName);
             productionOptionsAllowed += 1;
             EnumAnimalState state = EnumAnimalState.None;
             int ready = 0;
             var recipe = _recipes.Single(x => x.Animal == item.TargetName);
+            bool suppressed = false;
             if (list.Any(x => x.Name == recipe.Options.First().Output.Item))
             {
-                unlocked = false; //must be false because you are receiving from another source.
+                suppressed = true;
             }
 
             if (unlocked)
@@ -64,6 +63,7 @@ public static class ImportAnimalInstanceClass
             {
                 Name = item.TargetName,
                 Unlocked = unlocked,
+                IsSuppressed = suppressed,
                 State = state,
                 ProductionOptionsAllowed = productionOptionsAllowed,
                 OutputReady = ready

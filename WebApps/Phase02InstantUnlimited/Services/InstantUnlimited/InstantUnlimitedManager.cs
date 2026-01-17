@@ -1,4 +1,5 @@
 ﻿namespace Phase02InstantUnlimited.Services.InstantUnlimited;
+
 public class InstantUnlimitedManager(CropManager cropManager,
     TreeManager treeManager, AnimalManager animalManager,
     InventoryManager inventoryManager,
@@ -7,6 +8,7 @@ public class InstantUnlimitedManager(CropManager cropManager,
 {
     private BasicList<UnlockModel> _items = [];
     private IInstantUnlimitedProfile _profile = null!;
+    public event Action? Changed;
     public async Task SetInstantUnlimitedStyleContextAsync(InstantUnlimitedServicesContext context)
     {
         _items = await context.InstantUnlimitedProfile.LoadAsync();
@@ -26,6 +28,28 @@ public class InstantUnlimitedManager(CropManager cropManager,
         }
 
         model.Unlocked = unlocked;
+
+        //has to do other things too.
+        EnumItemCategory category = itemManager.GetItemCategory(item);
+        if (category == EnumItemCategory.Tree)
+        {
+            //must lock up a tree
+            treeManager.SetTreeSuppressionByProducedItem(item, unlocked);
+        }
+        else if (category == EnumItemCategory.Crop)
+        {
+            cropManager.SetCropSuppressionByProducedItem(item, unlocked);
+        }
+        else if (category == EnumItemCategory.Animal)
+        {
+            //must lock up an animal
+            animalManager.SetAnimalSuppressionByProducedItem(item, unlocked);
+        }
+        else
+        {
+            throw new CustomBasicException("Not supported");
+        }
+        Changed?.Invoke();
         await _profile.SaveAsync(_items);
     }
     public BasicList<string> UnlockedInstances =>

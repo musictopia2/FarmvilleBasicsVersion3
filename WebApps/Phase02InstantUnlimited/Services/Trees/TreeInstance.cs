@@ -10,7 +10,7 @@ public class TreeInstance(
 
     public string Name => tree.Item;
     public string TreeName => tree.TreeName;
-
+    public bool IsSuppressed { get; set; } = false;
     public int TreesReady { get; private set; } = collecting.TreesCollectedAtTime;
     public EnumTreeState State { get; private set; } = EnumTreeState.Collecting;
 
@@ -83,7 +83,7 @@ public class TreeInstance(
                 TreeName = TreeName,
                 TreesReady = TreesReady,
                 Unlocked = Unlocked,
-
+                IsSuppressed = IsSuppressed,
                 // Save the promise ONLY while producing
                 RunMultiplier = State == EnumTreeState.Producing ? _runMultiplier : null
             };
@@ -97,7 +97,7 @@ public class TreeInstance(
         Unlocked = model.Unlocked;
         TreesReady = model.TreesReady;
         StartedAt = model.StartedAt;
-
+        IsSuppressed |= model.IsSuppressed;
         _runMultiplier = model.RunMultiplier;
 
         // Back-compat / safety: if producing but multiplier missing, fall back to current

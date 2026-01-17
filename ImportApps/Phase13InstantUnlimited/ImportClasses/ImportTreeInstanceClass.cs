@@ -30,6 +30,7 @@ public static class ImportTreeInstanceClass
         //var treelPlan = await _treeProgression.GetPlanAsync(farm);
         var profile = await _levelProfile.GetProfileAsync(farm);
         int level = profile.Level;
+        bool suppressed = false;
         foreach (var item in plan)
         {
             bool unlocked = level >= item.LevelRequired;
@@ -42,12 +43,14 @@ public static class ImportTreeInstanceClass
 
             if (list.Any(x => x.Name == recipe.Item))
             {
-                unlocked = false; //must be false because you are receiving from another source.
+                suppressed = true;
+                //unlocked = false; //must be false because you are receiving from another source.
             }
             trees.Add(new()
             {
                 TreeName = item.TargetName,
-                Unlocked = unlocked
+                Unlocked = unlocked,
+                IsSuppressed = suppressed
             });
         }
         return new TreeInstanceDocument

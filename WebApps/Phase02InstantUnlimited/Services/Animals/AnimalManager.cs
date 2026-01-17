@@ -24,7 +24,7 @@ public class AnimalManager(InventoryManager inventory,
         get
         {
             BasicList<AnimalView> output = [];
-            _animals.ForConditionalItems(x => x.Unlocked, t =>
+            _animals.ForConditionalItems(x => x.Unlocked && x.IsSuppressed == false, t =>
             {
                 AnimalView summary = new()
                 {
@@ -36,33 +36,31 @@ public class AnimalManager(InventoryManager inventory,
             return output;
         }
     }
-    public BasicList<AnimalState> GetAllAnimals
-    {
-        get
-        {
-            BasicList<AnimalState> output = [];
-            _animals.ForEach(t =>
-            {
-                bool processing = t.State != EnumAnimalState.None;
-                output.Add(new()
-                {
-                    Id = t.Id,
-                    Name = t.Name,
-                    Unlocked = t.Unlocked,
-                    InProgress = processing,
-                    TotalPossibleOptions = t.TotalProductionOptions,
-                    TotalAllowedOptions = t.ProductionOptionsAllowed
-                });
-            });
-            return output;
-        }
-    }
+    
     public AnimalProductionOption NextProductionOption(string animal)
     {
         var instance = _animals.First(x => x.Name == animal);
         return instance.NextProductionOption;
 
     }
+
+    public void SetAnimalSuppressionByProducedItem(string itemName, bool supressed)
+    {
+        _animals.ForEach(x =>
+        {
+            if (x.GetUnlockedProductionOptions().All(x => x.Output.Item == itemName))
+            {
+                x.IsSuppressed = true;
+            }
+        });
+
+        //_animals.ForConditionalItems(x => x.Name == itemName, item =>
+        //{
+        //    item.IsSuppressed = supressed;
+        //});
+        _needsSaving = true;
+    }
+
     public void UnlockAnimalPaidFor(StoreItemRowModel store)
     {
         if (store.Category != EnumCatalogCategory.Animal)
@@ -275,11 +273,14 @@ public class AnimalManager(InventoryManager inventory,
         foreach (var animal in _animals)
         {
             // skip locked animals
-            if (!animal.Unlocked)
+            if (animal.Unlocked == false)
             {
                 continue;
             }
-
+            if (animal.IsSuppressed)
+            {
+                continue;
+            }
             // ensure each animal type is processed once, in original order
             if (seenAnimals.Add(animal.Name) == false)
             {
@@ -453,7 +454,7 @@ public class AnimalManager(InventoryManager inventory,
     //}
     public async Task UpdateTickAsync()
     {
-        _animals.ForConditionalItems(x => x.Unlocked && x.State != EnumAnimalState.None, animal =>
+        _animals.ForConditionalItems(x => x.Unlocked && x.State != EnumAnimalState.None && x.IsSuppressed == false, animal =>
         {
             animal.UpdateTick();
             if (animal.State == EnumAnimalState.Collecting && _animalCollectionMode == EnumAnimalCollectionMode.Automated)
