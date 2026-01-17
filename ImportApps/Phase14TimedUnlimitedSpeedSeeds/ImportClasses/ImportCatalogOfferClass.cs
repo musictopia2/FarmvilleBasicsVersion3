@@ -22,13 +22,16 @@ public static class ImportCatalogOfferClass
         list.AddRange(ImportWorksiteCatalogClass.GetWorksiteOffers(farm));
         list.AddRange(ImportWorkerCatalogClass.GetWorkerOffers(farm));
         list.AddRange(ImportWorkshopCatalogClass.GetWorkshopOffers(farm));
+        list.AddRange(ImportUnlimitedSpeedSeeds());
         if (farm.Theme == FarmThemeList.Country)
         {
             list.AddRange(ImportCountryUnlimitedItems());
+
         }
         else if (farm.Theme == FarmThemeList.Tropical)
         {
             list.AddRange(ImportTropicalUnlimitedItems());
+
         }
         else
         {
@@ -42,6 +45,33 @@ public static class ImportCatalogOfferClass
         };
 
     }
+
+    private static BasicList<CatalogOfferModel> ImportUnlimitedSpeedSeeds()
+    {
+        BasicList<CatalogOfferModel> output = [];
+        EnumCatalogCategory category = EnumCatalogCategory.TimedBoost;
+
+
+        output.Add(new()
+        {
+            Category = category,
+            LevelRequired = 10,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromSeconds(20),
+            TargetName = BoostKeys.UnlimitedSpeedSeed
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            LevelRequired = 10,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(2),
+            TargetName = BoostKeys.UnlimitedSpeedSeed
+        });
+        return output;
+    }
+
     private static BasicList<CatalogOfferModel> ImportCountryUnlimitedItems()
     {
         //this is where i set the prices
