@@ -1,4 +1,6 @@
-﻿namespace Phase02InstantUnlimited.Services.Trees;
+﻿using Microsoft.AspNetCore.Routing;
+
+namespace Phase02InstantUnlimited.Services.Trees;
 public class TreeManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry
@@ -136,7 +138,21 @@ public class TreeManager(InventoryManager inventory,
     }
     //ai suggested having a new service for speed seeds.
     //for now, chose not to do it.  may change my mind as i build out the feature more.
-    
+    public void GrantUnlimitedTreeItems(GrantableItem item)
+    {
+        if (item.Category != EnumItemCategory.Tree)
+        {
+            throw new CustomBasicException("This is not a tree");
+        }
+
+        if (inventory.CanAdd(item) == false)
+        {
+            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
+        }
+
+        AddTreeToInventory(item.Item, item.Amount);
+
+    }
     public void GrantTreeItems(GrantableItem item, int toUse)
     {
         if (toUse <= 0)

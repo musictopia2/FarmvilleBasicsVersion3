@@ -1,4 +1,5 @@
-﻿using Phase02InstantUnlimited.Services.Trees;
+﻿using Microsoft.AspNetCore.Routing;
+using Phase02InstantUnlimited.Services.Trees;
 
 namespace Phase02InstantUnlimited.Services.Animals;
 
@@ -207,7 +208,32 @@ public class AnimalManager(InventoryManager inventory,
         });
         return rets;
     }
+    public void GrantUnlimitedAnimalItems(AnimalGrantModel item)
+    {
+        //this would be used when i have unlimited for a time (must have the crops).
+        if (inventory.Has(item.InputData.Item, item.InputData.Amount) == false)
+        {
+            throw new CustomBasicException("Did not have the requirements to produce it.  Should had ran the required functions first");
+        }
+        if (inventory.CanAdd(item.OutputData) == false)
+        {
+            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
+        }
+        inventory.Consume(item.InputData.Item, item.InputData.Amount);
+        AddAnimalToInventory(item.OutputData.Item, item.OutputData.Amount);
+    }
+    public void GrantUnlimitedAnimalItems(ItemAmount item)
+    {
+        //this will not use speed seeds or have any requirements.
+        if (inventory.CanAdd(item) == false)
+        {
+            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
+        }
+        //hopefully no problem with requiring security (?) since this is intended for the unlimited feature.
 
+        AddAnimalToInventory(item.Item, item.Amount);
+    }
+    //when i am ready for unlimited speed seed for a time, figure that part out later.
     public void GrantAnimalItems(AnimalGrantModel item, int toUse)
     {
         if (toUse <= 0)
@@ -219,7 +245,6 @@ public class AnimalManager(InventoryManager inventory,
         {
             throw new CustomBasicException("Not enough speed seeds.  Should had ran the required functions first");
         }
-
         if (inventory.Has(item.InputData.Item, item.InputData.Amount * toUse) == false)
         {
             throw new CustomBasicException("Did not have the requirements to produce it.  Should had ran the required functions first");
@@ -230,7 +255,8 @@ public class AnimalManager(InventoryManager inventory,
         {
             throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
         }
-
+        inventory.Consume(item.InputData.Item, item.InputData.Amount * toUse);
+        //inventory.Consume(instance.RequiredName(selected), required);
         AddAnimalToInventory(item.OutputData.Item, granted);
         inventory.Consume(CurrencyKeys.SpeedSeed, toUse);
     }

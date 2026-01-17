@@ -1,4 +1,6 @@
-﻿namespace Phase02InstantUnlimited.Services.Crops;
+﻿using Microsoft.AspNetCore.Routing;
+
+namespace Phase02InstantUnlimited.Services.Crops;
 public class CropManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry
@@ -132,6 +134,18 @@ public class CropManager(InventoryManager inventory,
             });
         });
         return output;
+    }
+    public void GrantUnlimitedCropItems(GrantableItem item)
+    {
+        if (item.Category != EnumItemCategory.Crop)
+        {
+            throw new CustomBasicException("This is not a crop");
+        }
+        if (inventory.CanAdd(item.Item, item.Amount) == false)
+        {
+            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
+        }
+        AddCrop(item.Item, item.Amount);
     }
     public void GrantCropItems(GrantableItem item, int toUse)
     {
