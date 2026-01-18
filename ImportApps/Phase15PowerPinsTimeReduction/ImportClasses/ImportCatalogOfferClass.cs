@@ -26,12 +26,13 @@ public static class ImportCatalogOfferClass
         if (farm.Theme == FarmThemeList.Country)
         {
             list.AddRange(ImportCountryUnlimitedItems());
+            list.AddRange(ImportCountryTimeReductionPowerPins());
 
         }
         else if (farm.Theme == FarmThemeList.Tropical)
         {
             list.AddRange(ImportTropicalUnlimitedItems());
-
+            list.AddRange(ImportTropicalTimeReductionPowerPins());
         }
         else
         {
@@ -68,6 +69,112 @@ public static class ImportCatalogOfferClass
             Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
             Duration = TimeSpan.FromMinutes(4),
             TargetName = BoostKeys.UnlimitedSpeedSeed
+        });
+        return output;
+    }
+
+    private static BasicList<CatalogOfferModel> ImportCountryTimeReductionPowerPins()
+    {
+        EnumCatalogCategory category = EnumCatalogCategory.TimedBoost;
+        BasicList<CatalogOfferModel> output = [];
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryWorksiteListClass.Pond,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(1),
+            ReduceBy = TimeSpan.FromHours(2),
+            LevelRequired = 14
+        });
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryItemList.Peach,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(1),
+            ReduceBy = TimeSpan.FromHours(2), //this applies to all 4 (so do math to see how it would affect each one).
+            LevelRequired = 14
+        });
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryWorkshopList.Loom,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(2),
+            ReduceBy = TimeSpan.FromMinutes(5),
+            LevelRequired = 14
+        });
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryItemList.Strawberry,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(2),
+            ReduceBy = TimeSpan.FromMinutes(50),
+            LevelRequired = 14
+        });
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryItemList.Wool,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(2),
+            ReduceBy = TimeSpan.FromMinutes(15),
+            LevelRequired = 14
+        });
+
+
+        return output;
+    }
+
+    private static BasicList<CatalogOfferModel> ImportTropicalTimeReductionPowerPins()
+    {
+        EnumCatalogCategory category = EnumCatalogCategory.TimedBoost;
+        BasicList<CatalogOfferModel> output = [];
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = TropicalWorksiteListClass.HotSprings,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(1),
+            ReduceBy = TimeSpan.FromHours(1),
+            LevelRequired = 14
+        });
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = TropicalItemList.Lime,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(1),
+            ReduceBy = TimeSpan.FromHours(2), //this applies to all 4 (so do math to see how it would affect each one).
+            LevelRequired = 14
+        });
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = TropicalWorkshopList.BeachfrontKitchen,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(2),
+            ReduceBy = TimeSpan.FromMinutes(5),
+            LevelRequired = 14
+        });
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = TropicalItemList.Tapioca,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(2),
+            ReduceBy = TimeSpan.FromMinutes(5),
+            LevelRequired = 14
+        });
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = TropicalItemList.Mushroom,
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(2),
+            ReduceBy = TimeSpan.FromMinutes(1),
+            LevelRequired = 14
         });
         return output;
     }

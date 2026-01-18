@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Phase15PowerPinsTimeReduction.ImportClasses;
-
+﻿namespace Phase15PowerPinsTimeReduction.ImportClasses;
 public static class ImportTimedBoostProfileClass
 {
     private static CatalogOfferDatabase _catalogOfferDatabase = null!;
@@ -19,7 +14,6 @@ public static class ImportTimedBoostProfileClass
         TimedBoostProfileDatabase db = new();
         await db.ImportAsync(list);
     }
-
     private static async Task<TimedBoostProfileDocument> CreateInstanceAsync(FarmKey farm)
     {
         BasicList<TimedBoostCredit> list = [];
@@ -34,11 +28,10 @@ public static class ImportTimedBoostProfileClass
             {
                 BoostKey = catalog.TargetName,
                 Duration = catalog.Duration.Value,
-                Quantity = 2
-
+                Quantity = 2,
+                ReduceBy = catalog.ReduceBy
             });
         });
-        
         return new TimedBoostProfileDocument
         {
             Farm = farm,
