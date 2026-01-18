@@ -21,4 +21,9 @@ public class StoreItemRowModel
     public bool IsLocked { get; init; }      // locked by level
     public bool IsMaxedOut { get; init; }    // owned >= total possible
     public bool IsFree => Costs.Count == 0;
+
+
+    public bool Repeatable { get; init; }          // from CatalogOfferModel
+    public TimeSpan? Duration { get; init; }       // from CatalogOfferModel
+
 }

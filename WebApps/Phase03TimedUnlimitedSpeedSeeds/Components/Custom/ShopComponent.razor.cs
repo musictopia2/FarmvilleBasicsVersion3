@@ -29,6 +29,7 @@ public partial class ShopComponent(IToast toast)
         (EnumCatalogCategory.Worker,   "Workers"),
         (EnumCatalogCategory.Worksite, "Worksites"),
         (EnumCatalogCategory.InstantUnlimited, "Instant Unlimited"),
+        (EnumCatalogCategory.TimedBoosts, "Timed Boosts"),
     ];
 
     private StoreItemRowModel? _currentItem;

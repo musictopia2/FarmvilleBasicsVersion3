@@ -56,7 +56,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             LevelRequired = 10,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
             Duration = TimeSpan.FromSeconds(10),
             TargetName = BoostKeys.UnlimitedSpeedSeed
         });
@@ -65,7 +65,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             LevelRequired = 10,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
             Duration = TimeSpan.FromMinutes(4),
             TargetName = BoostKeys.UnlimitedSpeedSeed
         });

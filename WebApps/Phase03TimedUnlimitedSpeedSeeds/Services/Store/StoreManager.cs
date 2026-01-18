@@ -1,4 +1,6 @@
-﻿namespace Phase03TimedUnlimitedSpeedSeeds.Services.Store;
+﻿using Phase03TimedUnlimitedSpeedSeeds.Services.TimedBoosts;
+
+namespace Phase03TimedUnlimitedSpeedSeeds.Services.Store;
 public class StoreManager(IFarmProgressionReadOnly levelProgression,
     TreeManager treeManager,
     AnimalManager animalManager,
@@ -6,7 +8,8 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
     WorksiteManager worksiteManager,
     CatalogManager catalogManager,
     InventoryManager inventoryManager,
-    InstantUnlimitedManager instantUnlimitedManager
+    InstantUnlimitedManager instantUnlimitedManager,
+    TimedBoostManager timedBoostManager
     )
 {
     private int _currentLevel;
@@ -18,6 +21,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
     private BasicList<CatalogOfferModel> _workshopOffers = [];
     private BasicList<CatalogOfferModel> _worksiteOffers = [];
     private BasicList<CatalogOfferModel> _workerOffers = [];
+    private BasicList<CatalogOfferModel> _timedOffers = [];
     private BasicList<CatalogOfferModel> _instantUnlimitedOffers = [];
     public EnumCatalogCategory CurrentCategory => _catalogCategory;
     public async Task SetProgressionStyleContextAsync(StoreServicesContext context)
@@ -30,6 +34,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         _worksiteOffers = catalogManager.GetAllOffers(EnumCatalogCategory.Worksite);
         _workerOffers = catalogManager.GetAllOffers(EnumCatalogCategory.Worker);
         _instantUnlimitedOffers = catalogManager.GetAllOffers(EnumCatalogCategory.InstantUnlimited);
+        _timedOffers = catalogManager.GetAllOffers(EnumCatalogCategory.TimedBoosts);
         levelProgression.Changed += Refresh;
         Refresh();
     }
@@ -69,7 +74,62 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         {
             return GetInstantUnlimitedItems();
         }
+        if (_catalogCategory == EnumCatalogCategory.TimedBoosts)
+        {
+            return GetTimedOffers();
+        }
         throw new CustomBasicException("Not supported yet");
+    }
+    private BasicList<StoreItemRowModel> GetTimedOffers()
+    {
+        if (_timedOffers is null || _timedOffers.Count == 0)
+        {
+            return [];
+        }
+
+        // quantity lookup from profile credits
+        var creditLookup = timedBoostManager
+            .GetBoosts();
+            //.ToDictionary(x => x.BoostKey, x => x.Quantity);
+
+        BasicList<StoreItemRowModel> rows = [];
+
+        foreach (var offer in _timedOffers)
+        {
+            //int qty = creditLookup.TryGetValue(offer.TargetName, out int q) ? q : 0;
+
+            var temp = creditLookup.SingleOrDefault(x => x.Duration == offer.Duration && x.BoostKey == offer.TargetName);
+            int qty = 0;
+            if (temp is not null)
+            {
+                qty = temp.Quantity;
+            }
+            bool isLocked = _currentLevel < offer.LevelRequired;
+
+            rows.Add(new StoreItemRowModel
+            {
+                Category = EnumCatalogCategory.TimedBoosts,
+                TargetName = offer.TargetName,
+
+                // For boosts, this is just the min level to buy
+                LevelRequired = offer.LevelRequired,
+
+                // Not meaningful for boosts — UI should special-case
+                TotalPossible = 0,
+
+                // Quantity owned
+                OwnedCount = qty,
+
+                Costs = offer.Costs,
+
+                IsLocked = isLocked,
+                Duration = offer.Duration,
+                Repeatable = offer.Repeatable,
+                IsMaxedOut = false
+            });
+        }
+
+        return rows;
     }
     private BasicList<StoreItemRowModel> GetInstantUnlimitedItems()
     {
@@ -354,13 +414,16 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
             FinishAcquiring(store);
             return;
         }
+        if (store.Category == EnumCatalogCategory.TimedBoosts)
+        {
+            var offer = _timedOffers.Single(x => x.TargetName == store.TargetName && x.Duration == store.Duration);
+            await timedBoostManager.GrantCreditAsync(offer);
+            FinishAcquiring(store);
+            return;
+        }
     }
-
     private void FinishAcquiring(StoreItemRowModel store)
     {
         inventoryManager.Consume(store.Costs);
     }
-
-
-
 }

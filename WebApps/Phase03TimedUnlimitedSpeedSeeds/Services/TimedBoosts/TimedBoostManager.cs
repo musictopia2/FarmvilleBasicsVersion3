@@ -16,6 +16,29 @@ public class TimedBoostManager
     }
 
 
+    public async Task GrantCreditAsync(CatalogOfferModel item)
+    {   
+        if (item.Duration.HasValue == false)
+        {
+            throw new CustomBasicException("Must have duratin for granting credit");
+        }
+        var existing = _profile.Credits.SingleOrDefault(x => x.BoostKey == item.TargetName && x.Duration == item.Duration);
+
+        if (existing is null)
+        {
+            _profile.Credits.Add(new TimedBoostCredit
+            {
+                BoostKey = item.TargetName,
+                Duration = item.Duration.Value,
+                Quantity = 1
+            });
+        }
+        else
+        {
+            existing.Quantity += 1;
+        }
+        await SaveAsync();
+    }
 
     public BasicList<TimedBoostCredit> GetBoosts()
     {

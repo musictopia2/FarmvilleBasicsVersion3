@@ -69,6 +69,22 @@
     text-overflow: ellipsis;
 }
 
+.shop-title-wrap {
+    min-width: 0;
+    display: grid;
+    row-gap: 2px;
+}
+
+.shop-subtitle {
+    font-size: 0.95rem;
+    font-weight: 700;
+    opacity: 0.75;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
 /* The status cell */
 .shop-status {
     width: 34px;
@@ -103,7 +119,7 @@
 /* Bottom row */
 .shop-card-bottom {
     display: grid;
-    grid-template-columns: 1fr 30px 60px; /* costs | owned/max | item image */
+    grid-template-columns: 1fr 46px 60px; /* costs | owned/max | item image */
     align-items: center;
     column-gap: 6px;
 }
@@ -150,12 +166,31 @@
 
 /* Owned/max slot */
 .shop-owned {
-    width: 34px;
     text-align: right;
     font-size: 1.1rem;
     font-weight: 800;
     opacity: 0.85;
+    white-space: nowrap;
 }
+
+    .shop-owned.is-qty {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        column-gap: 4px;
+        align-items: baseline;
+    }
+
+.shop-owned-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    opacity: 0.7;
+}
+
+.shop-owned-value {
+    font-size: 1.2rem;
+    font-weight: 900;
+}
+
 
 /* Item image slot */
 .shop-item {

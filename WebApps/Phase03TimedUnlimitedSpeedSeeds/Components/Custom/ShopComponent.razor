@@ -54,8 +54,17 @@
                                     }
                                 </div>
 
-                                <div class="shop-title" title="@row.TargetName.GetWords">
-                                    @row.TargetName.GetWords
+                                <div class="shop-title-wrap">
+                                    <div class="shop-title" title="@row.TargetName.GetWords">
+                                        @row.TargetName.GetWords
+                                    </div>
+
+                                    @if (row.Duration is not null)
+                                    {
+                                        <div class="shop-subtitle">
+                                            Duration: @row.Duration.Value.GetTimeString
+                                        </div>
+                                    }
                                 </div>
                             </div>
 
@@ -86,8 +95,16 @@
                                     }
                                 </div>
 
-                                <div class="shop-owned">
-                                    @row.OwnedCount/@row.TotalPossible
+                                <div class="shop-owned @(row.Category == EnumCatalogCategory.TimedBoosts ? "is-qty" : "")">
+                                    @if (row.Category == EnumCatalogCategory.TimedBoosts)
+                                    {
+                                        <span class="shop-owned-label">Qty</span>
+                                        <span class="shop-owned-value">@row.OwnedCount</span>
+                                    }
+                                    else
+                                    {
+                                        @($"{row.OwnedCount}/{row.TotalPossible}")
+                                    }
                                 </div>
 
                                 <div class="shop-item">
