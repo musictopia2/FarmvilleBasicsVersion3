@@ -126,9 +126,38 @@
                 return;
             }
             <OverlayHost />
-            <div>
+            <div class="boost-row">
                 <ImageButtonComponent OnClick="ShowSpeedSeeds" Name="@CurrencyKeys.SpeedSeed" Height="100" />
+
+                <!-- existing: activation -->
                 <ImageButtonComponent OnClick="ShowTimedBoosts" Name="TimedBoost" Height="100" />
+
+                <!-- new: only visible when any boost is active -->
+                <button class="activefx-btn @(HasAnyActiveTimedBoosts ? "" : "activefx-hidden")"
+                        title="Active timed boosts"
+                        aria-label="Active timed boosts"
+                        @onclick="ShowActiveBoosts">
+                    <svg viewBox="0 0 100 100" width="70" height="70" aria-hidden="true">
+                        <!-- background -->
+                        <rect x="2" y="2" width="96" height="96" rx="16" ry="16"
+                              fill="#7CFF00" stroke="#222" stroke-width="4" />
+
+                        <!-- active ring -->
+                        <circle cx="50" cy="50" r="40"
+                                fill="none" stroke="#222" stroke-width="4" />
+
+                        <!-- lightning -->
+                        <path d="M58 10 L28 54 H48 L40 90 L72 44 H52 Z"
+                              fill="#FFD400" stroke="#222" stroke-width="4"
+                              stroke-linejoin="round" stroke-linecap="round" />
+
+                        <!-- active dot -->
+                        <circle cx="50" cy="72" r="5"
+                                fill="#FFD400" stroke="#222" stroke-width="3" />
+                    </svg>
+                    <span class="activefx-badge" aria-hidden="true"></span>
+                </button>
+
                 <InstantUnlimitedInstancesComponent />
             </div>
 

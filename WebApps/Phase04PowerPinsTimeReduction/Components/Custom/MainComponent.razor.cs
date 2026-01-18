@@ -26,7 +26,7 @@ public partial class MainComponent(NavigationManager nav, OverlayService service
     {
         quantityPickerService.UpdateVisibleStatus(visible);
     }
-
+    private bool HasAnyActiveTimedBoosts => TimedBoostManager.GetActiveBoosts.Count > 0;
     private async Task OnValueChanged(int value)
     {
         quantityPickerService.Submit(value);
@@ -34,8 +34,12 @@ public partial class MainComponent(NavigationManager nav, OverlayService service
         await Task.CompletedTask;
     }
 
+    private void ShowActiveBoosts()
+    {
+        toast.ShowInfoToast("Try to show active boosts");
+    }
 
-    private void PickerChanged()
+    private void Changed()
     {
         InvokeAsync(StateHasChanged);
     }
@@ -52,7 +56,8 @@ public partial class MainComponent(NavigationManager nav, OverlayService service
     }
     protected override void OnInitialized()
     {
-        quantityPickerService.StateChanged = PickerChanged;
+        quantityPickerService.StateChanged = Changed;
+        TimedBoostManager.Tick += Changed;
         service.Toast = toast;
         base.OnInitialized();
     }
