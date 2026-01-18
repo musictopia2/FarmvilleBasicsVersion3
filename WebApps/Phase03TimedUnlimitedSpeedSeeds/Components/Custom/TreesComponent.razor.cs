@@ -2,6 +2,9 @@ namespace Phase03TimedUnlimitedSpeedSeeds.Components.Custom;
 public partial class TreesComponent
 {
     private BasicList<TreeView> _trees = [];
+
+    private TimeSpan? _unlimitedSpeedSeedTime;
+
     protected override void OnInitialized()
     {
 
@@ -18,6 +21,11 @@ public partial class TreesComponent
     private void Refresh()
     {
         _trees = TreeManager.GetUnlockedTrees;
+        _unlimitedSpeedSeedTime = TimedBoostManager.GetUnlimitedSpeedSeedTimeLeft();
+        
     }
-   
+
+
+
+
 }

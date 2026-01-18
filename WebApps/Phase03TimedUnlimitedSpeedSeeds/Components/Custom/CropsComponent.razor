@@ -1,4 +1,13 @@
 ﻿@inherits TimedOnlyComponent
+@if (_unlimitedSpeedSeedTime is not null)
+{
+    <UnlimitedSpeedSeedsGrantComponent
+        Category="EnumItemCategory.Crop"
+        TimeRemaining="_unlimitedSpeedSeedTime.Value"
+        />
+    return;
+}
+
 <div class="mb-1">Select Crop to Plant:</div>
 
 <div class="crop-selected-line" aria-live="polite">

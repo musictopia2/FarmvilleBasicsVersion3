@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿namespace Phase03TimedUnlimitedSpeedSeeds.Services.Trees;
 
-namespace Phase03TimedUnlimitedSpeedSeeds.Services.Trees;
 public class TreeManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry
@@ -174,7 +173,7 @@ public class TreeManager(InventoryManager inventory,
         {
             throw new CustomBasicException("Not enough speed seeds.  Should had ran the required functions first");
         }
-        
+
         int granted = toUse * item.Amount;
         if (inventory.CanAdd(item.Item, granted) == false)
         {

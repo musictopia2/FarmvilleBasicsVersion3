@@ -37,7 +37,6 @@ public partial class InstantUnlimitedInstancesComponent(IToast toast) : IDisposa
     {
         if (Farm!.InstantUnlimitedManager.CanApplyInstantUnlimited(_currentOption, howMany) == false)
         {
-            Console.WriteLine("Trying to show error");
             toast.ShowUserErrorToast("Unable to add to inventory.  Most likely out of barn or silo space");
             _openOptions = true;
             return;

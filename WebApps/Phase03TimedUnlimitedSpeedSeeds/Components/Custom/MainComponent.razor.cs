@@ -4,7 +4,9 @@ using Phase03TimedUnlimitedSpeedSeeds.Services.Core;
 
 namespace Phase03TimedUnlimitedSpeedSeeds.Components.Custom;
 public partial class MainComponent(NavigationManager nav, OverlayService service,
-    IToast toast, IntegerQuantityPickerService quantityPickerService) : IDisposable
+    IToast toast, IntegerPickerService quantityPickerService,
+    IntegerActionPickerService actionPickerService
+    ) : IDisposable
 {
 
     [Parameter]
@@ -118,14 +120,14 @@ public partial class MainComponent(NavigationManager nav, OverlayService service
         }
     }
 
-    private async Task LevelUpAsync()
+    private void ActionVisibleChanged(bool visible)
     {
-        await ProgressionManager.IncrementLevelAsync();
+        actionPickerService.UpdateVisibleStatus(visible);
     }
-    private async Task IncrementPointsAsync()
+
+    private async Task OnActionValueChanged(int value)
     {
-        await ProgressionManager.AddPointSinglePointAsync();
+        await actionPickerService.SubmitAsync(value);
     }
-    
 
 }

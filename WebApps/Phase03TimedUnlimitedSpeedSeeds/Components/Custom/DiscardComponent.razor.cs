@@ -1,6 +1,6 @@
 namespace Phase03TimedUnlimitedSpeedSeeds.Components.Custom;
 
-public partial class DiscardComponent(IntegerQuantityPickerService quantityPickerService) : IDisposable
+public partial class DiscardComponent(IntegerPickerService quantityPickerService) : IDisposable
 {
     [Parameter]
     [EditorRequired]

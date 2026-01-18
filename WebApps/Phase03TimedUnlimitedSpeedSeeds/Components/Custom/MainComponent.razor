@@ -10,6 +10,19 @@
         @quantityPickerService.MaxValue
     </IntegerInputModal>
 
+    <IntegerInputModal Visible="actionPickerService.Visible"
+                       MaxValue="actionPickerService.MaxValue"
+                       StartBlank="true"
+                       CloseOnSubmit="false"
+                       ValueChanged="OnActionValueChanged"
+                       VisibleChanged="ActionVisibleChanged">
+
+        @if (actionPickerService.SideContent is not null)
+        {
+            @actionPickerService.SideContent
+        }
+    </IntegerInputModal>
+
 
     <PopupViewport GapLeftPx="10"
                    GapRightPx="10"

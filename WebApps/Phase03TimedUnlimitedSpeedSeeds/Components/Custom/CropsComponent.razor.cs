@@ -10,11 +10,18 @@ public partial class CropsComponent(IToast toast)
     private Guid _progressCropId;
 
     private void SelectCrop(string id) => _selectedItem = id;
+    private TimeSpan? _unlimitedSpeedSeedTime;
+
+
 
     private void UpdateCrops()
     {
+
         _crops = CropManager.UnlockedRecipes; //can change.
         _nextCrop = ProgressionManager.NextCrop;
+
+        _unlimitedSpeedSeedTime = TimedBoostManager.GetUnlimitedSpeedSeedTimeLeft();
+
     }
     protected override Task OnTickAsync()
     {

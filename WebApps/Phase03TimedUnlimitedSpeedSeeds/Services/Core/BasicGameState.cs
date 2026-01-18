@@ -75,7 +75,8 @@ public class BasicGameState : IGameTimer
             CatalogManager = catalogManager,
             StoreManager = storeManager,
             InstantUnlimitedManager = instantUnlimitedManager,
-            TimedBoostManager = timedBoostManager
+            TimedBoostManager = timedBoostManager,
+            ItemManager = itemManager
         };
     }
     readonly MainFarmContainer _container;

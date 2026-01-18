@@ -3,14 +3,16 @@ public class TimedBoostManager
 {
     private TimedBoostProfileModel _profile = null!;
     private ITimedBoostProfile _profileStore = null!;
-    public event Action? Changed;
-    private void NotifyChanged() => Changed?.Invoke();
+    public event Action? Tick;             // “countdown changed” (UI refresh)
+    private void NotifyTick() => Tick?.Invoke();
     public async Task SetTimedBoostStyleContextAsync(TimedBoostServicesContext context)
     {
         _profile = await context.TimedBoostProfile.LoadAsync();
         _profileStore = context.TimedBoostProfile;
         CleanupExpired();
+       
         await SaveAsync();
+        // reset cache when loading
     }
 
 
@@ -31,7 +33,7 @@ public class TimedBoostManager
 
         CleanupExpired();
 
-        var now = DateTime.UtcNow;
+        var now = DateTime.Now;
         var active = _profile.Active.SingleOrDefault(a => a.BoostKey == credit.BoostKey);
 
         if (active is null)
@@ -92,11 +94,28 @@ public class TimedBoostManager
         {
             return; //you have none active.
         }
+
+        
+
+
         bool changed = CleanupExpired();
         if (changed)
         {
             await SaveAsync();
-            NotifyChanged();
+            //NotifyChanged();
+            // if everything expired, ping tick once so any countdown UI clears
+            if (_profile.Active.Count == 0)
+            {
+                NotifyTick();
+                return;
+            }
         }
+        if (_profile.Active.Count > 0)
+        {
+            // still active => refresh countdown
+            NotifyTick();
+        }
+
+        
     }
 }
