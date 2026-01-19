@@ -11,5 +11,6 @@ public class AnimalAutoResumeModel
     //public TimeSpan? Duration { get; set; }
     public DateTime? StartedAt { get; set; }
     public int? Selected { get; set; }
+    public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
     //eventually needs to know about options you are allowed to do (later)
 }

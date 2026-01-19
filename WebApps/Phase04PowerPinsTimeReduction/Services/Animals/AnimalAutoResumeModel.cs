@@ -8,6 +8,7 @@ public class AnimalAutoResumeModel
     public int ProductionOptionsAllowed { get; set; } = 1;
     public int OutputReady { get; set; }
     public double? RunMultiplier { get; set; }
+    public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
 
     //cannot do duraton in the autoresume model anymore.
 

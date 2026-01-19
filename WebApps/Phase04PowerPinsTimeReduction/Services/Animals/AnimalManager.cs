@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Routing;
-using Phase04PowerPinsTimeReduction.Services.Trees;
-
-namespace Phase04PowerPinsTimeReduction.Services.Animals;
-
+﻿namespace Phase04PowerPinsTimeReduction.Services.Animals;
 public class AnimalManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
-    ItemRegistry itemRegistry
+    ItemRegistry itemRegistry,
+    TimedBoostManager timedBoostManager
     )
 {
     private readonly BasicList<AnimalInstance> _animals = [];
@@ -36,7 +33,7 @@ public class AnimalManager(InventoryManager inventory,
             return output;
         }
     }
-    
+
     public AnimalProductionOption NextProductionOption(string animal)
     {
         var instance = _animals.First(x => x.Name == animal);
@@ -242,7 +239,7 @@ public class AnimalManager(InventoryManager inventory,
         {
             throw new CustomBasicException("Must use at least one speed seed");
         }
-        
+
         if (inventory.Get(CurrencyKeys.SpeedSeed) < toUse)
         {
             throw new CustomBasicException("Not enough speed seeds.  Should had ran the required functions first");
@@ -339,7 +336,9 @@ public class AnimalManager(InventoryManager inventory,
         }
         int required = instance.RequiredCount(selected);
         inventory.Consume(instance.RequiredName(selected), required);
-        instance.Produce(selected);
+        string item = instance.ItemReceived(selected);
+        TimeSpan reducedBy = timedBoostManager.GetReducedTime(item);
+        instance.Produce(selected, reducedBy);
         _needsSaving = true;
     }
     private int GetAmount(AnimalInstance instance)
@@ -391,7 +390,7 @@ public class AnimalManager(InventoryManager inventory,
             animal.Collect();
         });
         AddAnimalToInventory(selectedName, maxs);
-        
+
     }
     private void AddAnimalToInventory(string name, int amount)
     {
@@ -412,7 +411,9 @@ public class AnimalManager(InventoryManager inventory,
     public string Duration(AnimalView animal, int selected)
     {
         AnimalInstance instance = GetAnimalById(animal);
-        return instance.GetDuration(selected).GetTimeString;
+        string item = instance.ItemReceived(selected);
+        TimeSpan reducedBy = timedBoostManager.GetReducedTime(item);
+        return instance.GetDuration(selected, reducedBy).GetTimeString;
     }
     public int InProgress(AnimalView animal) => GetAnimalById(animal).AmountInProgress;
     public async Task SetStyleContextAsync(AnimalServicesContext context, FarmKey farm)

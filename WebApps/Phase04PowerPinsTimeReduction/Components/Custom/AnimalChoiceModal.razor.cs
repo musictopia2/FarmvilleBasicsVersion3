@@ -51,12 +51,11 @@ public partial class AnimalChoiceModal(OverlayService overlay)
     {
         
         int index = _productionOptions.IndexOf(option);
-        return AnimalManager.Duration(Animal, index); // <-- rename to your real method
+        return AnimalManager.Duration(Animal, index);
     }
 
     private int Have(string itemKey) => InventoryManager.Get(itemKey);
 
-    private static string Details(int has, int required) => $"{has}/{required}";
 
 
 }

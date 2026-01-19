@@ -1,10 +1,9 @@
-﻿using Phase04PowerPinsTimeReduction.Services.Core;
-
-namespace Phase04PowerPinsTimeReduction.Services.Animals;
+﻿namespace Phase04PowerPinsTimeReduction.Services.Animals;
 public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
 {
     public Guid Id { get; } = Guid.NewGuid();
     public bool Unlocked { get; set; } = true;
+    public TimeSpan ReducedBy { get; private set; } = TimeSpan.Zero;
     public bool IsSuppressed { get; set; } = false;
     public BasicList<AnimalProductionOption> GetUnlockedProductionOptions()
         => recipe.Options.Take(ProductionOptionsAllowed).ToBasicList();
@@ -13,6 +12,7 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
     public int TotalProductionOptions => recipe.Options.Count;
     public AnimalProductionOption NextProductionOption => recipe.Options.Skip(ProductionOptionsAllowed).Take(1).Single();
     public string Name => recipe.Animal;
+    public string ItemReceived(int selected) => recipe.Options[selected].Output.Item;
 
     public int OutputReady { get; private set; } = 0;
     public EnumAnimalState State { get; set; } = EnumAnimalState.None;
@@ -41,6 +41,7 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
         ProductionOptionsAllowed = animal.ProductionOptionsAllowed;
         Unlocked = animal.Unlocked;
         _selected = animal.Selected;
+        ReducedBy = animal.ReducedBy;
         IsSuppressed = animal.IsSuppressed;
         // Restore locked promise only (do NOT overwrite current multiplier)
         _runMultiplier = animal.RunMultiplier;
@@ -53,7 +54,7 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
 
         if (_selected is not null)
         {
-            Duration = GetDuration(_selected.Value);
+            Duration = GetDuration(_selected.Value, ReducedBy);
         }
         else
         {
@@ -73,6 +74,7 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
                 OutputReady = OutputReady,
                 ProductionOptionsAllowed = ProductionOptionsAllowed,
                 State = State,
+                ReducedBy = ReducedBy,
                 Selected = _selected,
                 IsSuppressed = IsSuppressed,
                 // Save the promise only when a run exists; otherwise null
@@ -112,17 +114,17 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
         }
     }
 
-    public TimeSpan GetDuration(int selected)
+    public TimeSpan GetDuration(int selected, TimeSpan reducedBy)
     {
         var option = recipe.Options[selected];
-
+        var duration = option.Duration - reducedBy;
         // If producing, use locked promise. If idle (UI preview), use current.
         var m = _runMultiplier ?? _currentMultiplier;
 
-        return option.Duration.Apply(m);
+        return duration.Apply(m);
     }
 
-    public void Produce(int selected)
+    public void Produce(int selected, TimeSpan reducedBy)
     {
         if (State != EnumAnimalState.None)
         {
@@ -133,10 +135,10 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
 
         // Lock promise for this run
         _runMultiplier = _currentMultiplier;
-
+        ReducedBy = reducedBy;
         State = EnumAnimalState.Producing;
         OutputReady = Returned(selected);
-        Duration = GetDuration(selected);
+        Duration = GetDuration(selected, reducedBy);
         StartedAt = DateTime.Now; // consider UtcNow later if you want
     }
 
@@ -196,5 +198,5 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
         }
     }
 
-    
+
 }

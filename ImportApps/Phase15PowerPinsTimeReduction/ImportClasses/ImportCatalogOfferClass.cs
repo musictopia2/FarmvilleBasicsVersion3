@@ -127,7 +127,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             TargetName = CountryItemList.Wool,
             Costs = FarmHelperClass.GetFreeCosts,
-            Duration = TimeSpan.FromMinutes(30),
+            Duration = TimeSpan.FromMinutes(1),
             ReduceBy = TimeSpan.FromMinutes(15),
             LevelRequired = 14
         });
