@@ -100,7 +100,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             TargetName = CountryItemList.Peach,
             Costs = FarmHelperClass.GetFreeCosts,
-            Duration = TimeSpan.FromMinutes(1),
+            Duration = TimeSpan.FromMinutes(30),
             ReduceBy = TimeSpan.FromHours(2), //this applies to all 4 (so do math to see how it would affect each one).
             LevelRequired = 14
         });
@@ -109,7 +109,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             TargetName = CountryWorkshopList.Loom,
             Costs = FarmHelperClass.GetFreeCosts,
-            Duration = TimeSpan.FromMinutes(2),
+            Duration = TimeSpan.FromMinutes(1),
             ReduceBy = TimeSpan.FromMinutes(5),
             LevelRequired = 14
         });
@@ -118,7 +118,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             TargetName = CountryItemList.Strawberry,
             Costs = FarmHelperClass.GetFreeCosts,
-            Duration = TimeSpan.FromMinutes(2),
+            Duration = TimeSpan.FromMinutes(30),
             ReduceBy = TimeSpan.FromMinutes(50),
             LevelRequired = 14
         });
@@ -127,7 +127,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             TargetName = CountryItemList.Wool,
             Costs = FarmHelperClass.GetFreeCosts,
-            Duration = TimeSpan.FromMinutes(2),
+            Duration = TimeSpan.FromMinutes(30),
             ReduceBy = TimeSpan.FromMinutes(15),
             LevelRequired = 14
         });

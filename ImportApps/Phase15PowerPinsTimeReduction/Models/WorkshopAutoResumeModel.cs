@@ -10,4 +10,5 @@ public class WorkshopAutoResumeModel
     public int Capacity { get; set; } = 0; //this time, start with 0.  let it calculate.
     public BasicList<CraftingAutoResumeModel> Queue { get; set; } = [];
     public double? RunMultiplier { get; set; }
+    public TimeSpan ReduceBy { get; set; } = TimeSpan.Zero;
 }

@@ -8,4 +8,5 @@ public class WorkshopAutoResumeModel
     public bool Unlocked { get; set; } //needs this too now.
     public int Capacity { get; set; } = 2;
     public BasicList<CraftingAutoResumeModel> Queue { get; set; } = [];
+    public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
 }

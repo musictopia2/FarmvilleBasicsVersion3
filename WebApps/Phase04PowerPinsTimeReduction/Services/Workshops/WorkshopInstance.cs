@@ -6,6 +6,7 @@ public class WorkshopInstance
     public BasicList<UnlockModel> SupportedItems { get; set; } = [];
     public int Capacity { get; set; } = 2; //for now, always 2.  later will rethink.
     public bool Unlocked { get; set; }
+    public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
     public BasicList<CraftingJobInstance> Queue { get; } = [];
     required public string BuildingName { get; init; }
     public bool CanAccept(WorkshopRecipe recipe)
@@ -20,11 +21,7 @@ public class WorkshopInstance
         }
         return true;
     }
-    public void Start()
-    {
-        var next = Queue.First(j => j.State == EnumWorkshopState.Waiting);
-        next.Start();
-    }
+    
     public void Load(WorkshopAutoResumeModel workshop, BasicList<WorkshopRecipe> recipes, double multiplier)
     {
         Capacity = workshop.Capacity;
@@ -36,11 +33,12 @@ public class WorkshopInstance
         Id = workshop.Id;
         Unlocked = workshop.Unlocked;
         SelectedRecipeIndex = workshop.SelectedRecipeIndex;
+        ReducedBy = workshop.ReducedBy;
         Queue.Clear();
         foreach (var item in workshop.Queue)
         {
             WorkshopRecipe recipe = recipes.Single(x => x.Item == item.RecipeItem);
-            CraftingJobInstance job = new(recipe, multiplier);
+            CraftingJobInstance job = new(recipe, multiplier, workshop.ReducedBy);
             job.Load(item);
             Queue.Add(job);
         }
@@ -55,6 +53,7 @@ public class WorkshopInstance
                 Name = BuildingName,
                 Unlocked = Unlocked,
                 SupportedItems = SupportedItems,
+                ReducedBy = ReducedBy,
                 Queue = Queue.Select(x => x.GetCraftingForSaving).ToBasicList(),
                 SelectedRecipeIndex = SelectedRecipeIndex
             };

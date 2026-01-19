@@ -10,5 +10,7 @@ public class WorksiteAutoResumeModel
     public double? RunMultiplier { get; set; }
     public bool Focused { get; set; }
     public Dictionary<string, int> FailureHistory { get; set; } = [];
+    public TimeSpan ReduceBy { get; set; } = TimeSpan.Zero;
+
 
 }

@@ -89,7 +89,8 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
         {
             if (_selected is null)
             {
-                throw new CustomBasicException("There was nothing selected");
+                return recipe.Options.First().Output.Item; //just give them the first item this time.
+                //throw new CustomBasicException("There was nothing selected");
             }
             return recipe.Options[_selected.Value].Output.Item;
         }

@@ -1,14 +1,13 @@
-﻿using Phase04PowerPinsTimeReduction.Services.Core;
-
-namespace Phase04PowerPinsTimeReduction.Services.Workshops;
-public class CraftingJobInstance(WorkshopRecipe recipe, double currentMultiplier)
+﻿namespace Phase04PowerPinsTimeReduction.Services.Workshops;
+public class CraftingJobInstance(WorkshopRecipe recipe, double currentMultiplier, TimeSpan reducedBy)
 {
     public WorkshopRecipe Recipe { get; } = recipe;
     public Guid Id { get; set; } = Guid.NewGuid();
     public EnumWorkshopState State { get; private set; } = EnumWorkshopState.Waiting;
-
+    public TimeSpan ReducedBy => reducedBy;
     public DateTime? StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
+    //public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
 
     // Current multiplier (not persisted)
     private readonly double _currentMultiplier = GameRegistry.ValidateMultiplier(currentMultiplier);
@@ -22,7 +21,10 @@ public class CraftingJobInstance(WorkshopRecipe recipe, double currentMultiplier
         get
         {
             var m = _runMultiplier ?? _currentMultiplier;
-            return Recipe.Duration.Apply(m);
+
+            TimeSpan duration = Recipe.Duration - reducedBy;
+
+            return duration.Apply(m); //hopefully this simple this time.
         }
     }
 
@@ -38,7 +40,6 @@ public class CraftingJobInstance(WorkshopRecipe recipe, double currentMultiplier
     {
         // Lock promise at job start
         _runMultiplier = _currentMultiplier;
-
         StartedAt = DateTime.Now;
         CompletedAt = null;
         State = EnumWorkshopState.Active;
@@ -51,14 +52,13 @@ public class CraftingJobInstance(WorkshopRecipe recipe, double currentMultiplier
         CompletedAt = craft.CompletedAt;
 
         _runMultiplier = craft.RunMultiplier;
-
         // Back-compat / safety:
         // if job exists and has started but run multiplier missing, use current
         if (StartedAt is not null && _runMultiplier is null)
         {
             _runMultiplier = _currentMultiplier;
         }
-        
+
     }
 
     public void Complete()
@@ -109,7 +109,6 @@ public class CraftingJobInstance(WorkshopRecipe recipe, double currentMultiplier
                 RecipeItem = Recipe.Item,
                 StartedAt = StartedAt,
                 State = State,
-
                 // Save locked multiplier if job was ever started; otherwise null is fine
                 RunMultiplier = StartedAt is null ? null : _runMultiplier
             };

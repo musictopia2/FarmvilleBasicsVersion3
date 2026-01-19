@@ -2,7 +2,8 @@
 
 public class WorkshopManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
-    ItemRegistry itemRegistry
+    ItemRegistry itemRegistry,
+    TimedBoostManager timedBoostManager
     )
 {
     private IWorkshopRespository _workshopRespository = null!;
@@ -162,8 +163,10 @@ public class WorkshopManager(InventoryManager inventory,
             }
             WorkshopRecipe recipe = _recipes.Single(x => x.Item == item);
             inventory.Consume(recipe.Inputs);
-            CraftingJobInstance job = new(recipe, _multiplier);
+            TimeSpan reduced = timedBoostManager.GetReducedTime(summary.Name);
+            CraftingJobInstance job = new(recipe, _multiplier, reduced);
             WorkshopInstance workshop = GetWorkshopById(summary);
+            workshop.ReducedBy = reduced; //i think this too.
             workshop.Queue.Add(job);
             _needsSaving = true;
         }
@@ -221,16 +224,22 @@ public class WorkshopManager(InventoryManager inventory,
     {
         // _multiplier should be the CURRENT workshop time multiplier (<= 1.0)
         double m = _multiplier;
-
+        TimeSpan timeReduction = timedBoostManager.GetReducedTime(summary.Name);
         var firstList = _recipes.Where(x => x.BuildingName == summary.Name).ToBasicList();
         BasicList<WorkshopRecipeSummary> output = [];
+
+
+
         foreach (var item in firstList)
         {
             var workshop = _workshops.First(x => x.BuildingName == item.BuildingName);
             var nexts = workshop.SupportedItems.Single(x => x.Name == item.Item);
+
+            TimeSpan duration = item.Duration - timeReduction;
+
             WorkshopRecipeSummary fins = new()
             {
-                Duration = item.Duration.Apply(m),
+                Duration = duration.Apply(m),
                 Inputs = item.Inputs,
                 Output = item.Output,
                 Item = item.Item,
@@ -369,7 +378,6 @@ public class WorkshopManager(InventoryManager inventory,
     }
     private void ProcessBuilding(WorkshopInstance workshop)
     {
-
 
         // Find active job or start one
         var active = workshop.Queue.FirstOrDefault(j => j.State == EnumWorkshopState.Active);

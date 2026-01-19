@@ -11,7 +11,7 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
     public Dictionary<string, int> FailureHistory { get; set; } = [];
     public bool Unlocked { get; set; }
     public bool Focused { get; set; }
-    public TimeSpan? ReduceBy { get; set; }
+    public TimeSpan ReduceBy { get; set; }
     public string Location => recipe.Location;
 
     // Base duration from recipe (canonical)
@@ -99,7 +99,7 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
 
         if (Status == EnumWorksiteState.Processing)
         {
-            var reducedBase = BaseDuration - (ReduceBy ?? TimeSpan.Zero);
+            var reducedBase = BaseDuration - ReduceBy;
             if (reducedBase < TimeSpan.Zero)
             {
                 reducedBase = TimeSpan.Zero;
@@ -121,7 +121,7 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
             // amount to subtract (not the final time)
             ReduceBy = timedBoostManager.GetReducedTime(Location); // can return null/zero if none
 
-            var reducedBase = BaseDuration - (ReduceBy ?? TimeSpan.Zero);
+            var reducedBase = BaseDuration - ReduceBy;
             if (reducedBase < TimeSpan.Zero)
             {
                 reducedBase = TimeSpan.Zero;
@@ -324,7 +324,7 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
         // amount to subtract (not the final time)
         ReduceBy = timedBoostManager.GetReducedTime(Location); // can return null/zero if none
 
-        var reducedBase = BaseDuration - (ReduceBy ?? TimeSpan.Zero);
+        var reducedBase = BaseDuration - ReduceBy;
         if (reducedBase < TimeSpan.Zero)
         {
             reducedBase = TimeSpan.Zero;
