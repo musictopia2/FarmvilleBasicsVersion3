@@ -2,7 +2,8 @@
 
 public class TreeManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
-    ItemRegistry itemRegistry
+    ItemRegistry itemRegistry,
+    TimedBoostManager timedBoostManager
     )
 {
     private ITreesCollecting? _treeCollecting;
@@ -191,13 +192,13 @@ public class TreeManager(InventoryManager inventory,
         }
         TreeInstance instance = GetTreeById(id);
         int maxs = GetCollectAmount(instance);
+        TimeSpan reducedBy = timedBoostManager.GetReducedTime(instance.Name);
         maxs.Times(x =>
         {
-            instance.CollectTree();
+            instance.CollectTree(reducedBy);
         });
         AddTreeToInventory(instance.Name, maxs);
     }
-
     private void AddTreeToInventory(string name, int amount)
     {
         //this is used so if i ever have the ability of getting something else in future, will be here.

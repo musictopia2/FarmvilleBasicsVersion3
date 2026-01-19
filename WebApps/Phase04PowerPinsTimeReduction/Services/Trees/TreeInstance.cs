@@ -13,7 +13,7 @@ public class TreeInstance(
     public bool IsSuppressed { get; set; } = false;
     public int TreesReady { get; private set; } = collecting.TreesCollectedAtTime;
     public EnumTreeState State { get; private set; } = EnumTreeState.Collecting;
-
+    public TimeSpan ReducedBy { get; private set; } = TimeSpan.Zero;
     private TimeSpan ProductionTimePerTree => tree.ProductionTimeForEach;
 
     // production start time (used mostly for UI/pause semantics)
@@ -33,9 +33,12 @@ public class TreeInstance(
         get
         {
             var m = _runMultiplier ?? _currentMultiplier;
+
+            
+
             return ProductionTimePerTree.ApplyWithMinTotalForBatch(
                 m,
-                collecting.TreesCollectedAtTime);
+                collecting.TreesCollectedAtTime, ReducedBy);
             //return ProductionTimePerTree.Apply(m);
         }
     }
@@ -84,6 +87,7 @@ public class TreeInstance(
                 TreesReady = TreesReady,
                 Unlocked = Unlocked,
                 IsSuppressed = IsSuppressed,
+                ReducedBy = ReducedBy,
                 // Save the promise ONLY while producing
                 RunMultiplier = State == EnumTreeState.Producing ? _runMultiplier : null
             };
@@ -98,6 +102,7 @@ public class TreeInstance(
         TreesReady = model.TreesReady;
         StartedAt = model.StartedAt;
         IsSuppressed |= model.IsSuppressed;
+        ReducedBy = model.ReducedBy;
         _runMultiplier = model.RunMultiplier;
 
         // Back-compat / safety: if producing but multiplier missing, fall back to current
@@ -107,7 +112,7 @@ public class TreeInstance(
         }
     }
 
-    public void CollectTree()
+    public void CollectTree(TimeSpan reducedBy)
     {
         StartCollecting();
 
@@ -124,7 +129,7 @@ public class TreeInstance(
             _runMultiplier = _currentMultiplier; // LOCK promise
             State = EnumTreeState.Producing;
             IsCollecting = false;
-
+            ReducedBy = reducedBy;
             // both clocks start now
             StartedAt = DateTime.Now;
             TempStart = DateTime.Now;

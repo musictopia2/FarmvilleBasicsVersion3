@@ -59,10 +59,23 @@
                                         @row.TargetName.GetWords
                                     </div>
 
-                                    @if (row.Duration is not null)
+                                    @if (row.Duration is not null || row.ReducedBy is not null)
                                     {
                                         <div class="shop-subtitle">
-                                            Duration: @row.Duration.Value.GetTimeString
+                                            @if (row.Duration is not null)
+                                            {
+                                                <span>Duration: @row.Duration.Value.GetTimeString</span>
+                                            }
+                                            @if (row.ReducedBy is not null)
+                                            {
+                                                <span>&nbsp;•&nbsp;Reduced: @row.ReducedBy.Value.GetTimeString</span>
+                                            }
+                                        </div>
+                                    }
+                                    else if (row.Quantity > 0)
+                                    {
+                                        <div class="shop-subtitle">
+                                            Quantity To Add:  @row.Quantity
                                         </div>
                                     }
                                 </div>
@@ -95,10 +108,10 @@
                                     }
                                 </div>
 
-                                <div class="shop-owned @(row.Category == EnumCatalogCategory.TimedBoosts ? "is-qty" : "")">
-                                    @if (row.Category == EnumCatalogCategory.TimedBoosts)
+                                <div class="shop-owned">
+                                    @if (row.Category == EnumCatalogCategory.TimedBoosts || row.Category == EnumCatalogCategory.Misc)
                                     {
-                                        <span class="shop-owned-label">Qty</span>
+                                        <span class="shop-owned-label">Qty </span>
                                         <span class="shop-owned-value">@row.OwnedCount</span>
                                     }
                                     else
@@ -107,9 +120,11 @@
                                     }
                                 </div>
 
-                                <div class="shop-item">
-                                    <img class="shop-item-img" src="@ImageUrl(row)" alt="" />
-                                </div>
+                                <BoostIconComponent IsTree="row.Category == EnumCatalogCategory.Tree"
+                                                    Name="@row.TargetName"
+                                                    ReduceBy="@row.ReducedBy"
+                                                    ImageSize="55"
+                                                    IconSize="30" />
                             </div>
                         </div>
 

@@ -1,6 +1,5 @@
-﻿using Phase04PowerPinsTimeReduction.Services.TimedBoosts;
+﻿namespace Phase04PowerPinsTimeReduction.Services.Store;
 
-namespace Phase04PowerPinsTimeReduction.Services.Store;
 public class StoreManager(IFarmProgressionReadOnly levelProgression,
     TreeManager treeManager,
     AnimalManager animalManager,
@@ -23,6 +22,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
     private BasicList<CatalogOfferModel> _workerOffers = [];
     private BasicList<CatalogOfferModel> _timedOffers = [];
     private BasicList<CatalogOfferModel> _instantUnlimitedOffers = [];
+    private BasicList<CatalogOfferModel> _miscOffers = [];
     public EnumCatalogCategory CurrentCategory => _catalogCategory;
     public async Task SetProgressionStyleContextAsync(StoreServicesContext context)
     {
@@ -35,6 +35,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         _workerOffers = catalogManager.GetAllOffers(EnumCatalogCategory.Worker);
         _instantUnlimitedOffers = catalogManager.GetAllOffers(EnumCatalogCategory.InstantUnlimited);
         _timedOffers = catalogManager.GetAllOffers(EnumCatalogCategory.TimedBoosts);
+        _miscOffers = catalogManager.GetAllOffers(EnumCatalogCategory.Misc);
         levelProgression.Changed += Refresh;
         Refresh();
     }
@@ -78,7 +79,44 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         {
             return GetTimedOffers();
         }
+        if (_catalogCategory == EnumCatalogCategory.Misc)
+        {
+            return GetMiscOffers();
+        }
         throw new CustomBasicException("Not supported yet");
+    }
+    private BasicList<StoreItemRowModel> GetMiscOffers()
+    {
+        if (_miscOffers is null || _miscOffers.Count == 0)
+        {
+            return [];
+        }
+        BasicList<StoreItemRowModel> rows = [];
+        foreach (var offer in _miscOffers)
+        {
+            int owned = 0;
+            if (offer.Quantity > 0)
+            {
+                //this means needs inventory manager.
+                owned = inventoryManager.Get(offer.TargetName);
+            }
+            bool isLocked = _currentLevel < offer.LevelRequired;
+            //not sure otherwise for now
+            rows.Add(new()
+            {
+                Quantity = offer.Quantity,
+                OwnedCount = owned,
+                TargetName = offer.TargetName,
+                Repeatable = true,
+                LevelRequired = offer.LevelRequired,
+                Category = EnumCatalogCategory.Misc,
+                IsLocked = isLocked,
+                IsMaxedOut = false,
+                TotalPossible = 0,
+                Costs = offer.Costs
+            });
+        }
+        return rows;
     }
     private BasicList<StoreItemRowModel> GetTimedOffers()
     {
@@ -90,7 +128,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         // quantity lookup from profile credits
         var creditLookup = timedBoostManager
             .GetBoosts();
-            //.ToDictionary(x => x.BoostKey, x => x.Quantity);
+        //.ToDictionary(x => x.BoostKey, x => x.Quantity);
 
         BasicList<StoreItemRowModel> rows = [];
 
@@ -124,7 +162,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
                 OwnedCount = qty,
 
                 Costs = offer.Costs,
-
+                ReducedBy = offer.ReduceBy,
                 IsLocked = isLocked,
                 Duration = offer.Duration,
                 Repeatable = offer.Repeatable,
@@ -423,6 +461,17 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
             await timedBoostManager.GrantCreditAsync(offer);
             FinishAcquiring(store);
             return;
+        }
+        if (store.Category == EnumCatalogCategory.Misc)
+        {
+            if (store.Quantity > 0)
+            {
+                //this means you increase the inventory by this amount.
+                inventoryManager.Add(store.TargetName, store.Quantity);
+                FinishAcquiring(store);
+                return;
+            }
+            throw new CustomBasicException("Needs to figure out other cases for misc stuff");
         }
     }
     private void FinishAcquiring(StoreItemRowModel store)

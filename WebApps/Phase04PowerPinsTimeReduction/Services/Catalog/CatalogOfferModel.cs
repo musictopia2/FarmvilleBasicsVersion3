@@ -8,4 +8,5 @@ public class CatalogOfferModel
     public bool Repeatable { get; set; } //so the store can reflect this.
     public TimeSpan? Duration { get; set; } //null means this will not expire.
     public TimeSpan? ReduceBy { get; init; } //the new power pin feature needs it.   others need it to decide if you are going to purchase or not.
+    public int Quantity { get; init; } = 1;
 }

@@ -8,5 +8,6 @@ public enum EnumCatalogCategory
     Worksite,
     Worker,
     InstantUnlimited,
-    TimedBoost
+    TimedBoost,
+    Misc
 }

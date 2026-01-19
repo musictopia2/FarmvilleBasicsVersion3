@@ -1,6 +1,12 @@
 ﻿<div style="font-size: 3rem;">
     @StoreItem.TargetName.GetWords
 </div>
+@if (StoreItem.Quantity > 0)
+{
+    <div style="font-size: 2rem;">
+        Quantity:  @StoreItem.Quantity
+    </div>
+}
 <div>
     <ImageButtonComponent Height="300"
                           Style="background-color: red;"

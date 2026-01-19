@@ -22,6 +22,7 @@ public static class ImportCatalogOfferClass
         list.AddRange(ImportWorksiteCatalogClass.GetWorksiteOffers(farm));
         list.AddRange(ImportWorkerCatalogClass.GetWorkerOffers(farm));
         list.AddRange(ImportWorkshopCatalogClass.GetWorkshopOffers(farm));
+        list.AddRange(ImportSpeedSeedOffers());
         list.AddRange(ImportUnlimitedSpeedSeeds());
         if (farm.Theme == FarmThemeList.Country)
         {
@@ -44,7 +45,31 @@ public static class ImportCatalogOfferClass
             Offers = list
 
         };
+    }
+    private static BasicList<CatalogOfferModel> ImportSpeedSeedOffers()
+    {
+        BasicList<CatalogOfferModel> output = [];
+        EnumCatalogCategory category = EnumCatalogCategory.Misc;
+        int levelRequired = 10;
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 10,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            TargetName = CurrencyKeys.SpeedSeed,
+            LevelRequired = levelRequired,
+            
+        });
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 20,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(15), //you pay less per item if doing bulk.
+            TargetName = CurrencyKeys.SpeedSeed,
+            LevelRequired = levelRequired
 
+        });
+        return output;
     }
 
     private static BasicList<CatalogOfferModel> ImportUnlimitedSpeedSeeds()
@@ -81,7 +106,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryWorksiteListClass.Pond,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromHours(2),
             ReduceBy = TimeSpan.FromHours(2),
             LevelRequired = 14
@@ -90,7 +115,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryWorksiteListClass.Pond, //need to make sure that if reduceby is different, can't stack them.
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromMinutes(10),
             ReduceBy = TimeSpan.FromHours(3),
             LevelRequired = 14
@@ -99,8 +124,8 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryItemList.Peach,
-            Costs = FarmHelperClass.GetFreeCosts,
-            Duration = TimeSpan.FromMinutes(30),
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
+            Duration = TimeSpan.FromMinutes(1),
             ReduceBy = TimeSpan.FromHours(2), //this applies to all 4 (so do math to see how it would affect each one).
             LevelRequired = 14
         });
@@ -108,7 +133,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryWorkshopList.Loom,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromMinutes(1),
             ReduceBy = TimeSpan.FromMinutes(5),
             LevelRequired = 14
@@ -117,7 +142,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryItemList.Strawberry,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromMinutes(1),
             ReduceBy = TimeSpan.FromMinutes(50),
             LevelRequired = 14
@@ -126,7 +151,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryItemList.Wool,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromMinutes(1),
             ReduceBy = TimeSpan.FromMinutes(15),
             LevelRequired = 14
@@ -144,7 +169,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = TropicalWorksiteListClass.HotSprings,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromMinutes(1),
             ReduceBy = TimeSpan.FromHours(1),
             LevelRequired = 14
@@ -153,7 +178,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = TropicalItemList.Lime,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromMinutes(1),
             ReduceBy = TimeSpan.FromHours(2), //this applies to all 4 (so do math to see how it would affect each one).
             LevelRequired = 14
@@ -162,7 +187,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = TropicalWorkshopList.BeachfrontKitchen,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromMinutes(2),
             ReduceBy = TimeSpan.FromMinutes(5),
             LevelRequired = 14
@@ -171,7 +196,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = TropicalItemList.Tapioca,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromMinutes(2),
             ReduceBy = TimeSpan.FromMinutes(5),
             LevelRequired = 14
@@ -180,7 +205,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = TropicalItemList.Mushroom,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromMinutes(2),
             ReduceBy = TimeSpan.FromMinutes(1),
             LevelRequired = 14

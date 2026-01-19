@@ -8,6 +8,7 @@ public class TreeAutoResumeModel
     public DateTime? StartedAt { get; set; }
     public DateTime? TempStart { get; set; }
     public double? RunMultiplier { get; set; }
+    public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
 
     // Temporary override: something else is taking over the rule, so this tree shouldn't appear / be usable
     public bool IsSuppressed { get; set; } = false;

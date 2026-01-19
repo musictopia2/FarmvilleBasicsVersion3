@@ -25,5 +25,6 @@ public class StoreItemRowModel
 
     public bool Repeatable { get; init; }          // from CatalogOfferModel
     public TimeSpan? Duration { get; init; }       // from CatalogOfferModel
-
+    public TimeSpan? ReducedBy { get; init; }
+    public int Quantity { get;init;  }
 }

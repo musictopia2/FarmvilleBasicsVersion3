@@ -14,8 +14,7 @@ public static class TimeExtensions
     }
     extension (TimeSpan time)
     {
-        public TimeSpan ApplyWithMinTotalForBatch(double multiplier,
-        int batchSize)
+        public TimeSpan ApplyWithMinTotalForBatch(double multiplier, int batchSize, TimeSpan reducedBy)
         {
             if (multiplier <= 0)
             {
@@ -27,26 +26,66 @@ public static class TimeExtensions
                 throw new CustomBasicException("Batch size must be > 0");
             }
 
-            // scaled per-unit time
-            var scaledTicks = (long)Math.Round(time.Ticks * multiplier, MidpointRounding.AwayFromZero);
-
-            // compute minimum ticks per unit so that (perUnit * batchSize) >= minTotal
-            // use CEILING so the total is guaranteed to be at least minTotal
-            //has to still be the 2 seconds for the total batch.
-            var minPerUnitTicks = (long)Math.Ceiling(TimeSpan.FromSeconds(2).Ticks / (double)batchSize);
-
-            if (scaledTicks < minPerUnitTicks)
+            // ----- Step 1: compute ORIGINAL batch total (no multiplier yet)
+            long basePerUnitTicks = time.Ticks;
+            if (basePerUnitTicks <= 0)
             {
-                scaledTicks = minPerUnitTicks;
+                basePerUnitTicks = 1;
             }
 
-            // still guard against 0/negative ticks
-            if (scaledTicks <= 0)
+            long baseBatchTotalTicks = basePerUnitTicks * (long)batchSize;
+
+            // ----- Step 2: apply reduction ONCE per batch (still in original-time space)
+            long reducedTicks = reducedBy.Ticks;
+            if (reducedTicks < 0)
             {
-                scaledTicks = 1;
+                reducedTicks = 0;
             }
 
-            return TimeSpan.FromTicks(scaledTicks);
+            long batchAfterReductionTicks = baseBatchTotalTicks - reducedTicks;
+            if (batchAfterReductionTicks < 1)
+            {
+                batchAfterReductionTicks = 1;
+            }
+
+            // ----- Step 3: enforce minimum total time for the entire batch (pre-multiplier)
+            long minTotalTicks = TimeSpan.FromSeconds(2).Ticks;
+            if (batchAfterReductionTicks < minTotalTicks)
+            {
+                batchAfterReductionTicks = minTotalTicks;
+            }
+
+            // ----- Step 4: convert reduced batch back to per-unit (ceiling so total >= batchAfterReduction)
+            long perUnitAfterReductionTicks =
+                (long)Math.Ceiling(batchAfterReductionTicks / (double)batchSize);
+
+            if (perUnitAfterReductionTicks <= 0)
+            {
+                perUnitAfterReductionTicks = 1;
+            }
+
+            // ----- Step 5: apply multiplier AFTER reduction
+            long finalPerUnitTicks =
+                (long)Math.Round(perUnitAfterReductionTicks * multiplier, MidpointRounding.AwayFromZero);
+
+            if (finalPerUnitTicks <= 0)
+            {
+                finalPerUnitTicks = 1;
+            }
+
+            // ----- Step 6: enforce minimum TOTAL again after multiplier
+            // (because multiplier could drive it below the minimum)
+            long finalBatchTotalTicks = finalPerUnitTicks * (long)batchSize;
+            if (finalBatchTotalTicks < minTotalTicks)
+            {
+                finalPerUnitTicks = (long)Math.Ceiling(minTotalTicks / (double)batchSize);
+                if (finalPerUnitTicks <= 0)
+                {
+                    finalPerUnitTicks = 1;
+                }
+            }
+
+            return TimeSpan.FromTicks(finalPerUnitTicks);
         }
         public TimeSpan Apply(double multiplier)
         {

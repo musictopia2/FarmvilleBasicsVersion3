@@ -14,7 +14,8 @@ public static class CatalogExtensions
                 LevelRequired = source.LevelRequired,
                 Duration = source.Duration,
                 Repeatable = source.Repeatable,
-
+                ReduceBy = source.ReduceBy,
+                Quantity = source.Quantity,
                 // Deep-copy the costs dictionary
                 Costs = source.Costs is null
                     ? []

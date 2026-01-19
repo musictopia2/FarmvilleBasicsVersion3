@@ -119,7 +119,7 @@
 /* Bottom row */
 .shop-card-bottom {
     display: grid;
-    grid-template-columns: 1fr 46px 60px; /* costs | owned/max | item image */
+    grid-template-columns: 1fr 80px 60px; /* costs | owned/max | item image */
     align-items: center;
     column-gap: 6px;
 }
@@ -158,6 +158,7 @@
     object-fit: contain;
 }
 
+
 .shop-cost-amt {
     font-size: 1.1rem;
     font-weight: 700;
@@ -173,12 +174,8 @@
     white-space: nowrap;
 }
 
-    .shop-owned.is-qty {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        column-gap: 4px;
-        align-items: baseline;
-    }
+
+
 
 .shop-owned-label {
     font-size: 0.9rem;
@@ -192,13 +189,7 @@
 }
 
 
-/* Item image slot */
-.shop-item {
-    width: 60px;
-    height: 60px;
-    display: grid;
-    place-items: left;
-}
+
 
 .shop-item-img {
     width: 55px;

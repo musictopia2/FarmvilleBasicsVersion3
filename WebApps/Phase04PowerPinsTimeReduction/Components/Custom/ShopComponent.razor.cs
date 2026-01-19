@@ -30,6 +30,7 @@ public partial class ShopComponent(IToast toast)
         (EnumCatalogCategory.Worksite, "Worksites"),
         (EnumCatalogCategory.InstantUnlimited, "Instant Unlimited"),
         (EnumCatalogCategory.TimedBoosts, "Timed Boosts"),
+        (EnumCatalogCategory.Misc, "Misc Items")
     ];
 
     private StoreItemRowModel? _currentItem;
@@ -86,14 +87,7 @@ public partial class ShopComponent(IToast toast)
         return $"/{currencyKeyOrItemKey}.png";
     }
 
-    private static string ImageUrl(StoreItemRowModel row)
-    {
-        if (row.Category == EnumCatalogCategory.Tree)
-        {
-            return $"/tree.png";
-        }
-        return $"/{row.TargetName}.png";
-    }
+    
 
     protected override void OnInitialized()
     {
