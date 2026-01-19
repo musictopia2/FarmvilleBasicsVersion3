@@ -10,7 +10,7 @@ public class CropInstance(double currentMultiplier, CropRecipe? currentRecipe)
     // NEW: separate the two meanings
     private readonly double _currentMultiplier = GameRegistry.ValidateMultiplier(currentMultiplier);
     private double? _runMultiplier; // locked per run; null when idle
-
+    public TimeSpan ReducedBy { get; private set; } = TimeSpan.Zero;
 
 
     public TimeSpan? ReadyTime
@@ -39,16 +39,18 @@ public class CropInstance(double currentMultiplier, CropRecipe? currentRecipe)
             }
             // If producing, use locked promise. If idle (UI preview), use current.
             var m = _runMultiplier ?? _currentMultiplier;
-            return currentRecipe.Duration.Apply(m);
+            TimeSpan duration = currentRecipe.Duration;
+            duration = duration - ReducedBy;
+            return duration.Apply(m);
         }
     }
-
     public void Load(CropAutoResumeModel slot)
     {
         Crop = slot.Crop;
         State = slot.State;
         PlantedAt = slot.PlantedAt;
         Unlocked = slot.Unlocked;
+        ReducedBy = slot.ReducedBy;
         _runMultiplier = slot.RunMultiplier;
         // If something is/was planted, ensure a run multiplier exists
         if (Crop is not null && _runMultiplier is null)
@@ -57,10 +59,11 @@ public class CropInstance(double currentMultiplier, CropRecipe? currentRecipe)
         }
         GrowTime = Crop is null ? null : GetDuration;
     }
-    public void Plant(string crop, CropRecipe recipe)
+    public void Plant(string crop, CropRecipe recipe, TimeSpan reducedBy)
     {
         State = EnumCropState.Growing;
         currentRecipe = recipe;
+        ReducedBy = reducedBy;
         _runMultiplier = _currentMultiplier;
         GrowTime = GetDuration; //must send the recipe now.  can't trust the time sent anymore.
         Crop = crop;
@@ -84,6 +87,7 @@ public class CropInstance(double currentMultiplier, CropRecipe? currentRecipe)
     public void Clear()
     {
         State = EnumCropState.Empty;
+        ReducedBy = TimeSpan.Zero;
         Crop = null;
         GrowTime = null;
         PlantedAt = null;

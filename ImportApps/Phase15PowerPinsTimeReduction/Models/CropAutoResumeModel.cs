@@ -9,4 +9,5 @@ public class CropAutoResumeModel
     public DateTime? PlantedAt { get; set; } //when the crop was planted
     public bool Unlocked { get; set; } = true;             // Is this slot unlocked
     public double? RunMultiplier { get; set; }
+    public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
 }

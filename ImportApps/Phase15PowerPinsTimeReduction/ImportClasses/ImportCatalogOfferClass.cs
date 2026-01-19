@@ -118,7 +118,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             TargetName = CountryItemList.Strawberry,
             Costs = FarmHelperClass.GetFreeCosts,
-            Duration = TimeSpan.FromMinutes(30),
+            Duration = TimeSpan.FromMinutes(1),
             ReduceBy = TimeSpan.FromMinutes(50),
             LevelRequired = 14
         });

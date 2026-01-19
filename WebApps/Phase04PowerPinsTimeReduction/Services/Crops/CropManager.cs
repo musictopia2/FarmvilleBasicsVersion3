@@ -1,7 +1,8 @@
 ﻿namespace Phase04PowerPinsTimeReduction.Services.Crops;
 public class CropManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
-    ItemRegistry itemRegistry
+    ItemRegistry itemRegistry,
+    TimedBoostManager timedBoostManager
     )
 {
     private bool _canAutomateCropHarvest;
@@ -191,7 +192,8 @@ public class CropManager(InventoryManager inventory,
                 inventory.Consume(item, 1);
             }
             CropRecipe temp = _recipes.Single(x => x.Item == item);
-            crop.Plant(item, temp);
+            TimeSpan reducedBy = timedBoostManager.GetReducedTime(item);
+            crop.Plant(item, temp, reducedBy);
             _needsSaving = true;
             // Deduct crop only if available; do not go negative. If Wheat == 0
             // and CanPlant allowed due to no growing fields, permit the plant without deduction.
@@ -311,6 +313,7 @@ public class CropManager(InventoryManager inventory,
                 State = crop.State,
                 PlantedAt = crop.PlantedAt,
                 RunMultiplier = crop.GetCurrentRun,
+                ReducedBy = crop.ReducedBy
             }).ToBasicList();
             //has to figure out the other side (since you may unlock more slots).
             CropSystemState slate = new()
