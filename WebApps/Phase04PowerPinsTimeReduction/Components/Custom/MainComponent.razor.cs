@@ -20,7 +20,7 @@ public partial class MainComponent(NavigationManager nav, OverlayService service
 
     private NavigationBarContainer? _nav;
 
-    private OverlayInsets _overlays = new();
+    private readonly OverlayInsets _overlays = new();
     
     private void VisibleChanged(bool visible)
     {
@@ -36,7 +36,7 @@ public partial class MainComponent(NavigationManager nav, OverlayService service
 
     private void ShowActiveBoosts()
     {
-        toast.ShowInfoToast("Try to show active boosts");
+        _showActiveBoosts = true;
     }
 
     private void Changed()
@@ -76,6 +76,7 @@ public partial class MainComponent(NavigationManager nav, OverlayService service
     private bool _showShop = false;
     private bool _showSpeedSeeds = false;
     private bool _showTimedBoosts = false;
+    private bool _showActiveBoosts = false;
 
     private async Task CloseAllPopupsAsync()
     {
