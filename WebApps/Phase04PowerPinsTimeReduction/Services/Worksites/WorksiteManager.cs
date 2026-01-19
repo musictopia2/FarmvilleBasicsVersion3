@@ -2,7 +2,8 @@
 public class WorksiteManager(
     InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
-    ItemRegistry itemRegistry
+    ItemRegistry itemRegistry,
+    TimedBoostManager timedBoostManager
     )
 {
     private bool _canAutomateCollection;
@@ -144,7 +145,7 @@ public class WorksiteManager(
     public void StartJob(string location)
     {
         WorksiteInstance instance = GetWorksiteByLocation(location);
-        instance.StartJob(inventory);
+        instance.StartJob(inventory, timedBoostManager);
         _needsSaving = true;
     }
     public bool CanCollectRewards(string location)
@@ -212,7 +213,7 @@ public class WorksiteManager(
     public string GetDurationText(string location)
     {
         WorksiteInstance instance = GetWorksiteByLocation(location);
-        return $"{instance.StartText} ({instance.EffectiveDuration.GetTimeString})"; //i think this is what is needed (?)
+        return $"{instance.StartText} ({instance.GetPreviewDuration(timedBoostManager).GetTimeString})"; //i think this is what is needed (?)
     }
     public string GetProgressText(string location)
     {
@@ -298,7 +299,7 @@ public class WorksiteManager(
         {
             WorksiteRecipe recipe = recipes.Single(x => x.Location == item.Name);
             WorksiteInstance instance = new(recipe, offset, _allWorkers, _workerStates);
-            instance.Load(item);
+            instance.Load(item, timedBoostManager);
             foreach (var tempWorker in item.Workers)
             {
                 WorkerRecipe reals = _allWorkers.Single(x => x.WorkerName == tempWorker.WorkerName);

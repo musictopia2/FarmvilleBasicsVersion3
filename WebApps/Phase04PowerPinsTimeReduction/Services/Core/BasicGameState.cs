@@ -133,6 +133,8 @@ public class BasicGameState : IGameTimer
         Dictionary<string, int> starts = await init.LoadAsync(farm);
         InventoryStorageProfileModel inventoryStorageProfileModel = await inventoryProfileService.LoadAsync();
         _inventory.LoadStartingInventory(starts, inventoryStorageProfileModel);
+        TimedBoostServicesContext timedBoostContext = _timedBoostFactory.GetTimedBoostServices(farm);
+        await _timedBoostManager.SetTimedBoostStyleContextAsync(timedBoostContext);
         CropServicesContext cropContext = _cropFactory.GetCropServices(farm);
         await _cropManager.SetStyleContextAsync(cropContext, farm);
         TreeServicesContext treeContext = _treeFactory.GetTreeServices(farm);
@@ -156,8 +158,7 @@ public class BasicGameState : IGameTimer
         await _questManager.SetStyleContextAsync(questContext);
         InstantUnlimitedServicesContext instantUnlimitedContext = _instantUnlimitedFactory.GetInstantUnlimitedServices(farm);
         await _instantUnlimitedManager.SetInstantUnlimitedStyleContextAsync(instantUnlimitedContext);
-        TimedBoostServicesContext timedBoostContext = _timedBoostFactory.GetTimedBoostServices(farm);
-        await _timedBoostManager.SetTimedBoostStyleContextAsync(timedBoostContext);
+        
         _init = true;
     }
     async Task IGameTimer.TickAsync()

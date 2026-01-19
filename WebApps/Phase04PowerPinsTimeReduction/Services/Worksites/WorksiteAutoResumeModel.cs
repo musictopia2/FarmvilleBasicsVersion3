@@ -1,6 +1,5 @@
-﻿using Phase04PowerPinsTimeReduction.Services.Inventory;
+﻿namespace Phase04PowerPinsTimeReduction.Services.Worksites;
 
-namespace Phase04PowerPinsTimeReduction.Services.Worksites;
 public class WorksiteAutoResumeModel
 {
     public string Name { get; set; } = "";
@@ -12,4 +11,5 @@ public class WorksiteAutoResumeModel
     public double? RunMultiplier { get; set; }
     public bool Focused { get; set; }
     public Dictionary<string, int> FailureHistory { get; set; } = [];
+    public TimeSpan? ReduceBy { get; set; }
 }

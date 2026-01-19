@@ -82,8 +82,17 @@ public static class ImportCatalogOfferClass
             Category = category,
             TargetName = CountryWorksiteListClass.Pond,
             Costs = FarmHelperClass.GetFreeCosts,
-            Duration = TimeSpan.FromMinutes(1),
+            Duration = TimeSpan.FromHours(2),
             ReduceBy = TimeSpan.FromHours(2),
+            LevelRequired = 14
+        });
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryWorksiteListClass.Pond, //need to make sure that if reduceby is different, can't stack them.
+            Costs = FarmHelperClass.GetFreeCosts,
+            Duration = TimeSpan.FromMinutes(10),
+            ReduceBy = TimeSpan.FromHours(3),
             LevelRequired = 14
         });
         output.Add(new()

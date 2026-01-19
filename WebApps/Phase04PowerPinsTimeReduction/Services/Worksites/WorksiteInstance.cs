@@ -1,6 +1,7 @@
-﻿using System.Drawing;
+﻿using Phase04PowerPinsTimeReduction.Services.TimedBoosts;
 
 namespace Phase04PowerPinsTimeReduction.Services.Worksites;
+
 public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
     BasicList<WorkerRecipe> allWorkers,
     BasicList<UnlockModel> workstates
@@ -10,6 +11,7 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
     public Dictionary<string, int> FailureHistory { get; set; } = [];
     public bool Unlocked { get; set; }
     public bool Focused { get; set; }
+    public TimeSpan? ReduceBy { get; set; }
     public string Location => recipe.Location;
 
     // Base duration from recipe (canonical)
@@ -26,14 +28,46 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
     private readonly double _currentMultiplier = GameRegistry.ValidateMultiplier(currentMultiplier);
     private double? _runMultiplier; // locked per job run; null when idle
 
-
+    private TimeSpan? _runDuration;
     public bool HasRecipe(string name) => recipe.BaselineBenefits.Exists(x => x.Item == name);
+
+    public TimeSpan GetPreviewDuration(TimedBoostManager timedBoostManager)
+    {
+        // If not idle, preview should just show the locked duration
+        if (Status != EnumWorksiteState.None && _runDuration.HasValue)
+        {
+            return _runDuration.Value;
+        }
+
+        var reduction = timedBoostManager.GetReducedTime(Location);
+        if (reduction < TimeSpan.Zero)
+        {
+            reduction = TimeSpan.Zero;
+        }
+
+        var reducedBase = BaseDuration - reduction;
+        if (reducedBase < TimeSpan.Zero)
+        {
+            reducedBase = TimeSpan.Zero;
+        }
+
+        return reducedBase.Apply(_currentMultiplier);
+    }
+
     public TimeSpan EffectiveDuration
     {
         get
         {
-            var m = _runMultiplier ?? _currentMultiplier;
-            return BaseDuration.Apply(m);
+            // If a job is in progress (or awaiting collection), use the locked duration.
+            if (Status != EnumWorksiteState.None && _runDuration.HasValue)
+            {
+                return _runDuration.Value;
+            }
+
+            // Idle preview: no reduction applied (because reduction only locks at StartJob).
+            return BaseDuration.Apply(_currentMultiplier);
+            //var m = _runMultiplier ?? _currentMultiplier;
+            //return BaseDuration.Apply(m);
         }
     }
 
@@ -51,24 +85,60 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
             return remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero;
         }
     }
-
-    public void Load(WorksiteAutoResumeModel worksite)
+    public void Load(WorksiteAutoResumeModel worksite, TimedBoostManager timedBoostManager)
     {
         Unlocked = worksite.Unlocked;
         _rewards = worksite.Rewards;
         Status = worksite.Status;
         StartedAt = worksite.StartedAt;
         Focused = worksite.Focused;
+        ReduceBy = worksite.ReduceBy;
         FailureHistory = worksite.FailureHistory ?? [];
         //needs to rethink this part eventually if more fields are needed.  for now its manually done.
         _runMultiplier = worksite.RunMultiplier;
 
-        //if a job is processing, still needs to use the run multiplier.
-        if (Status == EnumWorksiteState.Collecting &&
-            _runMultiplier is null)
+        if (Status == EnumWorksiteState.Processing)
         {
-            _runMultiplier = _currentMultiplier;
+            var reducedBase = BaseDuration - (ReduceBy ?? TimeSpan.Zero);
+            if (reducedBase < TimeSpan.Zero)
+            {
+                reducedBase = TimeSpan.Zero;
+            }
+
+            // reduction BEFORE multiplier
+            if (_runMultiplier.HasValue)
+            {
+                _runDuration = reducedBase.Apply(_runMultiplier.Value);
+            }
+            else
+            {
+                _runDuration = reducedBase.Apply(_currentMultiplier);
+            }
+
         }
+        else if (Status == EnumWorksiteState.None)
+        {
+            // amount to subtract (not the final time)
+            ReduceBy = timedBoostManager.GetReducedTime(Location); // can return null/zero if none
+
+            var reducedBase = BaseDuration - (ReduceBy ?? TimeSpan.Zero);
+            if (reducedBase < TimeSpan.Zero)
+            {
+                reducedBase = TimeSpan.Zero;
+            }
+
+            if (_runMultiplier.HasValue)
+            {
+                _runDuration = reducedBase.Apply(_runMultiplier.Value);
+            }
+            else
+            {
+                _runDuration = reducedBase.Apply(_currentMultiplier);
+            }
+
+        }
+
+
 
         Workers.Clear();
     }
@@ -98,6 +168,7 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
                 Workers = Workers,
                 RunMultiplier = saveRun,
                 Focused = Focused,
+                ReduceBy = ReduceBy,
                 FailureHistory = FailureHistory ?? []
             };
         }
@@ -163,7 +234,8 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
         if (Workers.Count > 0)
         {
             return false;
-        };
+        }
+        ;
         AssignWorkersAutomatically();
         if (Workers.Count == 0)
         {
@@ -222,7 +294,7 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
         StartedAt = DateTime.Now;   // waste elapsed time (your rule)
     }
 
-    public void StartJob(InventoryManager inventory)
+    public void StartJob(InventoryManager inventory, TimedBoostManager timedBoostManager)
     {
         _rewards.Clear();
         if (CanStartJob(inventory) == false)
@@ -248,6 +320,18 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
 
         // LOCK promise at start
         _runMultiplier = _currentMultiplier;
+
+        // amount to subtract (not the final time)
+        ReduceBy = timedBoostManager.GetReducedTime(Location); // can return null/zero if none
+
+        var reducedBase = BaseDuration - (ReduceBy ?? TimeSpan.Zero);
+        if (reducedBase < TimeSpan.Zero)
+        {
+            reducedBase = TimeSpan.Zero;
+        }
+
+        // reduction BEFORE multiplier
+        _runDuration = reducedBase.Apply(_runMultiplier.Value);
 
         StartedAt = DateTime.Now;
         Status = EnumWorksiteState.Processing;

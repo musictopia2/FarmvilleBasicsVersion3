@@ -40,18 +40,46 @@ public class TimedBoostManager
         }
         await SaveAsync();
     }
-
     public BasicList<ActiveTimedBoost> GetActiveBoosts => _profile.Active.ToBasicList();
-    
-
     public BasicList<TimedBoostCredit> GetBoosts()
     {
         return _profile.Credits.Where(x => x.Quantity > 0).ToBasicList();
     }
+    public TimeSpan GetReducedTime(string key)
+    {
+        var active = _profile.Active.SingleOrDefault(a => a.BoostKey == key);
+        if (active is null)
+        {
+            return TimeSpan.Zero;
+        }
+        if (active.ReduceBy is null)
+        {
+            return TimeSpan.Zero;
+        }
+        return active.ReduceBy.Value;
+    }
+    public bool CanActivateBoost(TimedBoostCredit credit)
+    {
+        var active = _profile.Active.SingleOrDefault(a => a.BoostKey == credit.BoostKey);
+        if (active is null)
+        {
+            return true; //none like this so okay (for now).  once i have 2 different types, will require rethinking.
+        }
+        if (active.ReduceBy == credit.ReduceBy)
+        {
+            return true; //for now, okay.  later more rules.
+        }
+        return false; 
+    }
+
     // Activate later from credits
     // Rule: if already active, EXTEND the current end time.
     public async Task ActiveBoostAsync(TimedBoostCredit credit)
     {
+        if (CanActivateBoost(credit) == false)
+        {
+            throw new CustomBasicException("Unable to activate boost.   should had called CanActivateBoost");
+        }
         credit.Quantity--;
         if (credit.Quantity == 0)
         {

@@ -1,6 +1,6 @@
 namespace Phase04PowerPinsTimeReduction.Components.Custom;
 
-public partial class TimedBoostsComponent
+public partial class TimedBoostsComponent(IToast toast)
 {
     // Replace with your real source (manager/service/profile load)
     //public BasicList<TimedBoostCredit> Credits { get; set; } = new();
@@ -19,16 +19,20 @@ public partial class TimedBoostsComponent
         _credits = TimedBoostManager.GetBoosts();
     }
 
-    private static string GetBoostImage(string boostKey)
-        => $"/{boostKey}.png"; // if your files are /UnlimitedSpeedSeeds.png etc.
 
     private static string GetBoostTitle(string boostKey)
         => boostKey.GetWords;
 
+    private bool CanActivateBoost(TimedBoostCredit credit) => TimedBoostManager.CanActivateBoost(credit);
     private async Task ActivateBoostAsync(TimedBoostCredit credit)
     {
         if (credit.Quantity <= 0)
         {
+            return;
+        }
+        if (CanActivateBoost(credit) == false)
+        {
+            toast.ShowUserErrorToast("Unable to activate boost");
             return;
         }
         await TimedBoostManager.ActiveBoostAsync(credit);
