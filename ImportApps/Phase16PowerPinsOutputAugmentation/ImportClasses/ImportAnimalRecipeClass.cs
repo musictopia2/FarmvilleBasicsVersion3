@@ -90,7 +90,7 @@ public static class ImportAnimalRecipeClass
         options.Add(new AnimalProductionOption
         {
             Duration = TimeSpan.FromHours(4),
-            Input = 12,
+            Input = 16,
             Output = new(CountryItemList.Wool, 12),
             Required = CountryItemList.Tomato
         });

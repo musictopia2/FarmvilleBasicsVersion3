@@ -120,7 +120,14 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier,
             {
                 throw new CustomBasicException("There was nothing selected");
             }
-
+            if (OutputPromise is null)
+            {
+                return recipe.Options[_selected.Value].Output.Amount;
+            }
+            if (OutputPromise.IsDouble)
+            {
+                return recipe.Options[_selected.Value].Output.Amount * 2;
+            }
             return recipe.Options[_selected.Value].Output.Amount;
         }
     }

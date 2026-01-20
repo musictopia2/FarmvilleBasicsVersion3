@@ -1,4 +1,6 @@
-﻿namespace Phase05PowerPinsOutputAugmentation.Services.Animals;
+﻿using System.Collections.Generic;
+
+namespace Phase05PowerPinsOutputAugmentation.Services.Animals;
 public class AnimalManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry,
@@ -38,8 +40,24 @@ public class AnimalManager(InventoryManager inventory,
     public AnimalProductionOption NextProductionOption(string animal)
     {
         var instance = _animals.First(x => x.Name == animal);
-        return instance.NextProductionOption;
-
+        var option = instance.NextProductionOption;
+        var key = timedBoostManager.GetActiveOutputAugmentationKeyForItem(animal);
+        if (key is null)
+        {
+            return option;
+        }
+        var snap = outputAugmentationManager.GetSnapshot(key);
+        if (snap.IsDouble == false)
+        {
+            return option;
+        }
+        return new()
+        {
+            Duration = option.Duration,
+            Input = option.Input,
+            Required = option.Required,
+            Output = new ItemAmount(option.Output.Item, option.Output.Amount * 2)
+        };
     }
 
     public void SetAnimalSuppressionByProducedItem(string itemName, bool supressed)
@@ -464,7 +482,32 @@ public class AnimalManager(InventoryManager inventory,
     public BasicList<AnimalProductionOption> GetUnlockedProductionOptions(AnimalView animal)
     {
         AnimalInstance instance = GetAnimalById(animal);
-        return instance.GetUnlockedProductionOptions().ToBasicList();
+        var list = instance.GetUnlockedProductionOptions().ToBasicList();
+
+        var key = timedBoostManager.GetActiveOutputAugmentationKeyForItem(animal.Name);
+        if (key is null)
+        {
+            return list;
+        }
+
+        var snap = outputAugmentationManager.GetSnapshot(key);
+        if (snap.IsDouble == false)
+        {
+            return list;
+        }
+        BasicList<AnimalProductionOption> output = [];
+        foreach (var item in list)
+        {
+            var others = new AnimalProductionOption()
+            {
+                Input = item.Input,
+                Duration = item.Duration,
+                Required = item.Required,
+                Output = new ItemAmount(item.Output.Item, item.Output.Amount * 2)
+            };
+            output.Add(others);
+        }
+        return output;
     }
     public string GetName(AnimalView animal)
     {

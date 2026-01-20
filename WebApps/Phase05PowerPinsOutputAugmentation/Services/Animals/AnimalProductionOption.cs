@@ -1,6 +1,5 @@
-﻿using Phase05PowerPinsOutputAugmentation.Services.Inventory;
+﻿namespace Phase05PowerPinsOutputAugmentation.Services.Animals;
 
-namespace Phase05PowerPinsOutputAugmentation.Services.Animals;
 public class AnimalProductionOption
 {
     public ItemAmount Output { get; init; }
