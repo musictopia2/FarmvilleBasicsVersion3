@@ -2,7 +2,8 @@
 public class AnimalManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry,
-    TimedBoostManager timedBoostManager
+    TimedBoostManager timedBoostManager,
+    OutputAugmentationManager outputAugmentationManager
     )
 {
     private readonly BasicList<AnimalInstance> _animals = [];
@@ -47,7 +48,7 @@ public class AnimalManager(InventoryManager inventory,
         {
             if (x.GetUnlockedProductionOptions().All(x => x.Output.Item == itemName))
             {
-                x.IsSuppressed = true;
+                x.IsSuppressed = supressed;
             }
         });
 
@@ -77,9 +78,9 @@ public class AnimalManager(InventoryManager inventory,
         _needsSaving = true;
     }
     public void ApplyAnimalProgressionUnlocksFromLevels(
-    BasicList<ItemUnlockRule> rules,
-    BasicList<CatalogOfferModel> offers,
-    int level)
+        BasicList<ItemUnlockRule> rules,
+        BasicList<CatalogOfferModel> offers,
+        int level)
     {
         bool changed = false;
 
@@ -203,64 +204,220 @@ public class AnimalManager(InventoryManager inventory,
         });
         return rets;
     }
-    public void GrantUnlimitedAnimalItems(AnimalGrantModel item)
+    
+
+    public bool CanGrantUnlimitedAnimalItems(GrantableItem item)
     {
-        //this would be used when i have unlimited for a time (must have the crops).
-        if (inventory.Has(item.InputData.Item, item.InputData.Amount) == false)
+        var temp = timedBoostManager.GetActiveOutputAugmentationKeyForItem(item.Source);
+        if (temp is null)
         {
-            throw new CustomBasicException("Did not have the requirements to produce it.  Should had ran the required functions first");
+            return inventory.CanAdd(item.Item, item.Amount);
         }
-        if (inventory.CanAdd(item.OutputData) == false)
+        var fins = outputAugmentationManager.GetSnapshot(temp);
+        if (fins.ExtraRewards.Single() == item.Item)
         {
-            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
+            return inventory.CanAdd(item.Item, item.Amount);
         }
-        inventory.Consume(item.InputData.Item, item.InputData.Amount);
-        AddAnimalToInventory(item.OutputData.Item, item.OutputData.Amount);
+        if (fins.IsDouble)
+        {
+            return inventory.CanAdd(item.Item, item.Amount); //ignored for this.
+        }
+        if (fins.ExtraRewards.Count > 1)
+        {
+            throw new CustomBasicException("Should be no extra rewards on animal items except for one");
+        }
+        
+        if (fins.Chance >= 100)
+        {
+            throw new CustomBasicException("Should be no guarantees on animal items");
+        }
+
+        //has to figure out the chance stuff here.
+        //has to predetermine what is going to happen here.
+        int bonus = rs1.ComputeUnlimitedBonus(item.Amount, fins.Chance);
+        if (bonus == 0)
+        {
+            return inventory.CanAdd(item.Item, item.Amount);
+        }
+        BasicList<ItemAmount> list = [];
+        list.Add(new ItemAmount(item.Item, item.Amount));
+        list.Add(new()
+        {
+            Item = fins.ExtraRewards.Single(),
+            Amount = bonus
+        });
+        return inventory.CanAcceptRewards(list);
+
     }
+
     public void GrantUnlimitedAnimalItems(GrantableItem item)
     {
         if (item.Category != EnumItemCategory.Animal)
         {
             throw new CustomBasicException("This is not an animal");
         }
-        //this will not use speed seeds or have any requirements.
-        if (inventory.CanAdd(item) == false)
+        if (CanGrantUnlimitedAnimalItems(item) == false)
         {
-            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
+            throw new CustomBasicException("Cannot grant unlimited animal items.  Should had ran the CanGrantUnlimitedAnimalItems function first");
         }
+        //this will not use speed seeds or have any requirements.
+        //if (inventory.CanAdd(item) == false)
+        //{
+        //    throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
+        //}
         //hopefully no problem with requiring security (?) since this is intended for the unlimited feature.
 
+
+        var temp = timedBoostManager.GetActiveOutputAugmentationKeyForItem(item.Source);
+        if (temp is null)
+        {
+            AddAnimalToInventory(item.Item, item.Amount);
+            return;
+
+        }
+        var fins = outputAugmentationManager.GetSnapshot(temp);
+        if (fins.ExtraRewards.Count > 1)
+        {
+            throw new CustomBasicException("Should be no extra rewards on animal items except for one");
+        }
+        if (fins.IsDouble)
+        {
+            AddAnimalToInventory(item.Item, item.Amount);
+            return;
+        }
+        if (fins.ExtraRewards.Single() == item.Item)
+        {
+            AddAnimalToInventory(item.Item, item.Amount);
+            return;
+        }
+        int bonus = rs1.ComputeUnlimitedBonus(item.Amount, fins.Chance);
+        if (bonus > 0)
+        {
+            inventory.Add(fins.ExtraRewards.Single(), bonus);
+        }
         AddAnimalToInventory(item.Item, item.Amount);
     }
-    //when i am ready for unlimited speed seed for a time, figure that part out later.
-    public void GrantAnimalItems(AnimalGrantModel item, int toUse)
+
+    private static BasicList<ItemAmount> BuildSpeedSeedRewardBundleWorstCase(
+        AnimalGrantModel item,
+        int granted,
+        OutputAugmentationSnapshot fins)
+    {
+        BasicList<ItemAmount> rewards = [];
+
+        // base
+        rewards.Add(new ItemAmount(item.OutputData.Item, granted));
+
+        if (fins.IsDouble)
+        {
+            // Double means base doubles (and/or extras, depending on your plan)
+            rewards.Clear();
+            rewards.Add(new ItemAmount(item.OutputData.Item, granted * 2));
+            return rewards;
+        }
+
+        // chance-based extras: worst-case assume they will be awarded
+        foreach (var extraItem in fins.ExtraRewards)
+        {
+            rewards.Add(new ItemAmount(extraItem, 1)); // matches your ResolveExtraRewards payout rule
+        }
+
+        return rewards;
+    }
+    public bool CanGrantAnimalItems(AnimalGrantModel item, int toUse)
     {
         if (toUse <= 0)
         {
-            throw new CustomBasicException("Must use at least one speed seed");
+            return false;
         }
-
         if (inventory.Get(CurrencyKeys.SpeedSeed) < toUse)
         {
-            throw new CustomBasicException("Not enough speed seeds.  Should had ran the required functions first");
+            return false;
         }
         if (inventory.Has(item.InputData.Item, item.InputData.Amount * toUse) == false)
         {
-            throw new CustomBasicException("Did not have the requirements to produce it.  Should had ran the required functions first");
+            return false;
+        }
+        int granted = toUse * item.OutputData.Amount;
+        var temp = timedBoostManager.GetActiveOutputAugmentationKeyForItem(item.AnimalName);
+        if (temp is null)
+        {
+            return inventory.CanAdd(item.OutputData.Item, granted);
+        }
+        var fins = outputAugmentationManager.GetSnapshot(temp);
+        BasicList<ItemAmount> bundles = BuildSpeedSeedRewardBundleWorstCase(item, granted, fins);
+        return inventory.CanAcceptRewards(bundles);
+
+    }
+    public void GrantAnimalItems(AnimalGrantModel item, int toUse)
+    {
+        if (CanGrantAnimalItems(item, toUse) == false)
+        {
+            throw new CustomBasicException("Cannot grant animal items.  Should had ran the CanGrantAnimalItems function first");
         }
 
+
         int granted = toUse * item.OutputData.Amount;
-        if (inventory.CanAdd(item.OutputData.Item, granted) == false)
-        {
-            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
-        }
+
         inventory.Consume(item.InputData.Item, item.InputData.Amount * toUse);
-        //inventory.Consume(instance.RequiredName(selected), required);
-        AddAnimalToInventory(item.OutputData.Item, granted);
+
+
+        var temp = timedBoostManager.GetActiveOutputAugmentationKeyForItem(item.AnimalName);
+        if (temp is null)
+        {
+            AddAnimalToInventory(item.OutputData.Item, granted);
+        }
+        else
+        {
+            var fins = outputAugmentationManager.GetSnapshot(temp);
+            if (fins.IsDouble)
+            {
+                AddAnimalToInventory(item.OutputData.Item, granted * 2);
+            }
+            else
+            {
+
+                bool hit = rs1.RollHit(fins.Chance);
+
+
+                if (hit)
+                {
+                    foreach (var extra in fins.ExtraRewards)
+                    {
+                        inventory.Add(extra, 1);
+                    }
+                }
+
+                AddAnimalToInventory(item.OutputData.Item, granted);
+            }
+
+        }
+
         inventory.Consume(CurrencyKeys.SpeedSeed, toUse);
     }
 
+    public int GetDisplayedGrantAmount(AnimalGrantModel item)
+    {
+        int granted = item.OutputData.Amount;
 
+        var key = timedBoostManager.GetActiveOutputAugmentationKeyForItem(item.AnimalName);
+        if (key is null)
+        {
+            return granted;
+        }
+
+        var snap = outputAugmentationManager.GetSnapshot(key);
+
+        // Only treat as deterministic display if it doubles the SAME item
+        if (snap.IsDouble
+            && snap.ExtraRewards.Count == 1
+            && string.Equals(snap.ExtraRewards.Single(), item.OutputData.Item, StringComparison.OrdinalIgnoreCase))
+        {
+            return granted * 2;
+        }
+
+        return granted;
+    }
 
     public BasicList<AnimalGrantModel> GetUnlockedAnimalGrantItems()
     {
@@ -357,7 +514,19 @@ public class AnimalManager(InventoryManager inventory,
     private bool CanCollect(AnimalInstance instance)
     {
         int maxs = GetAmount(instance);
-        return inventory.CanAdd(instance.ReceivedName, maxs);
+
+        BasicList<ItemAmount> bundle = [];
+
+        // base
+        bundle.Add(new ItemAmount(instance.ReceivedName, maxs));
+
+        // extras (already resolved on instance)
+        if (instance.ExtraRewards is not null && instance.ExtraRewards.Count > 0)
+        {
+            bundle.AddRange(instance.ExtraRewards);
+        }
+
+        return inventory.CanAcceptRewards(bundle);
     }
     public bool CanCollect(AnimalView animal)
     {
@@ -384,13 +553,25 @@ public class AnimalManager(InventoryManager inventory,
     }
     private void Collect(AnimalInstance animal, int maxs)
     {
-        string selectedName = animal.ReceivedName;
-        maxs.Times(x =>
+        if (CanCollect(animal) == false)
         {
-            animal.Collect();
-        });
+            throw new CustomBasicException("Not enough storage space to collect (includes bonus rewards).");
+        }
+
+        string selectedName = animal.ReceivedName;
+
+        maxs.Times(_ => animal.Collect());
+
+        // base
         AddAnimalToInventory(selectedName, maxs);
 
+        // extras
+        foreach (var extra in animal.ExtraRewards)
+        {
+            inventory.Add(extra);
+        }
+        // IMPORTANT: clear extras so you don't add them again next collect
+        animal.Clear(); //needed a new method.  otherwise, it would had cleared and would never show extra rewards.
     }
     private void AddAnimalToInventory(string name, int amount)
     {
@@ -439,7 +620,7 @@ public class AnimalManager(InventoryManager inventory,
         foreach (var item in ours)
         {
             AnimalRecipe recipe = _recipes.Single(x => x.Animal == item.Name);
-            AnimalInstance animal = new(recipe, offset);
+            AnimalInstance animal = new(recipe, offset, timedBoostManager, outputAugmentationManager);
 
             animal.Load(item);
             _animals.Add(animal);

@@ -16,12 +16,7 @@ public class InstantUnlimitedManager(CropManager cropManager,
     }
     public async Task SetLockStateAsync(string item, bool unlocked)
     {
-        var model = _items.SingleOrDefault(x => x.Name == item);
-        if (model is null)
-        {
-            throw new CustomBasicException($"Instant Unlimited item '{item}' was not found.");
-        }
-
+        var model = _items.SingleOrDefault(x => x.Name == item) ?? throw new CustomBasicException($"Instant Unlimited item '{item}' was not found.");
         if (model.Unlocked == unlocked)
         {
             return; // no-op
@@ -92,7 +87,8 @@ public class InstantUnlimitedManager(CropManager cropManager,
         {
             Amount = howMany,
             Item = item,
-            Category = category
+            Category = category,
+            Source = itemManager.GetSource(item)
         };
         switch (category)
         {

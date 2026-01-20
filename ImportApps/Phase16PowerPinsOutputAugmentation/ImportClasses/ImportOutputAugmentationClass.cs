@@ -97,7 +97,7 @@ internal static class ImportOutputAugmentationClass
         key = CountryAugmentationKeys.TomatoChanceFarmersSoup;
         target = GetOffer(offers, key).TargetName;
         output.Add(Chance(key, target, FarmHelperClass.GetOnlyItem(CountryItemList.FarmersSoup)));
-
+        ValidateNoDuplicateTargets(output, farm);
         return output;
     }
 
@@ -133,7 +133,38 @@ internal static class ImportOutputAugmentationClass
         key = TropicalAugmentationKeys.SmugglersCaveGuaranteedTruffleFriesAndFriedRice;
         target = GetOffer(offers, key).TargetName;
         output.Add(GuaranteedList(key, target, [TropicalItemList.TruffleFries, TropicalItemList.FriedRice]));
-
+        ValidateNoDuplicateTargets(output, farm);
         return output;
     }
+
+
+
+    private static void ValidateNoDuplicateTargets(BasicList<OutputAugmentationPlanModel> plans, FarmKey farm)
+    {
+        static string Normalize(string s) => (s ?? "").Trim().ToLowerInvariant();
+
+        var dupes = plans
+            .GroupBy(p => Normalize(p.TargetName))
+            .Where(g => g.Count() > 1)
+            .Select(g => new
+            {
+                Target = g.Key,
+                Keys = g.Select(x => x.Key).ToList()
+            })
+            .ToList();
+
+        if (dupes.Count == 0)
+        {
+            return;
+        }
+
+        // Build a useful error message so you can fix the import fast
+        var lines = dupes.Select(d =>
+            $"{d.Target} => {string.Join(", ", d.Keys)}");
+
+        throw new CustomBasicException(
+            $"Output augmentation import invalid for farm '{farm.PlayerName}' ({farm.Theme}). " +
+            $"Each TargetName may appear only once. Duplicates: {string.Join(" | ", lines)}");
+    }
+
 }

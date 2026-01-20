@@ -15,7 +15,7 @@
 
                 <div class="ss-produces">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="fw-bold">+ @item.OutputData.Amount @item.OutputData.Item.GetWords</div>
+                        <div class="fw-bold">+ @AnimalManager.GetDisplayedGrantAmount(item) @item.OutputData.Item.GetWords</div>
                         <img src="@GetItemImage(item.OutputData.Item)"
                              alt="@item.OutputData.Item"
                              class="ss-produces-img" />

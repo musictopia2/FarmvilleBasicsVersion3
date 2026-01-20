@@ -138,7 +138,8 @@ public class CropManager(InventoryManager inventory,
             {
                 Amount = 2,
                 Category = EnumItemCategory.Crop,
-                Item = temp.Item
+                Item = temp.Item,
+                Source = temp.Item //i think.
             });
         });
         return output;

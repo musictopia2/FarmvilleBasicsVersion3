@@ -20,7 +20,7 @@ public class TimedBoostManager
     {   
         if (item.Duration.HasValue == false)
         {
-            throw new CustomBasicException("Must have duratin for granting credit");
+            throw new CustomBasicException("Must have duration for granting credit");
         }
         var existing = _profile.Credits.SingleOrDefault(x => x.BoostKey == item.TargetName && x.Duration == item.Duration);
 
@@ -59,6 +59,29 @@ public class TimedBoostManager
         }
         return active.ReduceBy.Value;
     }
+
+    public string? GetActiveOutputAugmentationKeyForItem(string itemName)
+    {
+        CleanupExpired();
+        var active = _profile.Active
+            .SingleOrDefault(a =>
+                a.BoostKey == itemName &&
+                string.IsNullOrWhiteSpace(a.OutputAugmentationKey) == false);
+        return active?.OutputAugmentationKey;
+    }
+
+    //public BasicList<string> GetActiveOutputAugmentationKeysForItem(string itemName)
+    //{
+    //    CleanupExpired();
+
+    //    return _profile.Active
+    //        .Where(a =>
+    //            a.BoostKey == itemName &&
+    //            string.IsNullOrWhiteSpace(a.OutputAugmentationKey) == false)
+    //        .Select(a => a.OutputAugmentationKey!)
+    //        .ToBasicList();
+    //}
+
     public bool CanActivateBoost(TimedBoostCredit credit)
     {
         var active = _profile.Active.SingleOrDefault(a => a.BoostKey == credit.BoostKey);

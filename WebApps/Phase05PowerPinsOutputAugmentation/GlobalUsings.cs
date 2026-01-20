@@ -38,3 +38,5 @@ global using Phase05PowerPinsOutputAugmentation.Services.Items;
 global using Phase05PowerPinsOutputAugmentation.Services.InstantUnlimited;
 global using Phase05PowerPinsOutputAugmentation.Services.TimedBoosts;
 global using Phase05PowerPinsOutputAugmentation.Services.OutputAugmentation;
+global using rs1 = Phase05PowerPinsOutputAugmentation.Utilities.RandomUtilities;
+//realized it was common enough (because not just generating quests anymore).

@@ -378,7 +378,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             LevelRequired = 12,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
-            TargetName = CountryItemList.Milk
+            TargetName = CountryItemList.Milk,
         });
         return output;
     }
@@ -406,7 +406,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             LevelRequired = 12,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
-            TargetName = TropicalItemList.Fish
+            TargetName = TropicalItemList.Fish,
         });
         return output;
     }

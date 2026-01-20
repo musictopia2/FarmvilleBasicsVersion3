@@ -12,5 +12,8 @@ public class AnimalAutoResumeModel
     public DateTime? StartedAt { get; set; }
     public int? Selected { get; set; }
     public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
+    public OutputAugmentationSnapshot? OutputPromise { get; set; }
+    public BasicList<ItemAmount> ExtraRewards { get; set; } = [];
+    public bool ExtrasResolved { get; set; }
     //eventually needs to know about options you are allowed to do (later)
 }

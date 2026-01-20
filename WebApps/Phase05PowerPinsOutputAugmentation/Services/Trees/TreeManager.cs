@@ -122,7 +122,8 @@ public class TreeManager(InventoryManager inventory,
             {
                 Item = name,
                 Amount = amount,
-                Category = EnumItemCategory.Tree
+                Category = EnumItemCategory.Tree,
+                Source = name
             });
         }
 

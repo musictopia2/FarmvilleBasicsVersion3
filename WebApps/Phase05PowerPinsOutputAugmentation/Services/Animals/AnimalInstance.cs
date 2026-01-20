@@ -1,10 +1,14 @@
 ﻿namespace Phase05PowerPinsOutputAugmentation.Services.Animals;
-public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
+public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier,
+    TimedBoostManager timedBoostManager, OutputAugmentationManager outputAugmentationManager
+    )
 {
     public Guid Id { get; } = Guid.NewGuid();
     public bool Unlocked { get; set; } = true;
     public TimeSpan ReducedBy { get; private set; } = TimeSpan.Zero;
     public bool IsSuppressed { get; set; } = false;
+    public OutputAugmentationSnapshot? OutputPromise { get; private set; }
+    public BasicList<ItemAmount> ExtraRewards { get; private set; } = [];
     public BasicList<AnimalProductionOption> GetUnlockedProductionOptions()
         => recipe.Options.Take(ProductionOptionsAllowed).ToBasicList();
 
@@ -35,6 +39,7 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
     }
     public void Load(AnimalAutoResumeModel animal)
     {
+
         State = animal.State;
         OutputReady = animal.OutputReady;
         StartedAt = animal.StartedAt;
@@ -42,7 +47,10 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
         Unlocked = animal.Unlocked;
         _selected = animal.Selected;
         ReducedBy = animal.ReducedBy;
+        ExtraRewards = animal.ExtraRewards;
+        OutputPromise = animal.OutputPromise;
         IsSuppressed = animal.IsSuppressed;
+        _extrasResolved = animal.ExtrasResolved;
         // Restore locked promise only (do NOT overwrite current multiplier)
         _runMultiplier = animal.RunMultiplier;
 
@@ -77,6 +85,9 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
                 ReducedBy = ReducedBy,
                 Selected = _selected,
                 IsSuppressed = IsSuppressed,
+                ExtraRewards = ExtraRewards,
+                ExtrasResolved = _extrasResolved,
+                OutputPromise = OutputPromise,
                 // Save the promise only when a run exists; otherwise null
                 RunMultiplier = _selected is null ? null : _runMultiplier
             };
@@ -130,46 +141,144 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
         {
             return;
         }
-
         _selected = selected;
-
         // Lock promise for this run
         _runMultiplier = _currentMultiplier;
         ReducedBy = reducedBy;
         State = EnumAnimalState.Producing;
         OutputReady = Returned(selected);
         Duration = GetDuration(selected, reducedBy);
-        StartedAt = DateTime.Now; // consider UtcNow later if you want
+        StartedAt = DateTime.Now;
+        OutputPromise = null;
+        ExtraRewards.Clear();
+        RunPossibleAugmentation();
+        _needsSaving = true; //i think.
     }
 
     private bool _needsSaving;
+    private bool _extrasResolved;
     public bool NeedsToSave => _needsSaving;
 
+    private void RunPossibleAugmentation()
+    {
+        if (OutputPromise is not null)
+        {
+            return; //already promised.
+        }
+        string? key = timedBoostManager.GetActiveOutputAugmentationKeyForItem(Name);
+        if (key is null)
+        {
+            return;
+        }
+        OutputPromise = outputAugmentationManager.GetSnapshot(key);
+        _needsSaving = true;
+    }
     public void UpdateTick()
     {
         _needsSaving = false;
-
+        if (State == EnumAnimalState.Collecting && OutputPromise is null)
+        {
+            //check for output augmentation promise
+            RunPossibleAugmentation();
+        }
+        // If we're Collecting and we have a promise but haven't resolved extras yet, do it now.
+        if (State == EnumAnimalState.Collecting && OutputPromise is not null && _extrasResolved == false)
+        {
+            ResolveExtraRewards();
+            _extrasResolved = true;
+            _needsSaving = true;
+        }
         if (State != EnumAnimalState.Producing || StartedAt is null || Duration is null)
         {
             return;
         }
-
+        RunPossibleAugmentation();
         var elapsed = DateTime.Now - StartedAt.Value;
         if (elapsed >= Duration)
         {
             State = EnumAnimalState.Collecting;
             StartedAt = null;
+            // If promise exists now, resolve immediately; otherwise it can resolve later when promise appears.
+            if (OutputPromise is not null)
+            {
+                ResolveExtraRewards();
+                _extrasResolved = true;
+            }
+            else
+            {
+                _extrasResolved = false;
+            }
             _needsSaving = true;
         }
     }
+    //may need here (?)
+    public void ResolveExtraRewards()
+    {
+        if (OutputPromise is null)
+        {
+            return;
+        }
 
+        ExtraRewards.Clear();
+
+        // Guaranteed double-type bonus (no RNG)
+        if (OutputPromise.IsDouble)
+        {
+            int received = OutputReady * 2;
+
+            if (OutputPromise.ExtraRewards.Count == 1 && OutputPromise.ExtraRewards.Single() == ReceivedName)
+            {
+                OutputReady = received; //computer discouraged doing this way.  i decided to risk doing it my way this time.
+                return;
+            }
+
+            foreach (var item in OutputPromise.ExtraRewards)
+            {
+                ExtraRewards.Add(new()
+                {
+                    Amount = received,
+                    Item = item
+                });
+            }
+            return;
+        }
+
+        if (_selected is null)
+        {
+            throw new CustomBasicException("No selection");
+        }
+
+        double totalChanceRaw = OutputPromise.Chance * (_selected.Value + 1);
+        int multiplier = _selected.Value + 1;
+        double chancePercent = OutputPromise.Chance * multiplier; // 0..100 (can be decimal)
+        chancePercent = Math.Clamp(chancePercent, 0d, 100d);
+
+
+        bool hit = rs1.RollHit(chancePercent);
+
+
+        // miss
+        if (hit == false)
+        {
+            return;
+        }
+
+        // hit => award once per item
+        foreach (var item in OutputPromise.ExtraRewards)
+        {
+            ExtraRewards.Add(new()
+            {
+                Amount = 1,
+                Item = item
+            });
+        }
+    }
     public void Collect()
     {
         if (OutputReady <= 0)
         {
             return;
         }
-
         OutputReady--;
         if (OutputReady == 0)
         {
@@ -178,9 +287,15 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier)
 
             // Clear promise for next run
             _runMultiplier = null;
-
+            _needsSaving = true;
             Duration = null;
         }
+    }
+    public void Clear()
+    {
+        OutputPromise = null;
+        ExtraRewards.Clear();
+        _needsSaving = true;
     }
 
     public TimeSpan? ReadyTime

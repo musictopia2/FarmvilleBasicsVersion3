@@ -6,10 +6,10 @@
 <StopClickPropagation Class="trees-root">
     <WrapLayout RenderList="_items" Context="item"
                 ColumnWidth="180px">
-        <ImageButtonComponent Name="@item"
+        <ImageButtonComponent Name="@item.ItemName"
                               OnClick="() => ChooseInstance(item)"
                               Height="100" />
-        <span style="font-size:  2rem;">@InventoryManager.Get(item)</span>
+        <span style="font-size:  2rem;">@InventoryManager.Get(item.ItemName)</span>
     </WrapLayout>
 </StopClickPropagation>
 

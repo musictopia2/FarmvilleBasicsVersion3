@@ -1,6 +1,4 @@
-﻿using CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.RandomGenerator; //not common enough.
-using rs1 = CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.RandomGenerator.RandomHelpers; //not common enough.
-
+﻿
 //we put here instead of data access because preparing for complex processes (future).
 
 namespace Phase05PowerPinsOutputAugmentation.RandomQuestGeneratorProcesses;
@@ -13,7 +11,6 @@ public class RandomQuestGenerationService(CropManager cropManager,
     //this version will be very simple.
     // Phase 13: simple anti-dup logic. You can tune later.
     private const int _duplicateCap = 3; //suggested no more than 3 at a time.
-    private readonly IRandomNumberList _rng = rs1.GetRandomGenerator();
 
     QuestInstanceModel IQuestGenerationService.CreateQuest(
     int currentLevel,
@@ -75,7 +72,7 @@ public class RandomQuestGenerationService(CropManager cropManager,
     }
 
     private int NextInt(int minInclusive, int maxInclusive)
-    => _rng.GetRandomNumber(maxInclusive, minInclusive);
+    => rs1.Randoms.GetRandomNumber(maxInclusive, minInclusive);
 
     private int GetRequired(ItemPlanModel chosen) => chosen.Category switch
     {

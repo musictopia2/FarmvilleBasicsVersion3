@@ -17,7 +17,6 @@ public partial class UnlimitedSpeedSeedsGrantComponent(IToast toast, IntegerActi
         {
             var list = ItemManager.GetEligibleItems(level);
             _items = list.Where(x => x.Category == Category)
-                         .Select(x => x.ItemName)
                          .ToBasicList();
 
             _lastLevel = level;
@@ -31,9 +30,9 @@ public partial class UnlimitedSpeedSeedsGrantComponent(IToast toast, IntegerActi
         _currentOption = "";
         actionPickerService.CompletedAsync = null;
     }
-    private void ChooseInstance(string instance)
+    private void ChooseInstance(ItemPlanModel instance)
     {
-        _currentOption = instance;
+        _currentOption = instance.ItemName;
 
         int maxValue = int.MaxValue;
 
@@ -54,7 +53,8 @@ public partial class UnlimitedSpeedSeedsGrantComponent(IToast toast, IntegerActi
             {
                 Amount = howMany,
                 Category = Category,
-                Item = _currentOption
+                Item = _currentOption,
+                Source = instance.Source
             };
             switch (Category)
             {
@@ -90,6 +90,6 @@ public partial class UnlimitedSpeedSeedsGrantComponent(IToast toast, IntegerActi
         GC.SuppressFinalize(this);
     }
 
-    private BasicList<string> _items = [];
+    private BasicList<ItemPlanModel> _items = [];
 
 }

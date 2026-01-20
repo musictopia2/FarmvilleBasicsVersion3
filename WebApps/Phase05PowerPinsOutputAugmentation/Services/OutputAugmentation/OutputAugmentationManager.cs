@@ -7,12 +7,25 @@ public class OutputAugmentationManager
     {
         _plans = await context.OutputAugmentationPlanProvider.GetPlanAsync(farm);
     }
-    //should know when it needs to use this.
-    public OutputAugmentationPlanModel GetPlanModel(string key)
+    //i propose that instead of getting the plan directly, will simply give the details from it.
+    private OutputAugmentationPlanModel GetPlanModel(string key)
     {
         var plan = _plans.SingleOrDefault(x => x.Key == key) ?? throw new CustomBasicException($"Could not find output augmentation plan with key {key}");
         return plan;
     }
+
+
+    public OutputAugmentationSnapshot GetSnapshot(string key)
+    {
+        var plan = GetPlanModel(key);
+        return new OutputAugmentationSnapshot
+        {
+            IsDouble = plan.IsDouble,
+            ExtraRewards = plan.Rewards.ToBasicList(),
+            Chance = plan.ChancePercent
+        };
+    }
+
     private static bool SameItem(string a, string b) =>
         string.Equals(a?.Trim(), b?.Trim(), StringComparison.OrdinalIgnoreCase);
 
