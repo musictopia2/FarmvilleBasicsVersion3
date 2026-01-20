@@ -3,7 +3,12 @@
     height: 50vh;
     overflow-y: auto;
 }
-
+.boost-icon-slot {
+    width: 72px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+}
 .boosts-title {
     font-size: 1.4rem;
     font-weight: 700;

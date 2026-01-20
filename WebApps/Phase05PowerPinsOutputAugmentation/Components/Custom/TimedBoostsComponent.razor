@@ -7,10 +7,12 @@
                     Context="boost">
             <div class="boost-card">
 
-                <BoostIconComponent ImageSize="72"
-                                    IconSize="40"
-                                    Name="@boost.BoostKey"
-                                    ReduceBy="@boost.ReduceBy" />
+                <div class="boost-icon-slot">
+                    <BoostIconComponent ImageSize="72"
+                                        IconSize="40"
+                                        Name="@boost.BoostKey"
+                                        ReduceBy="@boost.ReduceBy" />
+                </div>
 
                 <div class="boost-name">@GetBoostTitle(boost.BoostKey)</div>
 
