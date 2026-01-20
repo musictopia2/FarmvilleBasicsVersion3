@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Phase05PowerPinsOutputAugmentation.Services.Animals;
+﻿namespace Phase05PowerPinsOutputAugmentation.Services.Animals;
 public class AnimalManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry,
@@ -10,6 +8,8 @@ public class AnimalManager(InventoryManager inventory,
 {
     private readonly BasicList<AnimalInstance> _animals = [];
     public event Action? OnAnimalsUpdated;
+    public event Action<ItemAmount>? OnAugmentedOutput;
+
     private IAnimalRepository _animalRepository = null!;
 
 
@@ -222,7 +222,7 @@ public class AnimalManager(InventoryManager inventory,
         });
         return rets;
     }
-    
+
 
     public bool CanGrantUnlimitedAnimalItems(GrantableItem item)
     {
@@ -244,7 +244,7 @@ public class AnimalManager(InventoryManager inventory,
         {
             throw new CustomBasicException("Should be no extra rewards on animal items except for one");
         }
-        
+
         if (fins.Chance >= 100)
         {
             throw new CustomBasicException("Should be no guarantees on animal items");
@@ -311,11 +311,25 @@ public class AnimalManager(InventoryManager inventory,
         int bonus = rs1.ComputeUnlimitedBonus(item.Amount, fins.Chance);
         if (bonus > 0)
         {
-            inventory.Add(fins.ExtraRewards.Single(), bonus);
+            AddExtraRewards(fins.ExtraRewards.Single(), bonus);
+            
         }
         AddAnimalToInventory(item.Item, item.Amount);
     }
 
+    private void AddExtraRewards(string item, int amount)
+    {
+
+        ItemAmount payLoad = new()
+        {
+            Amount = amount,
+            Item = item
+        };
+        OnAugmentedOutput?.Invoke(payLoad);
+        inventory.Add(payLoad);
+    }
+
+    
     private static BasicList<ItemAmount> BuildSpeedSeedRewardBundleWorstCase(
         AnimalGrantModel item,
         int granted,
@@ -396,21 +410,17 @@ public class AnimalManager(InventoryManager inventory,
             {
 
                 bool hit = rs1.RollHit(fins.Chance);
-
-
+                if (fins.ExtraRewards.Count != 1)
+                {
+                    throw new CustomBasicException("For chanced based. must have just one reward");
+                }
                 if (hit)
                 {
-                    foreach (var extra in fins.ExtraRewards)
-                    {
-                        inventory.Add(extra, 1);
-                    }
+                    AddExtraRewards(fins.ExtraRewards.Single(), 1);
                 }
-
                 AddAnimalToInventory(item.OutputData.Item, granted);
             }
-
         }
-
         inventory.Consume(CurrencyKeys.SpeedSeed, toUse);
     }
 
@@ -608,11 +618,11 @@ public class AnimalManager(InventoryManager inventory,
         // base
         AddAnimalToInventory(selectedName, maxs);
 
-        // extras
-        foreach (var extra in animal.ExtraRewards)
+        if (animal.ExtraRewards.Count > 0)
         {
-            inventory.Add(extra);
+            AddExtraRewards(animal.ExtraRewards.Single().Item, animal.ExtraRewards.Single().Amount);
         }
+
         // IMPORTANT: clear extras so you don't add them again next collect
         animal.Clear(); //needed a new method.  otherwise, it would had cleared and would never show extra rewards.
     }
