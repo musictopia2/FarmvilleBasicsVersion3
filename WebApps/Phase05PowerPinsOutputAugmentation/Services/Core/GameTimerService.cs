@@ -29,7 +29,9 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
             IItemFactory itemFactory = sp.GetRequiredService<IItemFactory>();
             IInstantUnlimitedFactory instantUnlimitedFactory = sp.GetRequiredService<IInstantUnlimitedFactory>();
             ITimedBoostFactory timedBoostFactory = sp.GetRequiredService<ITimedBoostFactory>();
+            IOutputAugmentationFactory outputAugmentationFactory = sp.GetRequiredService<IOutputAugmentationFactory>();
             TimedBoostManager timedBoostManager = new();
+            OutputAugmentationManager outputAugmentationManager = new();
             CropManager cropManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager);
             TreeManager treeManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager);
             AnimalManager animalManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager);
@@ -53,11 +55,11 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
                 cropFactory, treeFactory, animalFactory, workshopFactory,
                 worksiteFactory, workerFactory, questFactory,
                 upgradeFactory, progressionFactory, catalogFactory, 
-                storeFactory, itemFactory, instantUnlimitedFactory, timedBoostFactory,
+                storeFactory, itemFactory, instantUnlimitedFactory, timedBoostFactory, outputAugmentationFactory,
                 cropManager, treeManager, animalManager,
                 workshopManager, worksiteManager, questManager,
                 upgradeManager, progressionManager, catalogManager, 
-                storeManager, itemManager, instantUnlimitedManager, timedBoostManager
+                storeManager, itemManager, instantUnlimitedManager, timedBoostManager, outputAugmentationManager
                 );
             await gameRegistry.InitializeFarmAsync(timer, farm);
         }

@@ -37,3 +37,4 @@ global using Phase05PowerPinsOutputAugmentation.Services.Store;
 global using Phase05PowerPinsOutputAugmentation.Services.Items;
 global using Phase05PowerPinsOutputAugmentation.Services.InstantUnlimited;
 global using Phase05PowerPinsOutputAugmentation.Services.TimedBoosts;
+global using Phase05PowerPinsOutputAugmentation.Services.OutputAugmentation;

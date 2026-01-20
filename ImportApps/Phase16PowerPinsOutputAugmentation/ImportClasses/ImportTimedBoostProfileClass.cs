@@ -29,7 +29,8 @@ public static class ImportTimedBoostProfileClass
                 BoostKey = catalog.TargetName,
                 Duration = catalog.Duration.Value,
                 Quantity = 2,
-                ReduceBy = catalog.ReduceBy
+                ReduceBy = catalog.ReduceBy,
+                OutputAugmentationKey = catalog.OutputAugmentationKey
             });
         });
         return new TimedBoostProfileDocument

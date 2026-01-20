@@ -16,6 +16,7 @@ public static class CatalogExtensions
                 Repeatable = source.Repeatable,
                 ReduceBy = source.ReduceBy,
                 Quantity = source.Quantity,
+                OutputAugmentationKey = source.OutputAugmentationKey,
                 // Deep-copy the costs dictionary
                 Costs = source.Costs is null
                     ? []

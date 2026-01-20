@@ -6,6 +6,7 @@ using Phase05PowerPinsOutputAugmentation.DataAccess.Core;
 using Phase05PowerPinsOutputAugmentation.DataAccess.Crops;
 using Phase05PowerPinsOutputAugmentation.DataAccess.InstantUnlimited;
 using Phase05PowerPinsOutputAugmentation.DataAccess.Items;
+using Phase05PowerPinsOutputAugmentation.DataAccess.OutputAugmentation;
 using Phase05PowerPinsOutputAugmentation.DataAccess.Progression;
 using Phase05PowerPinsOutputAugmentation.DataAccess.Quests; //not common enough.
 using Phase05PowerPinsOutputAugmentation.DataAccess.Store;
@@ -44,6 +45,7 @@ public static class ServiceExtensions
                 .AddSingleton<IItemFactory, ItemFactory>()
                 .AddSingleton<IInstantUnlimitedFactory, InstantUnlimitedFactory>()
                 .AddSingleton<ITimedBoostFactory, TimedBoostFactory>()
+                .AddSingleton<IOutputAugmentationFactory, OutputAugmentationFactory>()
                 .AddScoped<ReadyStatusService>()
                 .AddScoped<OverlayService>()
                 .AddScoped<FarmContext>()

@@ -5,4 +5,5 @@ public class ActiveTimedBoost
     public DateTime StartedAt { get; set; }
     public DateTime EndsAt { get; set; }
     public TimeSpan? ReduceBy { get; set; }
+    public string? OutputAugmentationKey { get; set; }
 }

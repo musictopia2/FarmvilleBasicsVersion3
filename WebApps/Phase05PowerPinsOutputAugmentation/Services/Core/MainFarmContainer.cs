@@ -1,6 +1,4 @@
-﻿
-
-namespace Phase05PowerPinsOutputAugmentation.Services.Core;
+﻿namespace Phase05PowerPinsOutputAugmentation.Services.Core;
 public class MainFarmContainer
 {
     required public CropManager CropManager { get; set; }
@@ -18,6 +16,7 @@ public class MainFarmContainer
     required public InstantUnlimitedManager InstantUnlimitedManager { get; set; }
     required public TimedBoostManager TimedBoostManager { get; set; }
     required public ItemManager ItemManager { get; set; }
+    required public OutputAugmentationManager OutputAugmentationManager { get; set; }
 
     //attempt to not require itemmanager here (since only the quest manager should require it.   if i am wrong, rethink).
 }
