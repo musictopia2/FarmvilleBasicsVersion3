@@ -9,6 +9,10 @@ public partial class BoostIconComponent
 
     [Parameter]
     public bool IsTree { get; set; }
+
+    [Parameter]
+    public bool IsAugmented { get; set; }
+
     [Parameter]
     public int ImageSize { get; set; } = 64;
     [Parameter]

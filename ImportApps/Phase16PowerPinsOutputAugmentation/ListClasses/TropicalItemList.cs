@@ -25,7 +25,7 @@ public static class TropicalItemList
     public const string BlueCrystal = "BlueCrystal";
     public const string SilverOre = "SilverOre"; //done
     public const string GrilledCrab = "GrilledCrab"; //done
-
+    public const string SearedFish = "SearedFish";
 
     //has to allow at least what is needed to craft what is needed so i can do the other 2 worksites (so no temporary workaround).
 

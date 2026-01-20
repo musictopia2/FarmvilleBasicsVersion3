@@ -35,6 +35,11 @@ public static class CountryItemList
     public const string Quartz = "Quartz"; //done
     public const string Cooper = "Cooper"; //done
     public const string Tin = "Tin"; //done
+
+    public const string Butter = "Butter";
+    public const string HerbButter = "HerbButter";
+
+
     //anything else i need will be here.
 
 }

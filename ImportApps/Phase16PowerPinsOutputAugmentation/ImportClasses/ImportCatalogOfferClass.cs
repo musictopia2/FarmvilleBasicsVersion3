@@ -1,5 +1,4 @@
 ﻿namespace Phase16PowerPinsOutputAugmentation.ImportClasses;
-
 public static class ImportCatalogOfferClass
 {
     public static async Task ImportCatalogAsync()
@@ -28,12 +27,13 @@ public static class ImportCatalogOfferClass
         {
             list.AddRange(ImportCountryUnlimitedItems());
             list.AddRange(ImportCountryTimeReductionPowerPins());
-
+            list.AddRange(ImportCountryOutputAugmentationOffers());
         }
         else if (farm.Theme == FarmThemeList.Tropical)
         {
             list.AddRange(ImportTropicalUnlimitedItems());
             list.AddRange(ImportTropicalTimeReductionPowerPins());
+            list.AddRange(ImportTropicalOutputAugmentationOffers());
         }
         else
         {
@@ -46,6 +46,143 @@ public static class ImportCatalogOfferClass
 
         };
     }
+
+    private static BasicList<CatalogOfferModel> ImportCountryOutputAugmentationOffers()
+    {
+        EnumCatalogCategory category = EnumCatalogCategory.TimedBoost;
+        BasicList<CatalogOfferModel> output = [];
+        TimeSpan duration = TimeSpan.FromHours(2);
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryWorksiteListClass.Mines,
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = CountryAugmentationKeys.MinesGuaranteedGranolaBlanket,
+            LevelRequired = 18
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryAnimalListClass.Sheep, //should give the animal name this time.
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = CountryAugmentationKeys.SheepDoubleWoolGuaranteed,
+            LevelRequired = 16
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryItemList.Peach,
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = CountryAugmentationKeys.PeachTreeChanceExtraPeach,
+            LevelRequired = 10
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryItemList.ApplePie, //i think this time needs to be apple pies.
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = CountryAugmentationKeys.ApplePieChanceExtraApplePie,
+            LevelRequired = 9
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryAnimalListClass.Cow,
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = CountryAugmentationKeys.CowChanceButter,
+            LevelRequired = 10
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = CountryItemList.Tomato,
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = CountryAugmentationKeys.TomatoChanceFarmersSoup,
+            LevelRequired = 11
+        });
+
+
+        return output;
+    }
+
+    private static BasicList<CatalogOfferModel> ImportTropicalOutputAugmentationOffers()
+    {
+        EnumCatalogCategory category = EnumCatalogCategory.TimedBoost;
+        BasicList<CatalogOfferModel> output = [];
+        TimeSpan duration = TimeSpan.FromHours(2);
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = TropicalWorksiteListClass.SmugglersCave,
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = TropicalAugmentationKeys.SmugglersCaveGuaranteedTruffleFriesAndFriedRice,
+            LevelRequired = 18
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = TropicalItemList.Rice, //should give the animal name this time.
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = TropicalAugmentationKeys.RiceChanceExtraSteamedRice,
+            LevelRequired = 16
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = TropicalItemList.Lime,
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = TropicalAugmentationKeys.LimeChanceExtraLime,
+            LevelRequired = 10
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = TropicalItemList.GrilledCrab, //i think this time needs to be apple pies.
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = TropicalAugmentationKeys.GrilledCrabChanceExtraGrilledCrab,
+            LevelRequired = 9
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = TropicalAnimalListClass.Dolphin,
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = TropicalAugmentationKeys.DolphinChanceSearedFish,
+            LevelRequired = 10
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = TropicalAnimalListClass.Chicken,
+            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Duration = duration,
+            OutputAugmentationKey = TropicalAugmentationKeys.ChickenDoubleEggsGuaranteed,
+            LevelRequired = 11
+        });
+        return output;
+    }
+
     private static BasicList<CatalogOfferModel> ImportSpeedSeedOffers()
     {
         BasicList<CatalogOfferModel> output = [];

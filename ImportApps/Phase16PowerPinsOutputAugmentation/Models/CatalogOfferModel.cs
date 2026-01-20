@@ -10,4 +10,5 @@ public class CatalogOfferModel
 
     public TimeSpan? ReduceBy { get; init; } //the new power pin feature needs it.   others need it to decide if you are going to purchase or not.
     public int Quantity { get; init; } = 1;
+    public string? OutputAugmentationKey { get; init; }
 }

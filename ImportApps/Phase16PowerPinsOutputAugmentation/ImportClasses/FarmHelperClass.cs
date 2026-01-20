@@ -32,5 +32,10 @@ internal static class FarmHelperClass
         return output;
     }
     public static Dictionary<string, int> GetFreeCosts => [];
-
+    public static BasicList<string> GetOnlyItem(string item)
+    {
+        BasicList<string> output = [];
+        output.Add(item);
+        return output;
+    }
 }
