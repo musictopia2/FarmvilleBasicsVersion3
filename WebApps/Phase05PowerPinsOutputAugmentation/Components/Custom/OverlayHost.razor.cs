@@ -1,15 +1,11 @@
 namespace Phase05PowerPinsOutputAugmentation.Components.Custom;
-
-public partial class OverlayHost(OverlayService overlay, IToast toast) : IDisposable
+public partial class OverlayHost(OverlayService overlay) : IDisposable
 {
-
-    
-
     public void Dispose()
     {
         overlay.Changed -= Refresh;
+        overlay.Dispose();
 
-        AnimalManager.OnAugmentedOutput -= OnAugmentedOutput;
         GC.SuppressFinalize(this);
     }
     private void Refresh()
@@ -19,14 +15,9 @@ public partial class OverlayHost(OverlayService overlay, IToast toast) : IDispos
     protected override void OnInitialized()
     {
         overlay.Changed += Refresh;
-
-        AnimalManager.OnAugmentedOutput += OnAugmentedOutput;
-
+        overlay.Init();
         base.OnInitialized();
     }
 
-    private void OnAugmentedOutput(ItemAmount obj)
-    {
-        toast.ShowSuccessToast($"You received {obj.Amount} of {obj.Item} from a power pin from harvesting/collecting");
-    }
+    
 }

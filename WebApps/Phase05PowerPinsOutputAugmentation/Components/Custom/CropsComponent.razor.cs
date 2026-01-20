@@ -87,7 +87,7 @@ public partial class CropsComponent(IToast toast)
                 toast.ShowUserErrorToast("Unable to harvest the crop because you are maxed out in the silo.  Try to discard, fulfill orders, plant more crops, or craft something");
                 return;
             }
-            HarvestSingle(item); //for now, go ahead and harvest.  once i start getting into limits, then rethink.
+            HarvestSingle(item);
         }
     }
 

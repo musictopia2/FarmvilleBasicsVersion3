@@ -10,6 +10,80 @@ public class OverlayService(PopupRegistry popup, FarmContext farm)
     public bool ShowLevelDetails { get; private set; }
     public bool ShowWorkshops => CurrentWorkshop is not null;
     public bool ShowWorksites => CurrentWorksite is not null;
+    public void Init()
+    {
+        farm.Current!.AnimalManager.OnAugmentedOutput += OnAugmentedOutput;
+    }
+    private int _batchDepth;
+    private readonly Dictionary<string, int> _batched = new(StringComparer.OrdinalIgnoreCase);
+
+    public void Begin()
+    {
+        _batchDepth++;
+    }
+
+    public void End()
+    {
+        if (_batchDepth <= 0)
+        {
+            return;
+        }
+
+        _batchDepth--;
+        if (_batchDepth > 0)
+        {
+            return;
+        }
+
+        if (_batched.Count == 0)
+        {
+            return;
+        }
+
+        var parts = _batched
+            .OrderByDescending(x => x.Value)
+            .Take(3)
+            .Select(x => $"+{x.Value} {x.Key.GetWords}")
+            .ToList();
+
+        int remaining = _batched.Count - parts.Count;
+        if (remaining > 0)
+        {
+            parts.Add($"+{remaining} more");
+        }
+
+        Toast!.ShowSuccessToast("Bonus received: " + string.Join(", ", parts));
+        _batched.Clear();
+    }
+    public void Dispose()
+    {
+        farm.Current!.AnimalManager.OnAugmentedOutput -= OnAugmentedOutput;
+    }
+    
+
+    //only one at a time can be used.
+    //private 
+
+    private void OnAugmentedOutput(ItemAmount obj)
+    {
+        if (obj.Amount <= 0)
+        {
+            return;
+        }
+
+        if (_batchDepth > 0)
+        {
+            _batched[obj.Item] = _batched.TryGetValue(obj.Item, out var old)
+                ? old + obj.Amount
+                : obj.Amount;
+            return;
+        }
+
+        // not batching => immediate toast
+        Toast?.ShowSuccessToast($"Bonus received: +{obj.Amount} {obj.Item.GetWords}");
+    }
+
+
     public async Task OpenQuestBookAsync()
     {
         await CloseAllAsync();
