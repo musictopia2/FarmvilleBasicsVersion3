@@ -5,7 +5,7 @@
         <WrapLayout RenderList="_credits"
                     ColumnWidth="200px"
                     Context="boost">
-            <div class="boost-card">
+            <div class="boost-card" @onclick="() => GiveDetailsAsync(boost)">
 
                 <div class="boost-icon-slot">
                     <BoostIconComponent ImageSize="72"
@@ -23,6 +23,7 @@
                     {
                         <span><b>Reduce By:</b> @boost.ReduceBy.Value.GetTimeString</span>
                     }
+                    
                     else
                     {
                         <span class="boost-detail-placeholder">&nbsp;</span>
@@ -35,6 +36,7 @@
                 </div>
 
                 <button class="boost-btn"
+                        @onclick:stopPropagation="true"
                         @onclick="() => ActivateBoostAsync(boost)">
                     Activate
                 </button>

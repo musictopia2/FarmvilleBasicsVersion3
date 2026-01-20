@@ -52,11 +52,11 @@ internal static class ImportOutputAugmentationClass
         IsDouble = false
     };
 
-    private static OutputAugmentationPlanModel GuaranteedDouble(string key, string target) => new()
+    private static OutputAugmentationPlanModel GuaranteedDouble(string key, string target, string received) => new()
     {
         Key = key,
         TargetName = target,
-        Rewards = FarmHelperClass.GetOnlyItem(target),
+        Rewards = FarmHelperClass.GetOnlyItem(received),
         ChancePercent = 100,
         IsDouble = true
     };
@@ -92,7 +92,7 @@ internal static class ImportOutputAugmentationClass
 
         key = CountryAugmentationKeys.SheepDoubleWoolGuaranteed;
         target = GetOffer(offers, key).TargetName;
-        output.Add(GuaranteedDouble(key, target));
+        output.Add(GuaranteedDouble(key, target, CountryItemList.Wool));
 
         key = CountryAugmentationKeys.TomatoChanceFarmersSoup;
         target = GetOffer(offers, key).TargetName;
@@ -112,7 +112,7 @@ internal static class ImportOutputAugmentationClass
 
         key = TropicalAugmentationKeys.ChickenDoubleEggsGuaranteed;
         target = GetOffer(offers, key).TargetName;
-        output.Add(GuaranteedDouble(key, target));
+        output.Add(GuaranteedDouble(key, target, CountryItemList.Eggs));
 
         key = TropicalAugmentationKeys.DolphinChanceSearedFish;
         target = GetOffer(offers, key).TargetName;

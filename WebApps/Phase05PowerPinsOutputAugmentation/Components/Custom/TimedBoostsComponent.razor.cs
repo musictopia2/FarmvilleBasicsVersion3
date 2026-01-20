@@ -1,6 +1,6 @@
 namespace Phase05PowerPinsOutputAugmentation.Components.Custom;
 
-public partial class TimedBoostsComponent(IToast toast)
+public partial class TimedBoostsComponent(IToast toast, IMessageBox message)
 {
     // Replace with your real source (manager/service/profile load)
     //public BasicList<TimedBoostCredit> Credits { get; set; } = new();
@@ -12,7 +12,15 @@ public partial class TimedBoostsComponent(IToast toast)
         Refresh();
         base.OnInitialized();
     }
-    
+    private async Task GiveDetailsAsync(TimedBoostCredit credit)
+    {
+        if (credit.OutputAugmentationKey is null)
+        {
+            return;
+        }
+        string description = Farm!.OutputAugmentationManager.GetDescription(credit.OutputAugmentationKey);
+        await message.ShowMessageAsync(description);
+    }
 
     private void Refresh()
     {

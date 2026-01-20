@@ -13,13 +13,13 @@
 
 
 
-            <div class="ae-card">
+            <div class="ae-card" @onclick="() => GiveDetailsAsync(fx)">
 
                 <StackLayout>
                     <StackItem Length="65px" Style="margin-left: 5px; margin-top: 5px;">
                         <BoostIconComponent Name="@fx.BoostKey"
                                             ImageSize="60"
-                                            
+                                            IsAugmented="fx.OutputAugmentationKey is not null"
                                             IconSize="30"
                                             ReduceBy="@fx.ReduceBy" />
                     </StackItem>

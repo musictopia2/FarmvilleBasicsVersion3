@@ -31,7 +31,8 @@ public class TimedBoostManager
                 BoostKey = item.TargetName,
                 Duration = item.Duration.Value,
                 Quantity = 1,
-                ReduceBy = item.ReduceBy
+                ReduceBy = item.ReduceBy,
+                OutputAugmentationKey = item.OutputAugmentationKey
             });
         }
         else
@@ -98,7 +99,8 @@ public class TimedBoostManager
                 BoostKey = credit.BoostKey,
                 StartedAt = now,
                 EndsAt = now.Add(credit.Duration),
-                ReduceBy = credit.ReduceBy
+                ReduceBy = credit.ReduceBy,
+                OutputAugmentationKey = credit.OutputAugmentationKey
             });
         }
         else

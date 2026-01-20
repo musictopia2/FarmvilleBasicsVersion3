@@ -1,5 +1,5 @@
 namespace Phase05PowerPinsOutputAugmentation.Components.Custom;
-public partial class ActiveEffectsOverlay : IDisposable
+public partial class ActiveEffectsOverlay(IMessageBox message) : IDisposable
 {
     private BasicList<ActiveTimedBoost> _effects = [];
     protected override void OnInitialized()
@@ -12,6 +12,15 @@ public partial class ActiveEffectsOverlay : IDisposable
     {
         _effects = TimedBoostManager.GetActiveBoosts;
         InvokeAsync(StateHasChanged);
+    }
+    private async Task GiveDetailsAsync(ActiveTimedBoost boost)
+    {
+        if (boost.OutputAugmentationKey is null)
+        {
+            return;
+        }
+        await message.ShowMessageAsync(Farm!.OutputAugmentationManager.GetDescription(boost.OutputAugmentationKey));
+        //await PopupService.ShowInfoAsync("Effect Details", GetDetails(boost), "OK", null, null, false, ShouldShowSubLine(boost) ? "Additional details about this effect." : null);
     }
     public void Dispose()
     {
