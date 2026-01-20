@@ -1,5 +1,9 @@
 ﻿namespace Phase05PowerPinsOutputAugmentation.Services.Crops;
-public class CropInstance(double currentMultiplier, CropRecipe? currentRecipe)
+
+public class CropInstance(double currentMultiplier,
+    CropRecipe? currentRecipe,
+    TimedBoostManager timedBoostManager, OutputAugmentationManager outputAugmentationManager
+    )
 {
     public Guid Id { get; } = Guid.NewGuid(); // unique per instance
     public bool Unlocked { get; set; }
@@ -7,6 +11,11 @@ public class CropInstance(double currentMultiplier, CropRecipe? currentRecipe)
     public DateTime? PlantedAt { get; private set; }
     public string? Crop { get; private set; } = null;
     public TimeSpan? GrowTime { get; private set; } = null;
+    public OutputAugmentationSnapshot? OutputPromise { get; private set; }
+    public BasicList<ItemAmount> ExtraRewards { get; private set; } = [];
+    private bool _needsSaving;
+    private bool _extrasResolved;
+    public bool NeedsToSave => _needsSaving;
     // NEW: separate the two meanings
     private readonly double _currentMultiplier = GameRegistry.ValidateMultiplier(currentMultiplier);
     private double? _runMultiplier; // locked per run; null when idle
@@ -51,6 +60,9 @@ public class CropInstance(double currentMultiplier, CropRecipe? currentRecipe)
         PlantedAt = slot.PlantedAt;
         Unlocked = slot.Unlocked;
         ReducedBy = slot.ReducedBy;
+        _extrasResolved = slot.ExtrasResolved;
+        OutputPromise = slot.OutputPromise;
+        ExtraRewards = slot.ExtraRewards;
         _runMultiplier = slot.RunMultiplier;
         // If something is/was planted, ensure a run multiplier exists
         if (Crop is not null && _runMultiplier is null)
@@ -69,19 +81,89 @@ public class CropInstance(double currentMultiplier, CropRecipe? currentRecipe)
         Crop = crop;
         PlantedAt = DateTime.Now;
     }
+
+    private void RunPossibleAugmentation()
+    {
+        if (OutputPromise is not null)
+        {
+            return; //already promised.
+        }
+        if (Crop is null)
+        {
+            return; //i think.
+        }
+        string? key = timedBoostManager.GetActiveOutputAugmentationKeyForItem(Crop);
+        if (key is null)
+        {
+            return;
+        }
+        OutputPromise = outputAugmentationManager.GetSnapshot(key);
+        _needsSaving = true;
+    }
+
     public void UpdateTick()
     {
+        _needsSaving = false;
+        if (State == EnumCropState.Ready && OutputPromise is null)
+        {
+            RunPossibleAugmentation();
+        }
+        if (State == EnumCropState.Ready && OutputPromise is not null && _extrasResolved == false)
+        {
+            ResolveExtraRewards();
+            _extrasResolved = true;
+            _needsSaving = true;
+        }
         if (State != EnumCropState.Growing || PlantedAt == null)
         {
             return;
         }
-
         var elapsed = DateTime.Now - PlantedAt.Value;
         if (elapsed >= GrowTime)
         {
             State = EnumCropState.Ready;
             PlantedAt = null;
+            if (OutputPromise is not null)
+            {
+                ResolveExtraRewards();
+                _extrasResolved = true;
+            }
+            else
+            {
+                _extrasResolved = false;
+            }
+            _needsSaving = true;
         }
+    }
+    private void ResolveExtraRewards()
+    {
+        if (OutputPromise is null)
+        {
+            return;
+        }
+        ExtraRewards.Clear();
+        if (OutputPromise.IsDouble)
+        {
+            throw new CustomBasicException("I don't think that crops can support doubles");
+        }
+        if (OutputPromise.Chance >= 100)
+        {
+            throw new CustomBasicException("I don't think that crops can support guaranteed extras");
+        }
+        if (OutputPromise.ExtraRewards.Count > 1)
+        {
+            throw new CustomBasicException("Crops cannot have multiple extra rewards at this time");
+        }
+        bool hit = rs1.RollHit(OutputPromise.Chance);
+        if (hit == false)
+        {
+            return; //you did not get anything extra.
+        }
+        ExtraRewards.Add(new()
+        {
+            Item = OutputPromise.ExtraRewards.Single(),
+            Amount = 1 //always just one for crops.
+        });
     }
     public double? GetCurrentRun => currentRecipe is null ? null : _runMultiplier;
     public void Clear()
@@ -89,6 +171,9 @@ public class CropInstance(double currentMultiplier, CropRecipe? currentRecipe)
         State = EnumCropState.Empty;
         ReducedBy = TimeSpan.Zero;
         Crop = null;
+        ExtraRewards.Clear();
+        _extrasResolved = false;
+        OutputPromise = null;
         GrowTime = null;
         PlantedAt = null;
         _runMultiplier = null;

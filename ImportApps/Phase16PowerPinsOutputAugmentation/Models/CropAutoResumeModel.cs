@@ -10,4 +10,8 @@ public class CropAutoResumeModel
     public bool Unlocked { get; set; } = true;             // Is this slot unlocked
     public double? RunMultiplier { get; set; }
     public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
+    public bool ExtrasResolved { get; set; }
+    public OutputAugmentationSnapshot? OutputPromise { get; set; }
+
+    public BasicList<ItemAmount> ExtraRewards { get; set; } = [];
 }

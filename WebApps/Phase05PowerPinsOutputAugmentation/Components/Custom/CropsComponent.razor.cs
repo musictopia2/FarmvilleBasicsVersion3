@@ -1,5 +1,5 @@
 namespace Phase05PowerPinsOutputAugmentation.Components.Custom;
-public partial class CropsComponent(IToast toast)
+public partial class CropsComponent(IToast toast, OverlayService overlayService)
 {
     private string? _selectedItem;
     private BasicList<string> _crops = [];
@@ -71,10 +71,10 @@ public partial class CropsComponent(IToast toast)
             PlantSingle(item);
         }
     }
-
     private void HarvestMax()
     {
         var list = CropManager.GetUnlockedCrops;
+        overlayService.Begin();
         foreach (var item in list)
         {
             var state = GetState(item);
@@ -85,13 +85,12 @@ public partial class CropsComponent(IToast toast)
             if (CropManager.CanHarvest(item) == false)
             {
                 toast.ShowUserErrorToast("Unable to harvest the crop because you are maxed out in the silo.  Try to discard, fulfill orders, plant more crops, or craft something");
-                return;
+                break;
             }
             HarvestSingle(item);
         }
+        overlayService.End();
     }
-
-
     private void CropLockedDetails()
     {
         toast.ShowInfoToast($"{_nextCrop!.ItemName} unlocks at level {_nextCrop.LevelRequired}");

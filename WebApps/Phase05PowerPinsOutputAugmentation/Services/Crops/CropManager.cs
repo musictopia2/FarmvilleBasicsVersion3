@@ -2,7 +2,8 @@
 public class CropManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry,
-    TimedBoostManager timedBoostManager
+    TimedBoostManager timedBoostManager,
+    OutputAugmentationManager outputAugmentationManager
     )
 {
     private bool _canAutomateCropHarvest;
@@ -11,6 +12,7 @@ public class CropManager(InventoryManager inventory,
     private readonly Lock _lock = new();
     private BasicList<CropRecipe> _recipes = [];
     private BasicList<CropDataModel> _allCropDefinitions = [];
+    public event Action<ItemAmount>? OnAugmentedOutput;
     private DateTime _lastHarvestPolicyCheck;
     private ICropRepository _cropRepository = null!;
     private DateTime _lastSave = DateTime.MinValue;
@@ -94,9 +96,7 @@ public class CropManager(InventoryManager inventory,
     //any methods needed goes here.
 
     public bool CanManuallyPickUpCrop => _canAutomateCropHarvest == false;
-
     public TimeSpan GetTimeForGivenCrop(string name) => _recipes.Single(x => x.Item == name).Duration;
-
     public bool CanPlant(Guid id, string item)
     {
         lock (_lock)
@@ -124,9 +124,6 @@ public class CropManager(InventoryManager inventory,
     {
         return _recipes.Exists(x => x.Item == item);
     }
-
-
-
     public BasicList<GrantableItem> GetUnlockedCropGrantItems()
     {
 
@@ -154,26 +151,83 @@ public class CropManager(InventoryManager inventory,
         {
             throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
         }
+        var temp = timedBoostManager.GetActiveOutputAugmentationKeyForItem(item.Item); //i think.
+        if (temp is null)
+        {
+            AddCrop(item.Item, item.Amount);
+            return;
+        }
+        var fins = outputAugmentationManager.GetSnapshot(temp);
+        if (fins.ExtraRewards.Count != 1)
+        {
+            throw new CustomBasicException("Must have one reward");
+        }
+        if (fins.Chance >= 100)
+        {
+            throw new CustomBasicException("Cannot be a guarantee for crops");
+        }
+        int count = rs1.ComputeUnlimitedBonus(item.Amount, fins.Chance);
+        if (count > 0)
+        {
+            AddExtraRewards(fins.ExtraRewards.Single(), count);
+        }
         AddCrop(item.Item, item.Amount);
     }
-    public void GrantCropItems(GrantableItem item, int toUse)
+    public bool CanGrantCropItems(GrantableItem item, int toUse)
     {
         if (toUse <= 0)
         {
-            throw new CustomBasicException("Must use at least one speed seed");
+            return false;
         }
         if (item.Category != EnumItemCategory.Crop)
         {
-            throw new CustomBasicException("This is not a crop");
+            return false;
         }
         if (inventory.Get(CurrencyKeys.SpeedSeed) < toUse)
         {
-            throw new CustomBasicException("Not enough speed seeds.  Should had ran the required functions first");
+            return false;
         }
         int granted = toUse * item.Amount;
-        if (inventory.CanAdd(item.Item, granted) == false)
+
+        var temp = timedBoostManager.GetActiveOutputAugmentationKeyForItem(item.Item); //i think.
+        if (temp is null)
         {
-            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
+            return inventory.CanAdd(item.Item, granted);
+        }
+        var fins = outputAugmentationManager.GetSnapshot(temp);
+        BasicList<ItemAmount> bundles = [];
+        bundles.Add(new (item.Item, granted));
+        if (fins.ExtraRewards.Count != 1)
+        {
+            throw new CustomBasicException("Must have one reward");
+        }
+        bundles.Add(new (fins.ExtraRewards.Single(), 1)); //will assume you will receive even if no guarantees.
+        return inventory.CanAcceptRewards(bundles);
+    }
+    public void GrantCropItems(GrantableItem item, int toUse)
+    {
+        if (CanGrantCropItems(item, toUse) == false)
+        {
+            throw new CustomBasicException("Cannot grant crop items.  Should had called the CanGrantCropItems first");
+        }
+        int granted = toUse * item.Amount;
+        var temp = timedBoostManager.GetActiveOutputAugmentationKeyForItem(item.Item);
+        if (temp is not null)
+        {
+            var fins = outputAugmentationManager.GetSnapshot(temp);
+            if (fins.ExtraRewards.Count != 1)
+            {
+                throw new CustomBasicException("Must have one reward");
+            }
+            if (fins.Chance >= 100)
+            {
+                throw new CustomBasicException("Cannot be a guarantee for crops");
+            }
+            bool hit = rs1.RollHit(fins.Chance);
+            if (hit)
+            {
+                AddExtraRewards(fins.ExtraRewards.Single(), toUse);
+            }
         }
         AddCrop(item.Item, granted);
         inventory.Consume(CurrencyKeys.SpeedSeed, toUse);
@@ -204,8 +258,22 @@ public class CropManager(InventoryManager inventory,
     {
         lock (_lock)
         {
+            
             CropInstance crop = GetCrop(id);
-            return inventory.CanAdd(crop.Crop!, 2);
+            if (crop.Crop is null)
+            {
+                throw new CustomBasicException("No crop");
+            }
+            BasicList<ItemAmount> bundle = [];
+            // base
+            bundle.Add(new ItemAmount(crop.Crop, 2));
+            // extras (already resolved on instance)
+            if (crop.ExtraRewards is not null && crop.ExtraRewards.Count > 0)
+            {
+                bundle.AddRange(crop.ExtraRewards);
+            }
+
+            return inventory.CanAcceptRewards(bundle);
         }
     }
     public void Harvest(Guid id)
@@ -216,11 +284,25 @@ public class CropManager(InventoryManager inventory,
             Harvest(crop);
         }
     }
+    private void AddExtraRewards(string item, int amount)
+    {
+        ItemAmount payLoad = new()
+        {
+            Amount = amount,
+            Item = item
+        };
+        OnAugmentedOutput?.Invoke(payLoad);
+        inventory.Add(payLoad);
+    }
     private void Harvest(CropInstance crop)
     {
         if (crop.Crop is null)
         {
             throw new CustomBasicException("No crop");
+        }
+        if (crop.ExtraRewards.Count > 0)
+        {
+            AddExtraRewards(crop.ExtraRewards.Single().Item, crop.ExtraRewards.Single().Amount);
         }
         AddCrop(crop.Crop, 2);
         crop.Clear();
@@ -256,7 +338,7 @@ public class CropManager(InventoryManager inventory,
                 //
                 recipe = _recipes.Single(y => y.Item == x.Crop);
             }
-            CropInstance crop = new(offset, recipe);
+            CropInstance crop = new(offset, recipe, timedBoostManager, outputAugmentationManager);
             crop.Load(x);
             _crops.Add(crop);
         });
@@ -286,6 +368,10 @@ public class CropManager(InventoryManager inventory,
                 {
                     Harvest(crop);
                 }
+            }
+            if (crop.NeedsToSave)
+            {
+                _needsSaving = true;
             }
         });
         if (_needsSaving)

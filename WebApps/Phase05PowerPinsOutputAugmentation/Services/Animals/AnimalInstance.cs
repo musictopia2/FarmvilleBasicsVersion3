@@ -219,7 +219,7 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier,
         }
     }
     //may need here (?)
-    public void ResolveExtraRewards()
+    private void ResolveExtraRewards()
     {
         if (OutputPromise is null)
         {

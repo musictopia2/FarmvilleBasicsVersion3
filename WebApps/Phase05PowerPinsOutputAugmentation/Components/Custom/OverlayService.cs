@@ -13,6 +13,7 @@ public class OverlayService(PopupRegistry popup, FarmContext farm)
     public void Init()
     {
         farm.Current!.AnimalManager.OnAugmentedOutput += OnAugmentedOutput;
+        farm.Current.CropManager.OnAugmentedOutput += OnAugmentedOutput;
     }
     private int _batchDepth;
     private readonly Dictionary<string, int> _batched = new(StringComparer.OrdinalIgnoreCase);
@@ -58,6 +59,7 @@ public class OverlayService(PopupRegistry popup, FarmContext farm)
     public void Dispose()
     {
         farm.Current!.AnimalManager.OnAugmentedOutput -= OnAugmentedOutput;
+        farm.Current.CropManager.OnAugmentedOutput -= OnAugmentedOutput;
     }
     
 

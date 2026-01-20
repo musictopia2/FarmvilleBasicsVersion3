@@ -32,7 +32,7 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
             IOutputAugmentationFactory outputAugmentationFactory = sp.GetRequiredService<IOutputAugmentationFactory>();
             TimedBoostManager timedBoostManager = new();
             OutputAugmentationManager outputAugmentationManager = new();
-            CropManager cropManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager);
+            CropManager cropManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager, outputAugmentationManager);
             TreeManager treeManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager);
             AnimalManager animalManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager, outputAugmentationManager);
             WorkshopManager workshopManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager);

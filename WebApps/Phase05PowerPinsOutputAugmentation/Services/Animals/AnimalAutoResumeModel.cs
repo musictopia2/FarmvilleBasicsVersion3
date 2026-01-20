@@ -9,10 +9,10 @@ public class AnimalAutoResumeModel
     public int OutputReady { get; set; }
     public double? RunMultiplier { get; set; }
     public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
-    public bool ExtrasResolved { get; set; }
+    
     public DateTime? StartedAt { get; set; }
     public int? Selected { get; set; }
-
+    public bool ExtrasResolved { get; set; }
     public OutputAugmentationSnapshot? OutputPromise { get; set; }
 
     public BasicList<ItemAmount> ExtraRewards { get; set; } = []; //when you are about to collect, show then.

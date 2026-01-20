@@ -8,5 +8,8 @@ public class CropAutoResumeModel
     public double? RunMultiplier { get; set; } //same idea as with the animals.
 
     public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
-    //public TimeSpan? GrowTime { get; set; } = null;
+    public bool ExtrasResolved { get; set; }
+    public OutputAugmentationSnapshot? OutputPromise { get; set; }
+
+    public BasicList<ItemAmount> ExtraRewards { get; set; } = []; //when you are about to collect, show then.
 }

@@ -615,14 +615,14 @@ public class AnimalManager(InventoryManager inventory,
 
         maxs.Times(_ => animal.Collect());
 
-        // base
-        AddAnimalToInventory(selectedName, maxs);
+        
 
         if (animal.ExtraRewards.Count > 0)
         {
             AddExtraRewards(animal.ExtraRewards.Single().Item, animal.ExtraRewards.Single().Amount);
         }
-
+        // base
+        AddAnimalToInventory(selectedName, maxs);
         // IMPORTANT: clear extras so you don't add them again next collect
         animal.Clear(); //needed a new method.  otherwise, it would had cleared and would never show extra rewards.
     }

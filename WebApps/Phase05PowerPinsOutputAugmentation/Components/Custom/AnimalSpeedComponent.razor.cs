@@ -17,29 +17,14 @@ public partial class AnimalSpeedComponent(IToast toast)
     private static string GetItemImage(string itemName)
         => $"/{Normalize(itemName)}.png";
 
-    private string DisplayAmount(AnimalGrantModel item) => $"+ {item.OutputData.Amount}";
     private void TryToUse(AnimalGrantModel item)
     {
-
-        if (InventoryManager.Has(item.InputData.Item, item.InputData.Amount) == false)
+        if (AnimalManager.CanGrantAnimalItems(item, 1) == false)
         {
-            toast.ShowUserErrorToast("You do not have the required ingredients");
+            toast.ShowUserErrorToast("Unable to use the speed seed.   Either don't have the requirements or the barn is full");
             return;
         }
-
-
-
-
-        if (InventoryManager.CanAdd(item.OutputData) == false)
-        {
-            toast.ShowUserErrorToast($"Barn is full.  Unable to add {item.OutputData.Item}");
-            return;
-        }
-        if (InventoryManager.Has(CurrencyKeys.SpeedSeed, 1) == false)
-        {
-            toast.ShowUserErrorToast("You have no more speed seeds left");
-            return;
-        }
+        
 
         AnimalManager.GrantAnimalItems(item, 1);
 
