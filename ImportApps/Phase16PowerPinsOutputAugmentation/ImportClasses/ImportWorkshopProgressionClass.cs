@@ -63,8 +63,13 @@ public static class ImportWorkshopProgressionClass
         });
         output.Add(new()
         {
-            ItemName = TropicalItemList.FriedRice,
+            ItemName = TropicalItemList.SearedFish,
             LevelRequired = 6
+        });
+        output.Add(new()
+        {
+            ItemName = TropicalItemList.FriedRice,
+            LevelRequired = 7
         });
         output.Add(new()
         {
@@ -100,6 +105,16 @@ public static class ImportWorkshopProgressionClass
         {
             ItemName = CountryItemList.ApplePie,
             LevelRequired = 5
+        });
+        output.Add(new()
+        {
+            ItemName = CountryItemList.Butter,
+            LevelRequired = 8
+        });
+        output.Add(new()
+        {
+            ItemName = CountryItemList.HerbButter,
+            LevelRequired = 9
         });
         output.Add(new()
         {

@@ -215,3 +215,21 @@
     object-fit: contain;
     pointer-events: none;
 }
+
+.workshop-vert-nav {
+    display: grid; /* or flex column; grid is easiest */
+    grid-template-rows: auto auto; /* two rows always */
+    row-gap: 8px;
+    margin-left: 15px;
+    justify-items: center;
+    align-items: center;
+}
+
+/* each row reserves the same space */
+.workshop-vert-slot {
+    height: 10vh; /* matches your TargetHeight intent */
+    min-height: 52px; /* prevents tiny screens collapsing */
+    width: 52px; /* keeps a consistent click area */
+    display: grid;
+    place-items: center;
+}

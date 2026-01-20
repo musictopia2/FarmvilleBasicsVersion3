@@ -72,6 +72,18 @@ public static class ImportWorkshopRecipeClass
                 i[CountryItemList.Milk] = 1;
             });
 
+        AddWorkshopRecipe(output, CountryItemList.Butter, CountryWorkshopList.Dairy, theme,
+            TimeSpan.FromMinutes(5),
+            i => { i[CountryItemList.Milk] = 3; });
+
+        AddWorkshopRecipe(output, CountryItemList.HerbButter, CountryWorkshopList.Dairy, theme,
+            TimeSpan.FromMinutes(5),
+            i =>
+            {
+                i[CountryItemList.Butter] = 1;
+                i[CountryItemList.Chives] = 1;
+            });
+
         AddWorkshopRecipe(output, CountryItemList.FarmersSoup, CountryWorkshopList.StovetopOven, theme,
             TimeSpan.FromMinutes(3.5),
             i =>
@@ -138,6 +150,10 @@ public static class ImportWorkshopRecipeClass
         AddWorkshopRecipe(output, TropicalItemList.GrilledCrab, TropicalWorkshopList.Grill, theme,
             TimeSpan.FromMinutes(3),
             i => { i[TropicalItemList.Crab] = 1; });
+
+        AddWorkshopRecipe(output, TropicalItemList.SearedFish, TropicalWorkshopList.Grill, theme,
+            TimeSpan.FromMinutes(4),
+            i => { i[TropicalItemList.Fish] = 3; });
 
         AddWorkshopRecipe(output, TropicalItemList.FriedRice, TropicalWorkshopList.Grill, theme,
             TimeSpan.FromMinutes(8),

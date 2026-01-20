@@ -113,6 +113,21 @@ internal static class ImportWorkshopCatalogClass
 
         output.Add(new()
         {
+            TargetName = CountryWorkshopList.Dairy,
+            LevelRequired = 9,
+            Category = _category,
+            Costs = FarmHelperClass.GetFreeCosts
+        });
+        output.Add(new()
+        {
+            TargetName = CountryWorkshopList.PastryOven,
+            LevelRequired = 12,
+            Category = _category,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(30)
+        });
+
+        output.Add(new()
+        {
             TargetName = CountryWorkshopList.StovetopOven,
             LevelRequired = 11,
             Category = _category,
@@ -123,7 +138,7 @@ internal static class ImportWorkshopCatalogClass
             TargetName = CountryWorkshopList.StovetopOven,
             LevelRequired = 14,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(30)
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(40)
         });
         output.Add(new()
         {
@@ -137,7 +152,7 @@ internal static class ImportWorkshopCatalogClass
             TargetName = CountryWorkshopList.Loom,
             LevelRequired = 16,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(40)
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(50)
         });
         return output;
     }

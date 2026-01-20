@@ -92,7 +92,7 @@ internal static class ImportOutputAugmentationClass
 
         key = CountryAugmentationKeys.SheepDoubleWoolGuaranteed;
         target = GetOffer(offers, key).TargetName;
-        output.Add(GuaranteedDouble(key, target, CountryItemList.Wool));
+        output.Add(GuaranteedDouble(key, target, CountryItemList.Wool)); //fully tested.
 
         key = CountryAugmentationKeys.TomatoChanceFarmersSoup;
         target = GetOffer(offers, key).TargetName;

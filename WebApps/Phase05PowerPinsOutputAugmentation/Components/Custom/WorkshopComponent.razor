@@ -156,16 +156,17 @@
     </StackItem>
 
     <StackItem StopClickPropagation="true">
-        @if (CanGoUp)
-        {
-            <ArrowUpComponent TargetHeight="10vh"
-                              Clicked="GoUp" />
-        }
-        @if (CanGoDown)
-        {
-            <ArrowDownComponent TargetHeight="10vh"
-                                Clicked="GoDown" />
-        }
+        <div class="workshop-vert-nav">
+            <div class="workshop-vert-slot" style="visibility:@(CanGoUp ? "visible" : "hidden")">
+                <ArrowUpComponent TargetHeight="10vh"
+                                  Clicked="GoUp" />
+            </div>
+
+            <div class="workshop-vert-slot" style="visibility:@(CanGoDown ? "visible" : "hidden")">
+                <ArrowDownComponent TargetHeight="10vh"
+                                    Clicked="GoDown" />
+            </div>
+        </div>
         
     </StackItem>
 </StackLayout>
