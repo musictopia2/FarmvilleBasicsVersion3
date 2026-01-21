@@ -130,20 +130,14 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
         _workerIndex = 0; //back to 0.
         OnCloseManually.InvokeAsync(); //since you collected all rewards, then close out
     }
-
     private void OnRewardClicked(ItemAmount r)
     {
-
         WorksiteManager.CollectSpecificReward(Location, r);
         if (_rewards.Count == 0)
         {
             OnCloseManually.InvokeAsync(); //because all rewards has been collected.
         }
-
     }
-
-
-
     private static string GetItemImage(string item) => $"/{item}.png";
 
     

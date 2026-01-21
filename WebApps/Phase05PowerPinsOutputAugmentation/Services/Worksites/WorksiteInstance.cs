@@ -1,10 +1,9 @@
-﻿using Phase05PowerPinsOutputAugmentation.Services.TimedBoosts;
-
-namespace Phase05PowerPinsOutputAugmentation.Services.Worksites;
-
+﻿namespace Phase05PowerPinsOutputAugmentation.Services.Worksites;
 public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
     BasicList<WorkerRecipe> allWorkers,
-    BasicList<UnlockModel> workstates
+    BasicList<UnlockModel> workstates,
+    TimedBoostManager timedBoostManager,
+    OutputAugmentationManager outputAugmentationManager
     )
 {
     public const string NoneLocation = "None";
@@ -19,7 +18,7 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
 
     public DateTime? StartedAt { get; private set; }
     public EnumWorksiteState Status { get; set; } = EnumWorksiteState.None;
-
+    public OutputAugmentationSnapshot? OutputPromise { get; private set; }
     public int MaximumWorkers => recipe.MaximumWorkers;
     public BasicList<WorkerRecipe> Workers { get; private set; } = [];
     private BasicList<ItemAmount> _rewards = [];
@@ -30,6 +29,8 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
 
     private TimeSpan? _runDuration;
     public bool HasRecipe(string name) => recipe.BaselineBenefits.Exists(x => x.Item == name);
+    private bool _needsSaving;
+    public bool NeedsSaving => _needsSaving;
 
     public TimeSpan GetPreviewDuration(TimedBoostManager timedBoostManager)
     {
@@ -93,6 +94,7 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
         StartedAt = worksite.StartedAt;
         Focused = worksite.Focused;
         ReduceBy = worksite.ReduceBy;
+        OutputPromise = worksite.OutputPromise;
         FailureHistory = worksite.FailureHistory ?? [];
         //needs to rethink this part eventually if more fields are needed.  for now its manually done.
         _runMultiplier = worksite.RunMultiplier;
@@ -147,7 +149,6 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
     {
         Workers.Add(worker);
     }
-
     public WorksiteAutoResumeModel GetWorksiteForSaving
     {
         get
@@ -169,13 +170,12 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
                 RunMultiplier = saveRun,
                 Focused = Focused,
                 ReduceBy = ReduceBy,
+                OutputPromise = OutputPromise,
                 FailureHistory = FailureHistory ?? []
             };
         }
     }
-
     public string StartText => recipe.StartText;
-
     public void AddWorker(WorkerRecipe worker)
     {
         if (Workers.Count >= MaximumWorkers)
@@ -188,7 +188,6 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
         worker.CurrentLocation = recipe.Location;
         Workers.Add(worker);
     }
-
     private static void FreeWorker(WorkerRecipe worker)
     {
         worker.WorkerStatus = EnumWorkerStatus.None;
@@ -293,7 +292,6 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
         _runMultiplier *= 2.0;      // Apply() uses time * multiplier, so this doubles effective time
         StartedAt = DateTime.Now;   // waste elapsed time (your rule)
     }
-
     public void StartJob(InventoryManager inventory, TimedBoostManager timedBoostManager)
     {
         _rewards.Clear();
@@ -332,7 +330,7 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
 
         // reduction BEFORE multiplier
         _runDuration = reducedBase.Apply(_runMultiplier.Value);
-
+        RunPossibleAugmentation();
         StartedAt = DateTime.Now;
         Status = EnumWorksiteState.Processing;
     }
@@ -435,23 +433,38 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
         Workers.Clear();
         StartedAt = null;
         Status = EnumWorksiteState.None;
-
+        OutputPromise = null;
         // Run is over; clear promise
         _runMultiplier = null;
     }
 
-    private bool _needsSaving;
-    public bool NeedsSaving => _needsSaving;
+    private void RunPossibleAugmentation()
+    {
+        if (OutputPromise is not null)
+        {
+            return; //already promised.
+        }
+        string? key = timedBoostManager.GetActiveOutputAugmentationKeyForItem(Location);
+        if (key is null)
+        {
+            return;
+        }
+        OutputPromise = outputAugmentationManager.GetSnapshot(key);
+        _needsSaving = true;
+    }
 
     public void UpdateTick()
     {
         _needsSaving = false;
-
+        if (Status == EnumWorksiteState.Collecting)
+        {
+            RunPossibleAugmentation();
+        }
         if (Status != EnumWorksiteState.Processing || StartedAt is null)
         {
             return;
         }
-
+        RunPossibleAugmentation();
         // Defensive: ensure promise exists
         _runMultiplier ??= _currentMultiplier;
 
@@ -470,7 +483,10 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
     {
         BasicList<WorksiteRewardPreview> output = [];
         WorksiteRewardPreview preview;
-
+        if (uiOnly)
+        {
+            RunPossibleAugmentation();
+        }
         if (Workers.Count == 0)
         {
             foreach (var firsts in recipe.BaselineBenefits)
@@ -482,6 +498,27 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
                     Item = firsts.Item
                 };
                 output.Add(preview);
+            }
+
+            
+
+            if (OutputPromise is not null)
+            {
+                foreach (var item in OutputPromise.ExtraRewards)
+                {
+                    preview = new()
+                    {
+                        Chance = 100,
+                        Amount = 1,
+                        Item = item
+                    };
+                    output.Add(preview);
+                }
+            }
+            if (uiOnly)
+            {
+                OutputPromise = null;
+                RunPossibleAugmentation();
             }
             return output;
         }
@@ -593,7 +630,24 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
             };
             output.Add(preview);
         }
-
+        if (OutputPromise is not null)
+        {
+            foreach (var item in OutputPromise.ExtraRewards)
+            {
+                preview = new()
+                {
+                    Chance = 100,
+                    Amount = 1,
+                    Item = item
+                };
+                output.Add(preview);
+            }
+        }
+        if (uiOnly)
+        {
+            OutputPromise = null;
+            RunPossibleAugmentation();
+        }
         return output;
     }
 

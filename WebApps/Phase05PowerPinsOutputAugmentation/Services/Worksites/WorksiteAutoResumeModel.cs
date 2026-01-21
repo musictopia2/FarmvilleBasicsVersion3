@@ -1,5 +1,4 @@
 ﻿namespace Phase05PowerPinsOutputAugmentation.Services.Worksites;
-
 public class WorksiteAutoResumeModel
 {
     public string Name { get; set; } = "";
@@ -12,4 +11,5 @@ public class WorksiteAutoResumeModel
     public bool Focused { get; set; }
     public Dictionary<string, int> FailureHistory { get; set; } = [];
     public TimeSpan ReduceBy { get; set; } = TimeSpan.Zero;
+    public OutputAugmentationSnapshot? OutputPromise { get; set; }
 }

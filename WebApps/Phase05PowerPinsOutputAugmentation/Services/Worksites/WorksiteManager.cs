@@ -3,7 +3,8 @@ public class WorksiteManager(
     InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry,
-    TimedBoostManager timedBoostManager
+    TimedBoostManager timedBoostManager,
+    OutputAugmentationManager outputAugmentationManager
     )
 {
     private bool _canAutomateCollection;
@@ -294,11 +295,10 @@ public class WorksiteManager(
         _allWorkers = await workerContext.WorkerRegistry.GetWorkersAsync();
         BaseBalanceProfile profile = await baseBalanceProvider.GetBaseBalanceAsync(farm);
         double offset = profile.WorksiteTimeMultiplier;
-
         foreach (var item in ours)
         {
             WorksiteRecipe recipe = recipes.Single(x => x.Location == item.Name);
-            WorksiteInstance instance = new(recipe, offset, _allWorkers, _workerStates);
+            WorksiteInstance instance = new(recipe, offset, _allWorkers, _workerStates, timedBoostManager, outputAugmentationManager);
             instance.Load(item, timedBoostManager);
             foreach (var tempWorker in item.Workers)
             {
