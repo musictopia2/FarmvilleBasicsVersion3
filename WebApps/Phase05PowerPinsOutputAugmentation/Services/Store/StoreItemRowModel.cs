@@ -27,4 +27,5 @@ public class StoreItemRowModel
     public TimeSpan? Duration { get; init; }       // from CatalogOfferModel
     public TimeSpan? ReducedBy { get; init; }
     public int Quantity { get;init;  }
+    public string? OutputAugmentationKey { get; init; }
 }

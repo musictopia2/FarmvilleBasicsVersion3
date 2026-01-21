@@ -166,7 +166,8 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
                 IsLocked = isLocked,
                 Duration = offer.Duration,
                 Repeatable = offer.Repeatable,
-                IsMaxedOut = false
+                IsMaxedOut = false,
+                OutputAugmentationKey = offer.OutputAugmentationKey
             });
         }
 

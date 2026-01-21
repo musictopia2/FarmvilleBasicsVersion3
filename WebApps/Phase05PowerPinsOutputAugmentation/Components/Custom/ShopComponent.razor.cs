@@ -1,5 +1,5 @@
 namespace Phase05PowerPinsOutputAugmentation.Components.Custom;
-public partial class ShopComponent(IToast toast)
+public partial class ShopComponent(IToast toast, IMessageBox message)
 {
     private async Task OnActiveKeyChanged(string? key)
     {
@@ -48,6 +48,20 @@ public partial class ShopComponent(IToast toast)
         _currentItem = null;
     }
 
+    private async Task ShowAugmentationDetailsAsync(StoreItemRowModel row)
+    {
+        if (string.IsNullOrWhiteSpace(row.OutputAugmentationKey))
+        {
+            return;
+        }
+
+        string description = Farm!.OutputAugmentationManager.GetDescription(row.OutputAugmentationKey);
+        await message.ShowMessageAsync(description);
+    }
+    private void CancelPurchase()
+    {
+        _showConfirmation = false;
+    }
     private void OnRowClicked(StoreItemRowModel row)
     {
         // You said you need the outer div for click; keep it here.

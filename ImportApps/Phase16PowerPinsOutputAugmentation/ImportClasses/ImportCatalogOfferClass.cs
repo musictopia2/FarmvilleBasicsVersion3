@@ -56,7 +56,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryWorksiteListClass.Mines,
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = CountryAugmentationKeys.MinesGuaranteedGranolaBlanket,
             LevelRequired = 18
@@ -66,7 +66,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryAnimalListClass.Sheep, //should give the animal name this time.
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = CountryAugmentationKeys.SheepDoubleWoolGuaranteed,
             LevelRequired = 16
@@ -76,7 +76,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryItemList.Peach,
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = CountryAugmentationKeys.PeachTreeChanceExtraPeach,
             LevelRequired = 10
@@ -86,7 +86,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryItemList.ApplePie, //i think this time needs to be apple pies.
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = CountryAugmentationKeys.ApplePieChanceExtraApplePie,
             LevelRequired = 9
@@ -96,7 +96,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryAnimalListClass.Cow,
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = CountryAugmentationKeys.CowChanceButter,
             LevelRequired = 10
@@ -106,7 +106,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = CountryItemList.Tomato,
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = CountryAugmentationKeys.TomatoChanceFarmersSoup,
             LevelRequired = 11
@@ -125,7 +125,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = TropicalWorksiteListClass.SmugglersCave,
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = TropicalAugmentationKeys.SmugglersCaveGuaranteedTruffleFriesAndFriedRice,
             LevelRequired = 18
@@ -135,7 +135,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = TropicalItemList.Rice, //should give the animal name this time.
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = TropicalAugmentationKeys.RiceChanceExtraSteamedRice,
             LevelRequired = 16
@@ -145,7 +145,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = TropicalItemList.Lime,
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = TropicalAugmentationKeys.LimeChanceExtraLime,
             LevelRequired = 10
@@ -155,7 +155,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = TropicalItemList.GrilledCrab, //i think this time needs to be apple pies.
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = TropicalAugmentationKeys.GrilledCrabChanceExtraGrilledCrab,
             LevelRequired = 9
@@ -165,7 +165,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = TropicalAnimalListClass.Dolphin,
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = TropicalAugmentationKeys.DolphinChanceSearedFish,
             LevelRequired = 10
@@ -175,7 +175,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName = TropicalAnimalListClass.Chicken,
-            Costs = FarmHelperClass.GetFreeCosts, //needs this so i can test before figuring out the store.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             Duration = duration,
             OutputAugmentationKey = TropicalAugmentationKeys.ChickenDoubleEggsGuaranteed,
             LevelRequired = 11

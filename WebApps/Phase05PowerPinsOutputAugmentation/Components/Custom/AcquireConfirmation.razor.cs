@@ -7,8 +7,8 @@ public partial class AcquireConfirmation
     public StoreItemRowModel StoreItem { get; set; }
     [Parameter]
     public EventCallback OnAcquire { get; set; } //you may already know because you have to set the parameter anyways.
-
-
+    [Parameter]
+    public EventCallback OnClose { get; set; }
 
 
     private string ImageUrl
