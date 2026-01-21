@@ -106,12 +106,8 @@ public class WorkshopManager(InventoryManager inventory,
         {
             throw new CustomBasicException("Don't have enough power gloves.  Should had called the inventorymanager.Has function");
         }
-
-        //todo:  figure out how to get the benefit of it.
         ApplyPowerGloveToActiveJob(workshop, howMany, PowerGloveRegistry.ReduceBy);
-
         inventory.Consume(CurrencyKeys.PowerGloveWorkshop, howMany);
-
     }
 
     public void UnlockWorkshopPaidFor(StoreItemRowModel store)

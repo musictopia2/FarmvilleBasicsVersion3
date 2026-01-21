@@ -32,6 +32,23 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
     private bool _needsSaving;
     public bool NeedsSaving => _needsSaving;
 
+
+    public void ApplyTimeReduction(TimeSpan reduceBy)
+    {
+        if (reduceBy <= TimeSpan.Zero)
+        {
+            return;
+        }
+        if (Status != EnumWorksiteState.Processing || StartedAt is null)
+        {
+            return; // only meaningful while actively processing
+        }
+
+        // Pretend the job started earlier -> increases elapsed -> finishes sooner
+        StartedAt = StartedAt.Value - reduceBy;
+        _needsSaving = true;
+    }
+
     public TimeSpan GetPreviewDuration(TimedBoostManager timedBoostManager)
     {
         // If not idle, preview should just show the locked duration

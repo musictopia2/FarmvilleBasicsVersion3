@@ -1,4 +1,6 @@
-﻿namespace Phase07PowerGloves.Services.Worksites;
+﻿using System.IO.Pipes;
+
+namespace Phase07PowerGloves.Services.Worksites;
 public class WorksiteManager(
     InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
@@ -46,6 +48,32 @@ public class WorksiteManager(
         }
         return output;
     }
+    private void ApplyPowerGloveToWorksite(string location, int used, TimeSpan reduceByPerUse)
+    {
+        if (used <= 0)
+        {
+            return;
+        }
+
+        TimeSpan totalReduce = reduceByPerUse * used;
+
+        lock (_lock)
+        {
+            WorksiteInstance instance = GetWorksiteByLocation(location);
+            instance.ApplyTimeReduction(totalReduce);
+            _needsSaving = true;
+        }   
+    }
+    public void UsePowerGlove(string location, int howMany)
+    {
+        if (inventory.Has(CurrencyKeys.PowerGloveWorksite, howMany) == false)
+        {
+            throw new CustomBasicException("Don't have enough power gloves.  Should had called the inventorymanager.Has function");
+        }
+        ApplyPowerGloveToWorksite(location, howMany, PowerGloveRegistry.ReduceBy);
+        inventory.Consume(CurrencyKeys.PowerGloveWorksite, howMany);
+    }
+
     public async Task UnlockWorkerPaidForAsync(StoreItemRowModel store)
     {
         if (store.Category != EnumCatalogCategory.Worker)

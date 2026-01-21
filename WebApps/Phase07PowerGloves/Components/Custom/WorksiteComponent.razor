@@ -1,8 +1,11 @@
 ﻿@inherits TimedOnlyComponent
-@* @if (_currentWorker is null)
-{
-    return;
-} *@
+
+<PopupViewport TapToClose=true
+               @bind-Visible="_showPowerGloves">
+    <PowerGloveWorksiteComponent Location="@Location"
+                                 OnClose="ClosePowerGloves" />
+</PopupViewport>
+
 @if (string.IsNullOrWhiteSpace(Location))
 {
     return;
@@ -19,10 +22,10 @@
             <div class="busy-hero-top">
                 @Location.GetWords
             </div>
-
             <div class="busy-hero-pill">
                 @GetProgressText
             </div>
+            
 
             @if (CanResetToFocused)
             {

@@ -25,6 +25,16 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
 
     private const string _ringSize = "100px";
 
+    private bool _showPowerGloves = false;
+    private void ClosePowerGloves()
+    {
+        _showPowerGloves = false;
+    }
+    private void OnPowerGloveClicked()
+    {
+        _showPowerGloves = true;
+    }
+
 
     //private bool _showWorkshops;
 
