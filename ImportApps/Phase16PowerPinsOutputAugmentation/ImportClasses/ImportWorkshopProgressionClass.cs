@@ -128,6 +128,11 @@ public static class ImportWorkshopProgressionClass
         });
         output.Add(new()
         {
+            ItemName = CountryItemList.Socks,
+            LevelRequired = 14
+        });
+        output.Add(new()
+        {
             ItemName = CountryItemList.Trousers,
             LevelRequired = 15
         });

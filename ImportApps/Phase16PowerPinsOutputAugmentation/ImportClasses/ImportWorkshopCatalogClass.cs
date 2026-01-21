@@ -140,10 +140,11 @@ internal static class ImportWorkshopCatalogClass
             Category = _category,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(40)
         });
+        
         output.Add(new()
         {
             TargetName = CountryWorkshopList.Loom,
-            LevelRequired = 15,
+            LevelRequired = 14,
             Category = _category,
             Costs = FarmHelperClass.GetFreeCosts
         });

@@ -101,7 +101,9 @@ public static class ImportWorkshopRecipeClass
                 i[CountryItemList.Wheat] = 5;
                 i[CountryItemList.Strawberry] = 4;
             });
-
+        AddWorkshopRecipe(output, CountryItemList.Socks, CountryWorkshopList.Loom, theme,
+            TimeSpan.FromHours(2),
+            i => { i[CountryItemList.Wool] = 4; });
         AddWorkshopRecipe(output, CountryItemList.Trousers, CountryWorkshopList.Loom, theme,
             TimeSpan.FromMinutes(20),
             i => { i[CountryItemList.Wool] = 6; });

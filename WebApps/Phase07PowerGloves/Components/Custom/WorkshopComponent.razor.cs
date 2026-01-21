@@ -17,6 +17,11 @@ public partial class WorkshopComponent(IToast toast)
     public EventCallback<string> NavigateTo { get; set; }
     private int _capacity;
     private bool _showToast = true;
+    private bool _showPowerGloves = false;
+    private void ClosePowerGloves()
+    {
+        _showPowerGloves = false;
+    }
     protected override void OnParametersSet()
     {
         _showToast = true; //good news is when the readycount increases since something is ready from the parent calls this so i actually get desired behavior.
@@ -155,10 +160,8 @@ public partial class WorkshopComponent(IToast toast)
     private static string Image(CraftingSummary craft) => $"/{craft.Name}.png";
     private static string GetTimeText(CraftingSummary craft) => craft.ReadyTime;
     private string WorkshopImage => $"/{Workshop.Name}.png";
-
-
     private void OnPowerGloveClicked()
     {
-        toast.ShowInfoToast("Try to show power gloves");
+        _showPowerGloves = true;
     }
 }

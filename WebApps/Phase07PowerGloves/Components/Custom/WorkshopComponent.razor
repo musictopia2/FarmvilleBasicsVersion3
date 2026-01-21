@@ -1,5 +1,12 @@
 ﻿@inherits TimedOnlyComponent
 
+<PopupViewport TapToClose=true
+               @bind-Visible="_showPowerGloves">
+    <PowerGloveWorkshopComponent Workshop="Workshop"
+        OnClose="ClosePowerGloves"
+        />
+</PopupViewport>
+
 @if (_recipes.Count == 0)
 {
     <div class="alert alert-warning">
@@ -138,7 +145,7 @@
 
                 <div class="workshop-recipe-icon @(CurrentRecipe.Unlocked ? "" : "locked")">
                     <ImageButtonComponent Name="@ChosenItem"
-                                          Height="72"
+                                          Height="120"
                                           OnClick="Craft" />
                     
 

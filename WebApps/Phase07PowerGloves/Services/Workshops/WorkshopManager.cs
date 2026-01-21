@@ -70,6 +70,50 @@ public class WorkshopManager(InventoryManager inventory,
 
     //if you purchase, must make sure all proper items are unlocked like it should had (?)
 
+
+    private void ApplyPowerGloveToActiveJob(WorkshopView summary, int used, TimeSpan reduceByPerUse)
+    {
+        if (used <= 0)
+        {
+            return;
+        }
+
+        lock (_lock)
+        {
+            var workshop = GetWorkshopById(summary);
+
+            // Only makes sense on an ACTIVE job (matches your earlier design: button only when active)
+            var active = workshop.Queue.FirstOrDefault(x => x.State == EnumWorkshopState.Active);
+            if (active is null || active.StartedAt is null)
+            {
+                return;
+            }
+
+            TimeSpan totalReduce = reduceByPerUse * used;
+
+            // Shift the start earlier => increases elapsed => finishes sooner
+            active.UpdateStartedAt(active.StartedAt.Value - totalReduce);
+
+            _needsSaving = true;
+        }
+
+        //no need for the other (because the next second, should be updated).
+    }
+
+    public void UsePowerGlove(WorkshopView workshop, int howMany)
+    {
+        if (inventory.Has(CurrencyKeys.PowerGloveWorkshop, howMany) == false)
+        {
+            throw new CustomBasicException("Don't have enough power gloves.  Should had called the inventorymanager.Has function");
+        }
+
+        //todo:  figure out how to get the benefit of it.
+        ApplyPowerGloveToActiveJob(workshop, howMany, PowerGloveRegistry.ReduceBy);
+
+        inventory.Consume(CurrencyKeys.PowerGloveWorkshop, howMany);
+
+    }
+
     public void UnlockWorkshopPaidFor(StoreItemRowModel store)
     {
         if (store.Category != EnumCatalogCategory.Workshop)
