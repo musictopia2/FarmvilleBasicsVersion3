@@ -1,0 +1,13 @@
+﻿@inherits FarmComponentBase
+
+@if (_unlimitedSpeedSeedTime is not null)
+{
+    <UnlimitedSpeedSeedsGrantComponent Category="EnumItemCategory.Animal"
+                                       TimeRemaining="_unlimitedSpeedSeedTime.Value" />
+    return;
+}
+
+
+<WrapLayout RenderList="_animals" ColumnWidth="60px" Context="animal">
+    <AnimalComponent Animal="animal" />
+</WrapLayout>
