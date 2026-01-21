@@ -1,9 +1,8 @@
-﻿namespace Phase16PowerPinsOutputAugmentation.ListClasses;
+﻿namespace Phase07PowerGloves.Services.Inventory;
 public static class CurrencyKeys
 {
     public const string Coin = "Coin";
     public const string SpeedSeed = "SpeedSeed";
     public const string PowerGloveWorkshop = "PowerGloveWorkshop";
     public const string PowerGloveWorksite = "PowerGloveWorksite";
-    //any future stuff goes here.
 }
