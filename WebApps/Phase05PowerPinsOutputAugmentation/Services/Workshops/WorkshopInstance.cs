@@ -22,7 +22,9 @@ public class WorkshopInstance
         return true;
     }
     
-    public void Load(WorkshopAutoResumeModel workshop, BasicList<WorkshopRecipe> recipes, double multiplier)
+    public void Load(WorkshopAutoResumeModel workshop, BasicList<WorkshopRecipe> recipes, double multiplier,
+        TimedBoostManager timedBoostManager, OutputAugmentationManager outputAugmentationManager
+        )
     {
         Capacity = workshop.Capacity;
         SupportedItems = workshop.SupportedItems;
@@ -38,7 +40,7 @@ public class WorkshopInstance
         foreach (var item in workshop.Queue)
         {
             WorkshopRecipe recipe = recipes.Single(x => x.Item == item.RecipeItem);
-            CraftingJobInstance job = new(recipe, multiplier, workshop.ReducedBy);
+            CraftingJobInstance job = new(recipe, multiplier, workshop.ReducedBy, timedBoostManager, outputAugmentationManager);
             job.Load(item);
             Queue.Add(job);
         }

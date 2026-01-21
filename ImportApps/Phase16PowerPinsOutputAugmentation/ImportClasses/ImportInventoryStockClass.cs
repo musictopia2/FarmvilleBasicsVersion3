@@ -34,6 +34,14 @@ public static class ImportInventoryStockClass
             //amounts[rule.ItemName] = 10;
         });
         amounts.Add(CurrencyKeys.Coin, 300);
+
+        //if (farm.Theme == FarmThemeList.Country)
+        //{
+        //    amounts.Add(CountryItemList.Flour, 20);
+        //    amounts.Add(CountryItemList.Milk, 10);
+        //    amounts.Add(CountryItemList.Apple, 60); //so i can apple pies now.
+        //}
+
         //amounts.Add(CurrencyKeys.SpeedSeed, 10); //you get 10 speed seeds.  once gone, that is it.
         //if (farm.Theme == FarmThemeList.Country)
         //{

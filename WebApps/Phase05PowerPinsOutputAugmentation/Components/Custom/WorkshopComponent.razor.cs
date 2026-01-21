@@ -99,7 +99,7 @@ public partial class WorkshopComponent(IToast toast)
         {
             if (WorkshopManager.CanAddToInventory(Workshop))
             {
-                WorkshopManager.PickupManually(Workshop);
+                WorkshopManager.PickupManually(Workshop); //since you are already there, no problem.
                 _showToast = true;
             }
             else if (_showToast)

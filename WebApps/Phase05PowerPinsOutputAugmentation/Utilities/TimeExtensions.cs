@@ -97,7 +97,7 @@ public static class TimeExtensions
             // preserve precision
             var ticks = (long)Math.Round(time.Ticks * multiplier, MidpointRounding.AwayFromZero);
             
-            var minTicks = TimeSpan.FromSeconds(2).Ticks;
+            var minTicks = TimeSpan.FromSeconds(5).Ticks;
 
             if (ticks < minTicks)
             {

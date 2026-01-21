@@ -15,10 +15,51 @@ public class OverlayService(PopupRegistry popup, FarmContext farm)
         farm.Current!.AnimalManager.OnAugmentedOutput += OnAugmentedOutput;
         farm.Current.CropManager.OnAugmentedOutput += OnAugmentedOutput;
         farm.Current.TreeManager.OnAugmentedOutput += OnAugmentedOutput;
+        farm.Current.WorkshopManager.OnAugmentedOutput += OnAugmentedOutput;
     }
     private int _batchDepth;
     private readonly Dictionary<string, int> _batched = new(StringComparer.OrdinalIgnoreCase);
 
+    private CancellationTokenSource? _debounceCts;
+    private static readonly TimeSpan _workshopIdleFlush = TimeSpan.FromSeconds(2); // adjust as needed
+
+    private bool _workshopBatchActive;
+    public void NotifyAugmentationActivity()
+    {
+        // Start workshop batch only once
+        if (_workshopBatchActive == false)
+        {
+            _workshopBatchActive = true;
+            _batchDepth++; // begin (but only once for the whole session)
+        }
+
+        // Restart idle timer
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        _debounceCts = new CancellationTokenSource();
+        var token = _debounceCts.Token;
+
+        _ = FlushAfterIdleAsync(token);
+    }
+
+    private async Task FlushAfterIdleAsync(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(_workshopIdleFlush, token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        // Only flush the workshop batch we started
+        if (_workshopBatchActive)
+        {
+            _workshopBatchActive = false;
+            End(); // this will drop depth to 0 and flush if _batched has anything
+        }
+    }
     public void Begin()
     {
         _batchDepth++;
@@ -62,6 +103,7 @@ public class OverlayService(PopupRegistry popup, FarmContext farm)
         farm.Current!.AnimalManager.OnAugmentedOutput -= OnAugmentedOutput;
         farm.Current.CropManager.OnAugmentedOutput -= OnAugmentedOutput;
         farm.Current.TreeManager.OnAugmentedOutput -= OnAugmentedOutput;
+        farm.Current.WorkshopManager.OnAugmentedOutput -= OnAugmentedOutput;
     }
     
 

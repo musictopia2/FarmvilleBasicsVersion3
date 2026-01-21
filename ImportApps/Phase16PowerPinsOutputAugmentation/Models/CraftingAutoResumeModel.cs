@@ -6,4 +6,5 @@ public class CraftingAutoResumeModel
     public DateTime? StartedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
     public double? RunMultiplier { get; set; }
+    public OutputAugmentationSnapshot? OutputPromise { get; set; } //may be here (?)
 }

@@ -3,7 +3,8 @@
 public class WorkshopManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry,
-    TimedBoostManager timedBoostManager
+    TimedBoostManager timedBoostManager,
+    OutputAugmentationManager outputAugmentationManager
     )
 {
     private IWorkshopRespository _workshopRespository = null!;
@@ -15,6 +16,7 @@ public class WorkshopManager(InventoryManager inventory,
     private bool _needsSaving;
     private DateTime _lastSave = DateTime.MinValue;
     private double _multiplier;
+    public event Action<ItemAmount>? OnAugmentedOutput;
     private WorkshopInstance GetWorkshopById(Guid id)
     {
         var workshop = _workshops.SingleOrDefault(t => t.Id == id) ?? throw new CustomBasicException($"Workshop with Id {id} not found.");
@@ -41,7 +43,7 @@ public class WorkshopManager(InventoryManager inventory,
                     output.Add(summary);
                 });
 
-                
+
                 return output;
             }
         }
@@ -65,7 +67,7 @@ public class WorkshopManager(InventoryManager inventory,
         //if (_workshops.Any(x => x.Unlocked && x.))
         //var workshop = _workshops.FirstOrDefault(x => x.Unlocked == false && )
     }
-    
+
     //if you purchase, must make sure all proper items are unlocked like it should had (?)
 
     public void UnlockWorkshopPaidFor(StoreItemRowModel store)
@@ -164,7 +166,7 @@ public class WorkshopManager(InventoryManager inventory,
             WorkshopRecipe recipe = _recipes.Single(x => x.Item == item);
             inventory.Consume(recipe.Inputs);
             TimeSpan reduced = timedBoostManager.GetReducedTime(summary.Name);
-            CraftingJobInstance job = new(recipe, _multiplier, reduced);
+            CraftingJobInstance job = new(recipe, _multiplier, reduced, timedBoostManager, outputAugmentationManager);
             WorkshopInstance workshop = GetWorkshopById(summary);
             workshop.ReducedBy = reduced; //i think this too.
             workshop.Queue.Add(job);
@@ -319,9 +321,19 @@ public class WorkshopManager(InventoryManager inventory,
     private bool CanAddToInventory(WorkshopInstance workshop)
     {
         CraftingJobInstance active = workshop.Queue.First(x => x.State == EnumWorkshopState.ReadyToPickUpManually);
-        return inventory.CanAdd(active.Recipe.Output);
+        return CanAddToInventory(active);
+        //return inventory.CanAdd(active.Recipe.Output);
     }
-    private bool CanAddToInventory(CraftingJobInstance active) => inventory.CanAdd(active.Recipe.Output);
+    private bool CanAddToInventory(CraftingJobInstance active)
+    {
+
+        if (active.OutputPromise is null)
+        {
+            return inventory.CanAdd(active.Recipe.Output);
+        }
+        return inventory.CanAdd(active.Recipe.Output.Item, active.Recipe.Output.Amount + 1);
+    }
+    //private bool CanAddToInventory(CraftingJobInstance active) => inventory.CanAdd(active.Recipe.Output);
     public void PickupManually(WorkshopView summary)
     {
         lock (_lock)
@@ -334,16 +346,29 @@ public class WorkshopManager(InventoryManager inventory,
             CraftingJobInstance active = workshop.Queue.First(x => x.State == EnumWorkshopState.ReadyToPickUpManually);
             //active.Complete();
 
+
+
+
             workshop.Queue.RemoveSpecificItem(active);
             //save something here too.
+
+            if (active.OutputPromise is null || rs1.RollHit(active.OutputPromise.Chance) == false)
+            {
+                inventory.Add(active.Recipe.Output.Item, active.Recipe.Output.Amount);
+                _needsSaving = true;
+                NotifyWorkshopsUpdated();
+                return;
+            }
+            OnAugmentedOutput?.Invoke(active.Recipe.Output);
+            inventory.Add(active.Recipe.Output.Item, active.Recipe.Output.Amount);
             inventory.Add(active.Recipe.Output.Item, active.Recipe.Output.Amount);
             _needsSaving = true;
             NotifyWorkshopsUpdated();
-            //return workshop.Queue.Any(x => x.State == EnumWorkshopState.ReadyToPickUpManually);
-            //CraftingJob? nexts = workshop.Queue.FirstOrDefault(x => x.State == EnumWorkshopState.ReadyToPickUpManually);
-            //return nexts is not null;
         }
     }
+
+    
+
     public async Task SetStyleContextAsync(WorkshopServicesContext context, FarmKey farm)
     {
         if (_workshopRespository != null)
@@ -367,7 +392,7 @@ public class WorkshopManager(InventoryManager inventory,
             {
                 BuildingName = item.Name
             };
-            workshop.Load(item, _recipes, _multiplier);
+            workshop.Load(item, _recipes, _multiplier, timedBoostManager, outputAugmentationManager);
             _workshops.Add(workshop);
         }
     }
@@ -392,29 +417,48 @@ public class WorkshopManager(InventoryManager inventory,
             active = next;
         }
 
-        if (active == null)
+        if (active is null)
         {
             return;
         }
-
         var now = DateTime.Now;
         var elapsed = now - active.StartedAt!.Value;
-
+        bool rets = active.RunPossibleAugmentation(); //i think if there is something active, must show here.
+        if (rets)
+        {
+            _needsSaving = true;
+        }
         while (active != null && elapsed >= active.DurationForProcessing)
         {
             // Consume time for this job
             elapsed -= active.DurationForProcessing;
-
             if (_automateCollection)
             {
                 if (CanAddToInventory(active))
                 {
-                    inventory.Add(active.Recipe.Output.Item, active.Recipe.Output.Amount);
+                    //if you are doing automatically, no toasts (no toasts should be here).
+
+                    if (active.OutputPromise is null)
+                    {
+                        inventory.Add(active.Recipe.Output.Item, active.Recipe.Output.Amount);
+
+                    }
+                    else
+                    {
+                        if (rs1.RollHit(active.OutputPromise.Chance))
+                        {
+                            //because of augmentation, we add one more and you were successful.
+                            inventory.Add(active.Recipe.Output.Item, active.Recipe.Output.Amount + 1);
+                        }
+                        else
+                        {
+                            inventory.Add(active.Recipe.Output.Item, active.Recipe.Output.Amount);
+                        }
+                    }
                     active.Complete();
                     workshop.Queue.RemoveSpecificItem(active);
                     _needsSaving = true;
                 }
-
             }
             else
             {

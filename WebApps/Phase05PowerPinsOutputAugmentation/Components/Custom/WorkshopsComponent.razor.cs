@@ -191,9 +191,6 @@ public partial class WorkshopsComponent(OverlayService overlay, IToast toast) : 
         UpdateWorkshops();
         InvokeAsync(StateHasChanged);
     }
-    
-    
-
     private void SelectWorkshop(WorkshopView workshop)
     {
         if (workshop.ReadyCount > 0)
@@ -208,6 +205,7 @@ public partial class WorkshopsComponent(OverlayService overlay, IToast toast) : 
                 toast.ShowUserErrorToast("Unable to pick up crafted item because the barn is full.  Try discarding or consuming the items");
                 return;
             }
+            overlay.NotifyAugmentationActivity();
             WorkshopManager.PickupManually(workshop);
             return;
         }

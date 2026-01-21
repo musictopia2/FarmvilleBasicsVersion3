@@ -9,4 +9,5 @@ public class WorkshopAutoResumeModel
     public int Capacity { get; set; } = 2;
     public BasicList<CraftingAutoResumeModel> Queue { get; set; } = [];
     public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
+    
 }

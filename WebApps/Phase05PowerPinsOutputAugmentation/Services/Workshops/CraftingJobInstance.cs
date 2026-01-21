@@ -1,13 +1,35 @@
-﻿namespace Phase05PowerPinsOutputAugmentation.Services.Workshops;
-public class CraftingJobInstance(WorkshopRecipe recipe, double currentMultiplier, TimeSpan reducedBy)
+﻿using System.Xml.Linq;
+
+namespace Phase05PowerPinsOutputAugmentation.Services.Workshops;
+public class CraftingJobInstance(
+    WorkshopRecipe recipe,
+    double currentMultiplier,
+    TimeSpan reducedBy,
+    TimedBoostManager timedBoostManager,
+    OutputAugmentationManager outputAugmentationManager
+    )
 {
-    public WorkshopRecipe Recipe { get; } = recipe;
+    public WorkshopRecipe Recipe => recipe;
     public Guid Id { get; set; } = Guid.NewGuid();
     public EnumWorkshopState State { get; private set; } = EnumWorkshopState.Waiting;
-    public TimeSpan ReducedBy => reducedBy;
+    public TimeSpan ReducedBy { get; } = reducedBy;
     public DateTime? StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
-    //public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
+    public OutputAugmentationSnapshot? OutputPromise { get; private set; } //may be here (?)
+    public bool RunPossibleAugmentation()
+    {
+        if (OutputPromise is not null)
+        {
+            return false;
+        }
+        string? key = timedBoostManager.GetActiveOutputAugmentationKeyForItem(recipe.Output.Item);
+        if (key is null)
+        {
+            return false;
+        }
+        OutputPromise = outputAugmentationManager.GetSnapshot(key);
+        return true;
+    }
 
     // Current multiplier (not persisted)
     private readonly double _currentMultiplier = GameRegistry.ValidateMultiplier(currentMultiplier);
@@ -22,14 +44,13 @@ public class CraftingJobInstance(WorkshopRecipe recipe, double currentMultiplier
         {
             var m = _runMultiplier ?? _currentMultiplier;
 
-            TimeSpan duration = Recipe.Duration - reducedBy;
+            TimeSpan duration = recipe.Duration - ReducedBy;
 
             return duration.Apply(m); //hopefully this simple this time.
         }
     }
 
     public TimeSpan DurationForProcessing => EffectiveDuration;
-
 
     public bool IsComplete =>
         State == EnumWorkshopState.Active &&
@@ -50,7 +71,7 @@ public class CraftingJobInstance(WorkshopRecipe recipe, double currentMultiplier
         State = craft.State;
         StartedAt = craft.StartedAt;
         CompletedAt = craft.CompletedAt;
-
+        OutputPromise = craft.OutputPromise;
         _runMultiplier = craft.RunMultiplier;
         // Back-compat / safety:
         // if job exists and has started but run multiplier missing, use current
@@ -58,12 +79,12 @@ public class CraftingJobInstance(WorkshopRecipe recipe, double currentMultiplier
         {
             _runMultiplier = _currentMultiplier;
         }
-
     }
 
     public void Complete()
     {
         CompletedAt = DateTime.Now;
+        OutputPromise = null;
     }
 
     public void ReadyForManualPickup()
@@ -106,9 +127,10 @@ public class CraftingJobInstance(WorkshopRecipe recipe, double currentMultiplier
             return new()
             {
                 CompletedAt = CompletedAt,
-                RecipeItem = Recipe.Item,
+                RecipeItem = recipe.Item,
                 StartedAt = StartedAt,
                 State = State,
+                OutputPromise = OutputPromise,
                 // Save locked multiplier if job was ever started; otherwise null is fine
                 RunMultiplier = StartedAt is null ? null : _runMultiplier
             };
