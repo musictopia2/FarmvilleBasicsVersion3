@@ -35,8 +35,11 @@ public static class ImportInventoryStockClass
         });
         amounts.Add(CurrencyKeys.Coin, 300);
 
-        amounts.Add(CurrencyKeys.PowerGloveWorksite, 20);
-        amounts.Add(CurrencyKeys.PowerGloveWorkshop, 20);
+
+
+
+        //amounts.Add(CurrencyKeys.PowerGloveWorksite, 20);
+        //amounts.Add(CurrencyKeys.PowerGloveWorkshop, 20);
 
         //if (farm.Theme == FarmThemeList.Country)
         //{

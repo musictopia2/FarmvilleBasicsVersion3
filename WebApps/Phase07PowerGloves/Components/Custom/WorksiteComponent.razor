@@ -1,6 +1,7 @@
 ﻿@inherits TimedOnlyComponent
 
-<PopupViewport TapToClose=true
+<PopupViewport ZIndex="2000"
+               ShowHeaders="false"
                @bind-Visible="_showPowerGloves">
     <PowerGloveWorksiteComponent Location="@Location"
                                  OnClose="ClosePowerGloves" />
@@ -23,9 +24,20 @@
                 @Location.GetWords
             </div>
             <div class="busy-hero-pill">
-                @GetProgressText
+
+                <span class="busy-hero-text">
+                    @GetProgressText
+                </span>
+                <StopClickPropagation>
+                    <div class="powerglove-pill-slot"
+                         @onclick="OnPowerGloveClicked">
+                        <BoostIconComponent Name="@CurrencyKeys.PowerGloveWorksite"
+                                            ImageSize="80" />
+                    </div>
+                </StopClickPropagation>
+                
+
             </div>
-            
 
             @if (CanResetToFocused)
             {

@@ -22,6 +22,7 @@ public static class ImportCatalogOfferClass
         list.AddRange(ImportWorkerCatalogClass.GetWorkerOffers(farm));
         list.AddRange(ImportWorkshopCatalogClass.GetWorkshopOffers(farm));
         list.AddRange(ImportSpeedSeedOffers());
+        list.AddRange(ImportPowerGloveOffers());
         list.AddRange(ImportUnlimitedSpeedSeeds());
         list.AddRange(ImportNoWorksiteSuppliesNeeded());
         if (farm.Theme == FarmThemeList.Country)
@@ -206,7 +207,51 @@ public static class ImportCatalogOfferClass
         });
         return output;
     }
+    private static BasicList<CatalogOfferModel> ImportPowerGloveOffers()
+    {
+        BasicList<CatalogOfferModel> output = [];
+        EnumCatalogCategory category = EnumCatalogCategory.Misc;
+        int levelRequired = 10;
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 10,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            TargetName = CurrencyKeys.PowerGloveWorkshop,
+            LevelRequired = levelRequired,
 
+        });
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 20,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(15), //you pay less per item if doing bulk.
+            TargetName = CurrencyKeys.PowerGloveWorkshop,
+            LevelRequired = levelRequired
+
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 10,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            TargetName = CurrencyKeys.PowerGloveWorksite,
+            LevelRequired = levelRequired,
+
+        });
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 20,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(15), //you pay less per item if doing bulk.
+            TargetName = CurrencyKeys.PowerGloveWorksite,
+            LevelRequired = levelRequired
+
+        });
+
+        return output;
+    }
     private static BasicList<CatalogOfferModel> ImportSpeedSeedOffers()
     {
         BasicList<CatalogOfferModel> output = [];

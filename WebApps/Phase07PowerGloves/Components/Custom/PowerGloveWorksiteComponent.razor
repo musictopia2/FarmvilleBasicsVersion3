@@ -5,7 +5,7 @@
         @if (_hasGloves == false)
         {
             <div style="font-size: 10rem;">
-                You have no more workshop power gloves left.
+                You have no more worksite power gloves left.
             </div>
             <div>
                 <PrimaryButton FontSize="10rem" OnClick="OnClose">
@@ -18,11 +18,11 @@
             <!-- LEFT: icon + inventory -->
             <div class="glove-left">
                 <div class="glove-icon">
-                    <BoostIconComponent Name="@CurrencyKeys.PowerGloveWorkshop" ImageSize="140" />
+                    <BoostIconComponent Name="@CurrencyKeys.PowerGloveWorksite" ImageSize="140" />
                 </div>
 
                 <div class="glove-count" style="font-size: 5rem;">
-                    @InventoryManager.Get(CurrencyKeys.PowerGloveWorkshop)
+                    @InventoryManager.Get(CurrencyKeys.PowerGloveWorksite)
                 </div>
             </div>
 
