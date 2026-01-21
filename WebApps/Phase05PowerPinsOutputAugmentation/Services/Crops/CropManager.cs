@@ -226,7 +226,7 @@ public class CropManager(InventoryManager inventory,
             bool hit = rs1.RollHit(fins.Chance);
             if (hit)
             {
-                AddExtraRewards(fins.ExtraRewards.Single(), toUse);
+                AddExtraRewards(fins.ExtraRewards.Single(), 1);
             }
         }
         AddCrop(item.Item, granted);

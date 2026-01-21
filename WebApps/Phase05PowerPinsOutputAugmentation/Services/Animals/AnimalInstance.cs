@@ -158,6 +158,7 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier,
         StartedAt = DateTime.Now;
         OutputPromise = null;
         ExtraRewards.Clear();
+        _extrasResolved = false;
         RunPossibleAugmentation();
         _needsSaving = true; //i think.
     }

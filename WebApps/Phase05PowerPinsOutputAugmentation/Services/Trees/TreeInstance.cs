@@ -2,7 +2,9 @@
 public class TreeInstance(
     TreeRecipe tree,
     ITreesCollecting collecting,
-    double currentMultiplier
+    double currentMultiplier,
+    TimedBoostManager timedBoostManager,
+    OutputAugmentationManager outputAugmentationManager
 )
 {
     public Guid Id { get; } = Guid.NewGuid();
@@ -21,6 +23,8 @@ public class TreeInstance(
 
     // production clock for per-tree accumulation
     private DateTime? TempStart { get; set; }
+
+    public OutputAugmentationSnapshot? OutputPromise { get; private set; }
 
     private bool IsCollecting { get; set; } = false;
 
@@ -88,6 +92,7 @@ public class TreeInstance(
                 Unlocked = Unlocked,
                 IsSuppressed = IsSuppressed,
                 ReducedBy = ReducedBy,
+                OutputPromise = OutputPromise,
                 // Save the promise ONLY while producing
                 RunMultiplier = State == EnumTreeState.Producing ? _runMultiplier : null
             };
@@ -104,7 +109,7 @@ public class TreeInstance(
         IsSuppressed |= model.IsSuppressed;
         ReducedBy = model.ReducedBy;
         _runMultiplier = model.RunMultiplier;
-
+        OutputPromise = model.OutputPromise;
         // Back-compat / safety: if producing but multiplier missing, fall back to current
         if (State == EnumTreeState.Producing && _runMultiplier is null)
         {
@@ -133,21 +138,41 @@ public class TreeInstance(
             // both clocks start now
             StartedAt = DateTime.Now;
             TempStart = DateTime.Now;
+            OutputPromise = null; // clear promise to allow new one
+            RunPossibleAugmentation();
         }
     }
 
     private bool _needsSaving;
     public bool NeedsToSave => _needsSaving;
-
+    private void RunPossibleAugmentation()
+    {
+        if (OutputPromise is not null)
+        {
+            return; //already promised.
+        }
+        
+        string? key = timedBoostManager.GetActiveOutputAugmentationKeyForItem(Name);
+        if (key is null)
+        {
+            return;
+        }
+        OutputPromise = outputAugmentationManager.GetSnapshot(key);
+        _needsSaving = true;
+    }
     public void UpdateTick()
     {
         _needsSaving = false;
+        if (State == EnumTreeState.Collecting && OutputPromise is null)
+        {
+            RunPossibleAugmentation();
+        }
 
         if (State != EnumTreeState.Producing || TempStart is null)
         {
             return;
         }
-
+        RunPossibleAugmentation(); //must run here just in case.
         // Ensure run multiplier exists if something started producing without it (defensive)
         _runMultiplier ??= _currentMultiplier;
 

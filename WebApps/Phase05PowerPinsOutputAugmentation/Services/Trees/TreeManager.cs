@@ -3,7 +3,8 @@
 public class TreeManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry,
-    TimedBoostManager timedBoostManager
+    TimedBoostManager timedBoostManager,
+    OutputAugmentationManager outputAugmentationManager
     )
 {
     private ITreesCollecting? _treeCollecting;
@@ -14,6 +15,7 @@ public class TreeManager(InventoryManager inventory,
     private DateTime _lastSave = DateTime.MinValue;
     private readonly BasicList<TreeInstance> _trees = [];
     private bool _collectAll;
+    public event Action<ItemAmount>? OnAugmentedOutput;
     // Public read-only summaries for the UI
     public BasicList<TreeView> GetUnlockedTrees
     {
@@ -126,13 +128,16 @@ public class TreeManager(InventoryManager inventory,
                 Source = name
             });
         }
-
         return output;
     }
     public bool CanCollectFromTree(TreeView id)
     {
         TreeInstance instance = GetTreeById(id);
         int amount = GetCollectAmount(instance);
+        if (instance.OutputPromise is not null)
+        {
+            return inventory.CanAdd(instance.Name, amount * 2);
+        }
         return inventory.CanAdd(instance.Name, amount);
     }
     private int GetCollectAmount(TreeInstance instance)
@@ -144,8 +149,6 @@ public class TreeManager(InventoryManager inventory,
         }
         return 1;
     }
-    //ai suggested having a new service for speed seeds.
-    //for now, chose not to do it.  may change my mind as i build out the feature more.
     public void GrantUnlimitedTreeItems(GrantableItem item)
     {
         if (item.Category != EnumItemCategory.Tree)
@@ -157,31 +160,70 @@ public class TreeManager(InventoryManager inventory,
         {
             throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
         }
-
+        //since this is unlimited, then no need for extra items (since you get literally what you ask for).
         AddTreeToInventory(item.Item, item.Amount);
 
     }
-    public void GrantTreeItems(GrantableItem item, int toUse)
+    private bool CanGrantTreeItems(GrantableItem item, int toUse)
     {
         if (toUse <= 0)
         {
-            throw new CustomBasicException("Must use at least one speed seed");
+            return false;
         }
         if (item.Category != EnumItemCategory.Tree)
         {
-            throw new CustomBasicException("This is not a tree");
+            return false;
         }
         if (inventory.Get(CurrencyKeys.SpeedSeed) < toUse)
         {
-            throw new CustomBasicException("Not enough speed seeds.  Should had ran the required functions first");
+            return false;
         }
-
         int granted = toUse * item.Amount;
-        if (inventory.CanAdd(item.Item, granted) == false)
-        {
-            throw new CustomBasicException("Unable to add because was full.  Should had ran the required functions first");
-        }
 
+        var temp = timedBoostManager.GetActiveOutputAugmentationKeyForItem(item.Item); //i think.
+        if (temp is null)
+        {
+            return inventory.CanAdd(item.Item, granted);
+        }
+        if (inventory.CanAdd(item.Item, granted + 1) == false)
+        {
+            return false;
+        }
+        return true;
+    }
+    public void GrantTreeItems(GrantableItem item, int toUse)
+    {
+        if (CanGrantTreeItems(item, toUse) == false)
+        {
+            throw new CustomBasicException("Unable to grant tree items.  Should had used CanGrantTreeItems first");
+        }
+        int granted = toUse * item.Amount;
+
+        var temp = timedBoostManager.GetActiveOutputAugmentationKeyForItem(item.Item);
+        if (temp is null)
+        {
+            AddTreeToInventory(item.Item, granted);
+            inventory.Consume(CurrencyKeys.SpeedSeed, toUse);
+            return;
+        }
+        var fins = outputAugmentationManager.GetSnapshot(temp);
+        if (fins.ExtraRewards.Count != 1)
+        {
+            throw new CustomBasicException("Must have one reward");
+        }
+        if (fins.Chance >= 100)
+        {
+            throw new CustomBasicException("Cannot be a guarantee for crops");
+        }
+        if (fins.ExtraRewards.Single() != item.Item)
+        {
+            throw new CustomBasicException("The extra reward does not match the item being granted");
+        }
+        bool hit = rs1.RollHit(fins.Chance);
+        if (hit)
+        {
+            AddExtraReward(fins.ExtraRewards.Single(), 1);
+        }
         AddTreeToInventory(item.Item, granted);
         inventory.Consume(CurrencyKeys.SpeedSeed, toUse);
     }
@@ -194,11 +236,30 @@ public class TreeManager(InventoryManager inventory,
         TreeInstance instance = GetTreeById(id);
         int maxs = GetCollectAmount(instance);
         TimeSpan reducedBy = timedBoostManager.GetReducedTime(instance.Name);
+        var temps = instance.OutputPromise; //must store this first.
+        int extras = 0;
         maxs.Times(x =>
         {
+            if (temps is not null)
+            {
+                if (rs1.RollHit(temps.Chance))
+                {
+                    extras++;
+                }
+            }
             instance.CollectTree(reducedBy);
         });
+        AddExtraReward(instance.Name, extras);
         AddTreeToInventory(instance.Name, maxs);
+    }
+    private void AddExtraReward(string item, int amount)
+    {
+        if (amount == 0)
+        {
+            return;
+        }
+        OnAugmentedOutput?.Invoke(new ItemAmount(item, amount));
+        inventory.Add(item, amount);
     }
     private void AddTreeToInventory(string name, int amount)
     {
@@ -230,7 +291,7 @@ public class TreeManager(InventoryManager inventory,
         foreach (var item in ours)
         {
             TreeRecipe recipe = _recipes.Single(x => x.TreeName == item.TreeName);
-            TreeInstance tree = new(recipe, _treeCollecting, offset);
+            TreeInstance tree = new(recipe, _treeCollecting, offset, timedBoostManager, outputAugmentationManager);
             tree.Load(item);
             _trees.Add(tree);
         }

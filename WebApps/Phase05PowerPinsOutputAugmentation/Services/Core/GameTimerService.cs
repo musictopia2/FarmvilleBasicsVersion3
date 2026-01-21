@@ -33,7 +33,7 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
             TimedBoostManager timedBoostManager = new();
             OutputAugmentationManager outputAugmentationManager = new();
             CropManager cropManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager, outputAugmentationManager);
-            TreeManager treeManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager);
+            TreeManager treeManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager, outputAugmentationManager);
             AnimalManager animalManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager, outputAugmentationManager);
             WorkshopManager workshopManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager);
             WorksiteManager worksiteManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager);

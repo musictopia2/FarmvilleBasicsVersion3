@@ -13,6 +13,10 @@ public class TreeAutoResumeModel
     // Temporary override: something else is taking over the rule, so this tree shouldn't appear / be usable
     public bool IsSuppressed { get; set; } = false;
 
+    public OutputAugmentationSnapshot? OutputPromise { get; set; }
+
+
+
     //good news is did not save time here so at least no problem here.
 
     // Production timing is determined by the associated TreeRecipe.

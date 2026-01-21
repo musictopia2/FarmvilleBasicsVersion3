@@ -80,6 +80,10 @@ public class CropInstance(double currentMultiplier,
         GrowTime = GetDuration; //must send the recipe now.  can't trust the time sent anymore.
         Crop = crop;
         PlantedAt = DateTime.Now;
+        OutputPromise = null; //clear out any old promises.
+        _extrasResolved = false;
+        ExtraRewards.Clear();
+        RunPossibleAugmentation();
     }
 
     private void RunPossibleAugmentation()
