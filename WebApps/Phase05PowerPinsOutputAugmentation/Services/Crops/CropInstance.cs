@@ -1,5 +1,4 @@
 ﻿namespace Phase05PowerPinsOutputAugmentation.Services.Crops;
-
 public class CropInstance(double currentMultiplier,
     CropRecipe? currentRecipe,
     TimedBoostManager timedBoostManager, OutputAugmentationManager outputAugmentationManager
@@ -21,6 +20,7 @@ public class CropInstance(double currentMultiplier,
     private double? _runMultiplier; // locked per run; null when idle
     public TimeSpan ReducedBy { get; private set; } = TimeSpan.Zero;
 
+    public bool IsExtrasResolved => _extrasResolved;
 
     public TimeSpan? ReadyTime
     {
@@ -119,6 +119,7 @@ public class CropInstance(double currentMultiplier,
             return;
         }
         var elapsed = DateTime.Now - PlantedAt.Value;
+        RunPossibleAugmentation();
         if (elapsed >= GrowTime)
         {
             State = EnumCropState.Ready;
@@ -155,6 +156,8 @@ public class CropInstance(double currentMultiplier,
             throw new CustomBasicException("Crops cannot have multiple extra rewards at this time");
         }
         bool hit = rs1.RollHit(OutputPromise.Chance);
+
+        //Console.WriteLine($"{hit} for chance of {OutputPromise.Chance}");
         if (hit == false)
         {
             return; //you did not get anything extra.

@@ -400,7 +400,10 @@ public class CropManager(InventoryManager inventory,
                 State = crop.State,
                 PlantedAt = crop.PlantedAt,
                 RunMultiplier = crop.GetCurrentRun,
-                ReducedBy = crop.ReducedBy
+                ReducedBy = crop.ReducedBy,
+                ExtraRewards = crop.ExtraRewards,
+                ExtrasResolved = crop.IsExtrasResolved,
+                OutputPromise = crop.OutputPromise
             }).ToBasicList();
             //has to figure out the other side (since you may unlock more slots).
             CropSystemState slate = new()
