@@ -64,8 +64,15 @@
     font-weight: 700;
     white-space: nowrap;
 }
+.powerglove-reserve {
+    height: 80px; /* reserves space ALWAYS */
+    
+}
 
-
+.powerglove-hidden {
+    visibility: hidden; /* keeps the space, hides the icon */
+    pointer-events: none; /* prevents clicking when hidden */
+}
 .req-list {
     display: flex;
     flex-direction: column;

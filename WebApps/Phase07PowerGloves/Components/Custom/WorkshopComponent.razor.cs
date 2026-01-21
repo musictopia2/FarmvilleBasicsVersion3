@@ -157,4 +157,8 @@ public partial class WorkshopComponent(IToast toast)
     private string WorkshopImage => $"/{Workshop.Name}.png";
 
 
+    private void OnPowerGloveClicked()
+    {
+        toast.ShowInfoToast("Try to show power gloves");
+    }
 }

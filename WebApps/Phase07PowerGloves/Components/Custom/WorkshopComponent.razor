@@ -15,7 +15,14 @@
 </div>
 @{
     var visibleQueue = GetVisibleQueue();
+    bool anyActive = visibleQueue.Any(x => x.State == EnumWorkshopState.Active);
 }
+<div class="powerglove-reserve @(anyActive ? "" : "powerglove-hidden")"
+     @onclick="OnPowerGloveClicked">
+    <BoostIconComponent Name="@CurrencyKeys.PowerGloveWorkshop" ImageSize="80" />
+</div>
+
+
 <StackLayout ItemSpacing="5px">
     <SimpleRepeater HowMany="_capacity" Context="slotIndex">
         @{
@@ -36,6 +43,14 @@
                 {
                     @if (current.State == EnumWorkshopState.Active)
                     {
+                        @* <button type="button"
+                                class="powerglove-btn"
+                                @onclick="OnPowerGloveClicked"
+                                @onclick:stopPropagation="true">
+                                <BoostIconComponent Name="@CurrencyKeys.PowerGloveWorkshop" ImageSize="26" />
+                            
+                        </button> *@
+                        
                         <div class="queue-badge">
                             @GetTimeText(current)
                         </div>
