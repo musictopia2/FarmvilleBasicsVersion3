@@ -23,6 +23,7 @@ public static class ImportCatalogOfferClass
         list.AddRange(ImportWorkshopCatalogClass.GetWorkshopOffers(farm));
         list.AddRange(ImportSpeedSeedOffers());
         list.AddRange(ImportUnlimitedSpeedSeeds());
+        list.AddRange(ImportNoWorksiteSuppliesNeeded());
         if (farm.Theme == FarmThemeList.Country)
         {
             list.AddRange(ImportCountryUnlimitedItems());
@@ -46,7 +47,22 @@ public static class ImportCatalogOfferClass
 
         };
     }
-
+    private static BasicList<CatalogOfferModel> ImportNoWorksiteSuppliesNeeded()
+    {
+        EnumCatalogCategory category = EnumCatalogCategory.TimedBoost;
+        BasicList<CatalogOfferModel> output = [];
+        //TimeSpan duration = TimeSpan.FromHours(2);
+        string boostKey = BoostKeys.WorksiteNoSupplies;
+        output.Add(new()
+        {
+            Category = category,
+            TargetName= boostKey,
+            Costs = FarmHelperClass.GetFreeCosts,
+            LevelRequired = 4,
+            Duration = TimeSpan.FromHours(2)
+        });
+        return output;
+    }
     private static BasicList<CatalogOfferModel> ImportCountryOutputAugmentationOffers()
     {
         EnumCatalogCategory category = EnumCatalogCategory.TimedBoost;

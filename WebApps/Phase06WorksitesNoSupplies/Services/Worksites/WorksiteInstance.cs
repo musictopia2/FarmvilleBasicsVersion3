@@ -214,6 +214,10 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
     }
     public bool CanStartJob(InventoryManager inventory)
     {
+        if (timedBoostManager.HasNoSuppliesNeededForWorksites())
+        {
+            return Status == EnumWorksiteState.None; //because you don't need supplies because of the boost.
+        }
         if (inventory.Has(recipe.Inputs) == false)
         {
             return false;
@@ -292,7 +296,7 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
         _runMultiplier *= 2.0;      // Apply() uses time * multiplier, so this doubles effective time
         StartedAt = DateTime.Now;   // waste elapsed time (your rule)
     }
-    public void StartJob(InventoryManager inventory, TimedBoostManager timedBoostManager)
+    public void StartJob(InventoryManager inventory)
     {
         _rewards.Clear();
         if (CanStartJob(inventory) == false)
@@ -308,11 +312,14 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
                 return; //do this to protect me from myself.    so if no workers, then don't do anything (because no workers anyways).
             }
         }
-
-        foreach (var item in recipe.Inputs)
+        if (timedBoostManager.HasNoSuppliesNeededForWorksites() == false)
         {
-            inventory.Consume(item.Key, item.Value);
+            foreach (var item in recipe.Inputs)
+            {
+                inventory.Consume(item.Key, item.Value);
+            }
         }
+        
 
         Workers.ForEach(worker => worker.WorkerStatus = EnumWorkerStatus.Working);
 

@@ -151,7 +151,21 @@ public class TimedBoostManager
         }
         return remaining;
     }
-
+    public bool HasNoSuppliesNeededForWorksites()
+    {
+        var active = _profile.Active
+           .SingleOrDefault(x => x.BoostKey == BoostKeys.WorksiteNoSupplies);
+        if (active is null)
+        {
+            return false;
+        }
+        var remaining = active.EndsAt - DateTime.Now;
+        if (remaining <= TimeSpan.Zero)
+        {
+            return false; //already expired
+        }
+        return true;
+    }
     private bool CleanupExpired()
     {
         var now = DateTime.Now;

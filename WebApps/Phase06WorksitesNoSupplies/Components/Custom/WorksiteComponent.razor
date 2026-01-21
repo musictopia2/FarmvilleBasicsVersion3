@@ -192,32 +192,28 @@
         <div>@_currentWorker?.Details</div>
     </StackItem>
     <StackItem>
-        <div class="supplies-title">
-            Supplies Needed
-        </div>
-        <div class="supplies-grid">
-            @foreach (var item in SuppliesNeeded)
-            {
-                <ItemRequirementDisplay 
-                    Variant="EnumRequirementVariant.Tile"
-                    Name="@item.Item"
-                    OnClicked="AttemptWorkshopAsync"
-                    Required="item.Amount"
-                    Have="InventoryManager.Get(item.Item)"
-                    />
-                @* <div class="supply-tile">
-                    <img class="supply-img"
-                         src="@GetItemImage(item.Item)"
-                         alt="@item.Item" />
+        @if (SuppliesNeeded.Count > 0)
+        {
+            <div class="supplies-title">
+                Supplies Needed
+            </div>
+            <div class="supplies-grid">
+                @foreach (var item in SuppliesNeeded)
+                {
+                    <ItemRequirementDisplay Variant="EnumRequirementVariant.Tile"
+                                            Name="@item.Item"
+                                            OnClicked="AttemptWorkshopAsync"
+                                            Required="item.Amount"
+                                            Have="InventoryManager.Get(item.Item)" />
+                }
+                
+            </div>
+        }
+        else
+        {
+            <BoostIconComponent Name="@BoostKeys.WorksiteNoSupplies" ImageSize="200" />
+        }
 
-                    <div class="req-detail @GetRequirementClass(item.Item, item.Amount)">
-                        @GetRequirementDetails(item.Item, item.Amount)
-                    </div>
-                </div> *@
-            }
-        </div>
-        
-       
         <div class="worksite-grid">
             <SimpleRepeater HowMany="_shownList.Count" Context="i">
                 @{

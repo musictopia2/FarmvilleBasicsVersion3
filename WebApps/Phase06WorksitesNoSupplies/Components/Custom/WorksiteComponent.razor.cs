@@ -1,7 +1,5 @@
 using BasicBlazorLibrary.Components.Layouts;
 using BasicBlazorLibrary.Components.MediaQueries.ParentClasses;
-using Phase06WorksitesNoSupplies.Services.Inventory;
-
 namespace Phase06WorksitesNoSupplies.Components.Custom;
 public partial class WorksiteComponent(IToast toast, OverlayService overlay)
 {
@@ -140,7 +138,7 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
     }
     private static string GetItemImage(string item) => $"/{item}.png";
 
-    
+
     //for now, no background.
     private void GetPreviewDetail(WorksiteRewardPreview reward)
     {

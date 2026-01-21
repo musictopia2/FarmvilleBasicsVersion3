@@ -146,7 +146,7 @@ public class WorksiteManager(
     public void StartJob(string location)
     {
         WorksiteInstance instance = GetWorksiteByLocation(location);
-        instance.StartJob(inventory, timedBoostManager);
+        instance.StartJob(inventory);
         _needsSaving = true;
     }
     public bool CanCollectRewards(string location)
@@ -240,6 +240,10 @@ public class WorksiteManager(
     }
     public BasicList<ItemAmount> SuppliesNeeded(string location)
     {
+        if (timedBoostManager.HasNoSuppliesNeededForWorksites())
+        {
+            return [];
+        }
         WorksiteInstance instance = GetWorksiteByLocation(location);
         return instance.SuppliesNeeded;
     }
