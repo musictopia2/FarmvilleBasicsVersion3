@@ -57,7 +57,15 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             TargetName= boostKey,
-            Costs = FarmHelperClass.GetFreeCosts,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
+            LevelRequired = 4,
+            Duration = TimeSpan.FromMinutes(2)
+        });
+        output.Add(new()
+        {
+            Category = category,
+            TargetName = boostKey,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(30),
             LevelRequired = 4,
             Duration = TimeSpan.FromHours(2)
         });
