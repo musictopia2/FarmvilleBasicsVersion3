@@ -1,4 +1,6 @@
-﻿namespace Phase16PowerPinsOutputAugmentation.ImportClasses;
+﻿using CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.BasicExtensions;
+
+namespace Phase16PowerPinsOutputAugmentation.ImportClasses;
 public static class ImportCatalogOfferClass
 {
     public static async Task ImportCatalogAsync()
@@ -25,6 +27,7 @@ public static class ImportCatalogOfferClass
         list.AddRange(ImportPowerGloveOffers());
         list.AddRange(ImportUnlimitedSpeedSeeds());
         list.AddRange(ImportNoWorksiteSuppliesNeeded());
+        list.AddRange(ImportSingleCompletionOffers());
         if (farm.Theme == FarmThemeList.Country)
         {
             list.AddRange(ImportCountryUnlimitedItems());
@@ -207,6 +210,51 @@ public static class ImportCatalogOfferClass
         });
         return output;
     }
+    private static BasicList<CatalogOfferModel> ImportSingleCompletionOffers()
+    {
+        BasicList<CatalogOfferModel> output = [];
+        EnumCatalogCategory category = EnumCatalogCategory.Misc;
+        int levelRequired = 4;
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 10,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
+            TargetName = CurrencyKeys.FinishSingleWorkshop,
+            LevelRequired = levelRequired,
+
+        });
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 20,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20), //you pay less per item if doing bulk.
+            TargetName = CurrencyKeys.FinishSingleWorkshop,
+            LevelRequired = levelRequired
+
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 10,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(15),
+            TargetName = CurrencyKeys.FinishSingleWorksite,
+            LevelRequired = levelRequired,
+
+        });
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 20,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20), //you pay less per item if doing bulk.
+            TargetName = CurrencyKeys.FinishSingleWorksite,
+            LevelRequired = levelRequired
+
+        });
+
+        return output;
+    }
     private static BasicList<CatalogOfferModel> ImportPowerGloveOffers()
     {
         BasicList<CatalogOfferModel> output = [];
@@ -216,7 +264,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             Quantity = 10,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(15),
             TargetName = CurrencyKeys.PowerGloveWorkshop,
             LevelRequired = levelRequired,
 
@@ -225,7 +273,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             Quantity = 20,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(15), //you pay less per item if doing bulk.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20), //you pay less per item if doing bulk.
             TargetName = CurrencyKeys.PowerGloveWorkshop,
             LevelRequired = levelRequired
 
@@ -235,7 +283,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             Quantity = 10,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(15),
             TargetName = CurrencyKeys.PowerGloveWorksite,
             LevelRequired = levelRequired,
 
@@ -244,7 +292,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             Quantity = 20,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(15), //you pay less per item if doing bulk.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20), //you pay less per item if doing bulk.
             TargetName = CurrencyKeys.PowerGloveWorksite,
             LevelRequired = levelRequired
 
@@ -261,7 +309,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             Quantity = 10,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(15),
             TargetName = CurrencyKeys.SpeedSeed,
             LevelRequired = levelRequired,
             
@@ -270,7 +318,7 @@ public static class ImportCatalogOfferClass
         {
             Category = category,
             Quantity = 20,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(15), //you pay less per item if doing bulk.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20), //you pay less per item if doing bulk.
             TargetName = CurrencyKeys.SpeedSeed,
             LevelRequired = levelRequired
 

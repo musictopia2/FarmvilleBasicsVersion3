@@ -1,5 +1,4 @@
 namespace Phase08AutoCompleteSingle.Components.Custom;
-
 public partial class WorkshopComponent(IToast toast)
 {
     [Parameter]
@@ -18,6 +17,20 @@ public partial class WorkshopComponent(IToast toast)
     private int _capacity;
     private bool _showToast = true;
     private bool _showPowerGloves = false;
+
+    private bool _showConfirmation = false;
+    private string GetConfirmationMessage =>
+        $"Are you sure you want to use the finish single workshop to complete this?  You have {InventoryManager.Get(CurrencyKeys.FinishSingleWorkshop)} left";
+    private void ConfirmCompleteWorkshop(bool allowed)
+    {
+        _showConfirmation = false;
+        if (allowed)
+        {
+            WorkshopManager.CompleteSingleActiveJobImmediately(Workshop);
+            return;
+        }
+    }
+
     private void ClosePowerGloves()
     {
         _showPowerGloves = false;
@@ -163,5 +176,14 @@ public partial class WorkshopComponent(IToast toast)
     private void OnPowerGloveClicked()
     {
         _showPowerGloves = true;
+    }
+    private void OnFinishNowClicked()
+    {
+        if (InventoryManager.Has(CurrencyKeys.FinishSingleWorkshop, 1) == false)
+        {
+            toast.ShowUserErrorToast("You do not have enough Finish Single Workshop consumable to do this.  Try purchasing more");
+            return;
+        }
+        _showConfirmation = true;
     }
 }

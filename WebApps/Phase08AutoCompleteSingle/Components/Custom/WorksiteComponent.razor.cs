@@ -26,6 +26,22 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
     private const string _ringSize = "100px";
 
     private bool _showPowerGloves = false;
+
+    private bool _showConfirmation = false;
+
+    private string GetConfirmationMessage =>
+        $"Are you sure you want to use the finish single worksite to complete this?  You have {InventoryManager.Get(CurrencyKeys.FinishSingleWorksite)} left";
+    private void ConfirmCompleteWorksite(bool allowed)
+    {
+        _showConfirmation = false;
+        if (allowed)
+        {
+            WorksiteManager.CompleteSingleWorksiteImmediately(Location);
+            //WorkshopManager.CompleteSingleActiveJobImmediately(Workshop);
+            return;
+        }
+    }
+
     private void ClosePowerGloves()
     {
         _showPowerGloves = false;
@@ -34,7 +50,15 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
     {
         _showPowerGloves = true;
     }
-
+    private void OnFinishSingleClicked()
+    {
+        if (InventoryManager.Has(CurrencyKeys.FinishSingleWorksite, 1) == false)
+        {
+            toast.ShowUserErrorToast("You do not have enough Finish Single Worksite consumable to do this.  Try purchasing more");
+            return;
+        }
+        _showConfirmation = true;
+    }
 
     //private bool _showWorkshops;
 
@@ -241,4 +265,5 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
         return output;
     }
 
+   
 }

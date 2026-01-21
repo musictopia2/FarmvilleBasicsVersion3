@@ -61,11 +61,16 @@
     padding-right: 70px; /* reserve space so text never shifts */
 }
 
-.powerglove-pill-slot {
+.powerglove-pill-container {
     position: absolute;
-    right: -78px; /* hangs off the right side of the pill */
+    right: -180px;
     top: 50%;
     transform: translateY(-50%);
+    display: flex;
+    gap: 6px; /* spacing between buttons */
+}
+
+.powerglove-pill-slot {
     width: 80px;
     height: 80px;
     display: flex;

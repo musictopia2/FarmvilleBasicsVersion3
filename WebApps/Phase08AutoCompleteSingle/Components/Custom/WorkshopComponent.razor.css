@@ -64,14 +64,26 @@
     font-weight: 700;
     white-space: nowrap;
 }
-.powerglove-reserve {
-    height: 80px; /* reserves space ALWAYS */
+/* Reserve the *entire* area for both buttons so nothing shifts */
+.boost-buttons-reserve {
+    display: flex;
+    gap: 8px; /* whatever spacing you want */
+    height: 80px; /* same as icon size */
+    align-items: center;
+}
+
+/* Each button reserves its own width too */
+.boost-btn {
+    width: 80px; /* locks footprint */
+    height: 80px;
+    display: flex;
     
 }
 
-.powerglove-hidden {
-    visibility: hidden; /* keeps the space, hides the icon */
-    pointer-events: none; /* prevents clicking when hidden */
+/* Hide but keep space */
+.boost-hidden {
+    visibility: hidden;
+    pointer-events: none;
 }
 .req-list {
     display: flex;

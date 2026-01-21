@@ -1,5 +1,4 @@
 ﻿namespace Phase08AutoCompleteSingle.Services.Workshops;
-
 public class WorkshopManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry,
@@ -70,6 +69,39 @@ public class WorkshopManager(InventoryManager inventory,
 
     //if you purchase, must make sure all proper items are unlocked like it should had (?)
 
+
+    public void CompleteSingleActiveJobImmediately(WorkshopView workshop)
+    {
+        if (inventory.Has(CurrencyKeys.FinishSingleWorkshop, 1) == false)
+        {
+            throw new CustomBasicException("You do not have any finish single workshop consumables left.  Should had called inventory.Has function");
+        }
+        CompleteActiveJobImmediately(workshop);
+        inventory.Consume(CurrencyKeys.FinishSingleWorkshop, 1);
+    }
+
+    private void CompleteActiveJobImmediately(WorkshopView summary)
+    {
+        lock (_lock)
+        {
+            var workshop = GetWorkshopById(summary);
+
+            var active = workshop.Queue.FirstOrDefault(x => x.State == EnumWorkshopState.Active);
+            if (active is null)
+            {
+                return;
+            }
+
+            var now = DateTime.Now;
+
+            // Push StartedAt back so that next tick sees elapsed >= DurationForProcessing
+            // Add a tiny buffer so you don't lose to timing/precision.
+            var buffer = TimeSpan.FromMilliseconds(50);
+            active.UpdateStartedAt(now - active.DurationForProcessing - buffer);
+
+
+        }
+    }
 
     private void ApplyPowerGloveToActiveJob(WorkshopView summary, int used, TimeSpan reduceByPerUse)
     {

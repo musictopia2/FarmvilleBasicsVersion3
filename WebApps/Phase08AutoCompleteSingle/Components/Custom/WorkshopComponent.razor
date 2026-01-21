@@ -8,6 +8,14 @@
         />
 </PopupViewport>
 
+@if (_showConfirmation)
+{
+    <ConfirmationBlazor Title="Complete Active Item"
+        Message="@GetConfirmationMessage"
+        Results="ConfirmCompleteWorkshop"
+        />
+}
+
 @if (_recipes.Count == 0)
 {
     <div class="alert alert-warning">
@@ -25,10 +33,24 @@
     var visibleQueue = GetVisibleQueue();
     bool anyActive = visibleQueue.Any(x => x.State == EnumWorkshopState.Active);
 }
-<div class="powerglove-reserve @(anyActive ? "" : "powerglove-hidden")"
-     @onclick="OnPowerGloveClicked">
-    <BoostIconComponent Name="@CurrencyKeys.PowerGloveWorkshop" ImageSize="80" />
+
+
+<div style="margin-top: -40px" class="boost-buttons-reserve">
+
+    <div class="@(anyActive ? "" : "boost-hidden")"
+         @onclick="OnFinishNowClicked">
+        <BoostIconComponent Name="@CurrencyKeys.FinishSingleWorkshop" ImageSize="80" />
+    </div>
+    <div style="margin-left: -20px;" class="@(anyActive ? "" : "boost-hidden")"
+         @onclick="OnPowerGloveClicked">
+        <BoostIconComponent Name="@CurrencyKeys.PowerGloveWorkshop" ImageSize="80" />
+    </div>
+    
+    
+
+   
 </div>
+
 
 
 <StackLayout ItemSpacing="5px">

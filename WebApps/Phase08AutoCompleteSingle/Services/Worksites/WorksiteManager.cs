@@ -1,6 +1,7 @@
-﻿using System.IO.Pipes;
+﻿using System;
 
 namespace Phase08AutoCompleteSingle.Services.Worksites;
+
 public class WorksiteManager(
     InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
@@ -48,6 +49,32 @@ public class WorksiteManager(
         }
         return output;
     }
+
+    public void CompleteSingleWorksiteImmediately(string location)
+    {
+        if (inventory.Has(CurrencyKeys.FinishSingleWorksite, 1) == false)
+        {
+            throw new CustomBasicException("You do not have any finish single worksite consumables left.  Should had called inventory.Has function");
+        }
+        CompleteActiveJobImmediately(location);
+        inventory.Consume(CurrencyKeys.FinishSingleWorksite, 1);
+    }
+    private void CompleteActiveJobImmediately(string location)
+    {
+        lock (_lock)
+        {
+            WorksiteInstance instance = GetWorksiteByLocation(location);
+
+            var now = DateTime.Now;
+
+            // Reduce by the remaining time + a tiny buffer.
+            // Easiest way: reduce by the full effective duration (always enough).
+            var buffer = TimeSpan.FromMilliseconds(50);
+
+            instance.ApplyTimeReduction(instance.EffectiveDuration + buffer);
+            _needsSaving = true;
+        }
+    }
     private void ApplyPowerGloveToWorksite(string location, int used, TimeSpan reduceByPerUse)
     {
         if (used <= 0)
@@ -62,7 +89,7 @@ public class WorksiteManager(
             WorksiteInstance instance = GetWorksiteByLocation(location);
             instance.ApplyTimeReduction(totalReduce);
             _needsSaving = true;
-        }   
+        }
     }
     public void UsePowerGlove(string location, int howMany)
     {
@@ -135,7 +162,7 @@ public class WorksiteManager(
         var worksite = _worksites.SingleOrDefault(t => t.Location == location) ?? throw new CustomBasicException($"Worksite with location {location} not found.");
         return worksite;
     }
-    
+
     public void AddWorker(string location, WorkerRecipe worker)
     {
         WorksiteInstance instance = GetWorksiteByLocation(location);
@@ -259,7 +286,7 @@ public class WorksiteManager(
         {
             return "Finished";
         }
-        
+
     }
     public BasicList<WorksiteRewardPreview> GetPreview(string location)
     {
@@ -284,8 +311,8 @@ public class WorksiteManager(
         });
         return output;
     }
-    
-    
+
+
     public async Task<bool> CanAutomateCollectionAsync()
     {
         _canAutomateCollection = await _worksiteCollectionPolicy!.CollectAllAsync();

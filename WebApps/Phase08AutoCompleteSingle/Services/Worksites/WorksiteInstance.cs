@@ -295,6 +295,12 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
             {
                 return false;
             }
+            if (Workers.Count < recipe.MaximumWorkers)
+            {
+                return false; //you must have all workers there.  otherwise, too powerful.
+            }
+
+
             return recipe.CanFocus;
         }
     }
@@ -311,6 +317,13 @@ public class WorksiteInstance(WorksiteRecipe recipe, double currentMultiplier,
         Focused = true;
         _runMultiplier ??= _currentMultiplier;
         _runMultiplier *= 2.0;      // Apply() uses time * multiplier, so this doubles effective time
+        var reducedBase = BaseDuration - ReduceBy;
+        if (reducedBase < TimeSpan.Zero)
+        {
+            reducedBase = TimeSpan.Zero;
+        }
+
+        _runDuration = reducedBase.Apply(_runMultiplier.Value);
         StartedAt = DateTime.Now;   // waste elapsed time (your rule)
     }
     public void StartJob(InventoryManager inventory)

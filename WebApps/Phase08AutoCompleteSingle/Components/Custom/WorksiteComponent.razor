@@ -6,6 +6,12 @@
     <PowerGloveWorksiteComponent Location="@Location"
                                  OnClose="ClosePowerGloves" />
 </PopupViewport>
+@if (_showConfirmation)
+{
+    <ConfirmationBlazor Title="Complete Active Item"
+                        Message="@GetConfirmationMessage"
+                        Results="ConfirmCompleteWorksite" />
+}
 
 @if (string.IsNullOrWhiteSpace(Location))
 {
@@ -29,10 +35,18 @@
                     @GetProgressText
                 </span>
                 <StopClickPropagation>
-                    <div class="powerglove-pill-slot"
-                         @onclick="OnPowerGloveClicked">
-                        <BoostIconComponent Name="@CurrencyKeys.PowerGloveWorksite"
-                                            ImageSize="80" />
+                    <div class="powerglove-pill-container">
+                        <div class="powerglove-pill-slot"
+                             @onclick="OnFinishSingleClicked">
+                            <BoostIconComponent Name="@CurrencyKeys.FinishSingleWorksite"
+                                                ImageSize="80" />
+                        </div>
+
+                        <div class="powerglove-pill-slot"
+                             @onclick="OnPowerGloveClicked">
+                            <BoostIconComponent Name="@CurrencyKeys.PowerGloveWorksite"
+                                                ImageSize="80" />
+                        </div>
                     </div>
                 </StopClickPropagation>
                 
