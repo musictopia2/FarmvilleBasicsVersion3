@@ -11,4 +11,25 @@ public partial class AnimalProgressModal
     private string ReadyText => $"Ready In {AnimalManager.TimeLeftForResult(Animal)}";
     private string ProducingText => $"Producing {AnimalManager.InProgress(Animal)} {Option.Output.Item.GetWords}";
     private int Have(string itemKey) => InventoryManager.Get(itemKey);
+
+    private string _rentalTimeLeft = "";
+    protected override void OnInitialized()
+    {
+        Refresh();
+        base.OnInitialized();
+    }
+    private void Refresh()
+    {
+        if (Animal.IsRental)
+        {
+            _rentalTimeLeft = RentalManager.GetDurationString(Animal.Name);
+        }
+    }
+
+    protected override Task OnTickAsync()
+    {
+        Refresh();
+        return base.OnTickAsync();
+    }
+
 }

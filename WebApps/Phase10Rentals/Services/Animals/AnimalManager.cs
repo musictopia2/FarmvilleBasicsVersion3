@@ -79,7 +79,7 @@ public class AnimalManager(InventoryManager inventory,
         {
             throw new CustomBasicException("Only animals can be rented");
         }
-        var instance = _animals.First(x => x.Name == rental.TargetName && x.Unlocked == false);
+        var instance = _animals.Last(x => x.Name == rental.TargetName && x.Unlocked == false);
         instance.Unlocked = true;
         instance.RentalExpired = false; //because you started the rental now.
         instance.IsRental = true; //so later can lock the proper one.  also ui can show the details for it as well.
@@ -87,12 +87,21 @@ public class AnimalManager(InventoryManager inventory,
     }
     public async Task ShowRentalExpireAsync(RentalInstanceModel rental)
     {
-        if (rental.Category != EnumCatalogCategory.Tree)
+        if (rental.Category != EnumCatalogCategory.Animal)
         {
             throw new CustomBasicException("Only animals can show it expired");
         }
         var instance = _animals.Single(x => x.Name == rental.TargetName && x.IsRental);
-        instance.RentalExpired = true;
+
+        if (instance.State == EnumAnimalState.None)
+        {
+            instance.Unlocked = false;
+            OnAnimalsUpdated?.Invoke();
+        }
+        else
+        {
+            instance.RentalExpired = true;
+        }
         await ForceSaveAnimalsAsync(); //don't trust it.
     }
     private async Task ForceSaveAnimalsAsync()
@@ -639,7 +648,7 @@ public class AnimalManager(InventoryManager inventory,
         {
             throw new CustomBasicException("Not enough storage space to collect (includes bonus rewards).");
         }
-
+        bool wasUnlocked = animal.Unlocked;
         string selectedName = animal.ReceivedName;
 
         maxs.Times(_ => animal.Collect());
@@ -654,6 +663,10 @@ public class AnimalManager(InventoryManager inventory,
         AddAnimalToInventory(selectedName, maxs);
         // IMPORTANT: clear extras so you don't add them again next collect
         animal.Clear(); //needed a new method.  otherwise, it would had cleared and would never show extra rewards.
+        if (wasUnlocked && animal.Unlocked == false)
+        {
+            OnAnimalsUpdated?.Invoke();
+        }
     }
     private void AddAnimalToInventory(string name, int amount)
     {

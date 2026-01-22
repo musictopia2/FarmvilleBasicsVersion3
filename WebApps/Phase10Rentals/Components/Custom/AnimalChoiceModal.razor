@@ -1,8 +1,12 @@
 ﻿@inherits FarmComponentBase
 
-
-
 <div class="p-2" style="min-width: 320px;">
+    @if (_rentalTimeLeft != "")
+    {
+        <div>
+            Time Left:  @_rentalTimeLeft
+        </div>
+    }
     <div class="fw-bold mb-2">Choose production</div>
 
     <SimpleRepeater HowMany="_productionOptions.Count" Context="i">

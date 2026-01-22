@@ -72,7 +72,7 @@ public class TreeManager(InventoryManager inventory,
         {
             throw new CustomBasicException("Only trees can be rented");
         }
-        var instance = _trees.First(x => x.TreeName == rental.TargetName && x.Unlocked == false);
+        var instance = _trees.Last(x => x.TreeName == rental.TargetName && x.Unlocked == false);
         instance.Unlocked = true;
         instance.RentalExpired = false; //because you started the rental now.
         instance.IsRental = true; //so later can lock the proper one.  also ui can show the details for it as well.

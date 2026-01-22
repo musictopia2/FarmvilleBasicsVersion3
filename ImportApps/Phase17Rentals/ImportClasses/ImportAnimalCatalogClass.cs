@@ -50,7 +50,7 @@ public static class ImportAnimalCatalogClass
             TargetName = TropicalAnimalListClass.Chicken,
             LevelRequired = 10,
             Category = _category,
-            Duration = TimeSpan.FromMinutes(1),
+            Duration = TimeSpan.FromSeconds(10),
             Costs = FarmHelperClass.GetCoinOnlyDictionary(30) //this is where i do the balancing.
         });
         output.Add(new()
@@ -107,7 +107,7 @@ public static class ImportAnimalCatalogClass
             TargetName = CountryAnimalListClass.Goat,
             LevelRequired = 14,
             Category = _category,
-            Duration = TimeSpan.FromMinutes(1),
+            Duration = TimeSpan.FromSeconds(10),
             Costs = FarmHelperClass.GetCoinOnlyDictionary(10)
         });
         output.Add(new()

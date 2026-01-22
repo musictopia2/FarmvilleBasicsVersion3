@@ -11,7 +11,7 @@ public partial class AnimalChoiceModal(OverlayService overlay)
     private BasicList<AnimalProductionOption> _productionOptions = [];
 
     private AnimalPreviewOption? _nextOption;
-
+    private string _rentalTimeLeft = "";
 
     private async Task ClickedCropAsync(string name)
     {
@@ -28,6 +28,12 @@ public partial class AnimalChoiceModal(OverlayService overlay)
     {
         _productionOptions = AnimalManager.GetUnlockedProductionOptions(Animal);
         _nextOption = ProgressionManager.NextAnimalOption(Animal.Name);
+        if (Animal.IsRental)
+        {
+            _rentalTimeLeft = RentalManager.GetDurationString(Animal.Name);
+        }
+
+
         //figure out next option.
 
 

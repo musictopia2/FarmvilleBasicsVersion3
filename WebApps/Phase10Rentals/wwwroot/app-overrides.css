@@ -20,3 +20,22 @@
     display: block; /* SVG sometimes behaves inline */
     pointer-events: none; /* avoids intercepting clicks */
 }
+
+.rental-timer {
+    position: absolute;
+    background: rgba(0,0,0,0.82);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 10px;
+    font-weight: 900;
+    font-size: 18px;
+    line-height: 1;
+    /* Prevent shifting as digits change */
+    width: 110px; /* pick a width that fits your longest string */
+    text-align: center;
+    white-space: nowrap;
+    /* Make digits equal-width even if font isn't */
+    font-variant-numeric: tabular-nums;
+    z-index: 20;
+    pointer-events: none; /* allow clicking the tree through the overlay */
+}
