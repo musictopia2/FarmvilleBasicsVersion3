@@ -126,6 +126,7 @@
     font-size: 1.1rem;
     font-weight: 700;
 }
+
 .workshop-header {
     box-sizing: border-box;
     user-select: none;
@@ -165,14 +166,41 @@
         justify-content: flex-start;
     }
 
-.workshop-title {
+/*.workshop-title {
     text-align: center;
     font-size: 2rem;
     font-weight: 900;
-    min-width: 0; /* critical in grid to avoid overflow */
-    white-space: nowrap;
+    min-width: 0;*/ /* critical in grid to avoid overflow */
+    /*white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}*/
+
+.workshop-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    gap: 12px;
+    white-space: nowrap;
+}
+
+.rental-pill {
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 2px solid #fff;
+    background: rgba(0,0,0,0.78);
+    color: #fff;
+    font-weight: 900;
+    font-size: 14px;
+    /* reserve width so title doesn't jump */
+    min-width: 165px; /* tweak if needed */
+    text-align: center;
+}
+
+.rental-pill-hidden {
+    visibility: hidden; /* keeps space */
+    pointer-events: none;
 }
 
 

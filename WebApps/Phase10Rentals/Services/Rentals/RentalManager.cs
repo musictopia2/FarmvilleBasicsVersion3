@@ -1,6 +1,6 @@
 ﻿namespace Phase10Rentals.Services.Rentals;
 public class RentalManager(TreeManager treeManager,
-    AnimalManager animalManager
+    AnimalManager animalManager, WorkshopManager workshopManager
     )
 {
     private BasicList<RentalInstanceModel> _rentals = [];
@@ -32,6 +32,10 @@ public class RentalManager(TreeManager treeManager,
         else if (row.Category == EnumCatalogCategory.Animal)
         {
             id = animalManager.StartRental(row);
+        }
+        else if (row.Category == EnumCatalogCategory.Workshop)
+        {
+            id = workshopManager.StartRental(row);
         }
         else
         {
@@ -134,6 +138,22 @@ public class RentalManager(TreeManager treeManager,
                     // Once you implement animalManager.CanDeleteRental(id), switch to it.
                     // bool canDelete = animalManager.CanDeleteRental(item.TargetInstanceId);
                     // if (canDelete) { _rentals.RemoveSpecificItem(item); changed = true; }
+                }
+            }
+            else if (item.Category == EnumCatalogCategory.Workshop)
+            {
+                if (item.State == EnumRentalState.Active)
+                {
+                    workshopManager.DoubleCheckActiveRental(item.TargetInstanceId!.Value);
+                }
+                else
+                {
+                    bool canDelete = workshopManager.CanDeleteRental(item.TargetInstanceId!.Value);
+                    if (canDelete)
+                    {
+                        _rentals.RemoveSpecificItem(item);
+                        changed = true;
+                    }
                 }
             }
             else

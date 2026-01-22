@@ -82,7 +82,6 @@ public class AnimalManager(InventoryManager inventory,
         var instance = _animals.LastOrDefault(x => x.Name == rental.TargetName && x.Unlocked == false)
             ?? throw new CustomBasicException("No locked animal available to rent");
         instance.Unlocked = true;
-        instance.RentalExpired = false; //because you started the rental now.
         instance.IsRental = true; //so later can lock the proper one.  also ui can show the details for it as well.
         _needsSaving = true;
         return instance.Id;
@@ -92,7 +91,6 @@ public class AnimalManager(InventoryManager inventory,
         foreach (var t in _animals.Where(x => x.IsRental && x.Id != instance.Id))
         {
             t.IsRental = false;
-            t.RentalExpired = false; 
             _needsSaving = true;
         }
     }
@@ -109,12 +107,7 @@ public class AnimalManager(InventoryManager inventory,
             animal.IsRental = true; //implies its a rental.
             _needsSaving = true;
         }
-        if (animal.RentalExpired == false)
-        {
-            animal.RentalExpired = true;
-            _needsSaving = true;
-            return false;
-        }
+        
         return false;
     }
 
@@ -130,11 +123,6 @@ public class AnimalManager(InventoryManager inventory,
         if (animal.Unlocked == false)
         {
             animal.Unlocked = true;
-            _needsSaving = true;
-        }
-        if (animal.RentalExpired)
-        {
-            animal.RentalExpired = false;
             _needsSaving = true;
         }
     }

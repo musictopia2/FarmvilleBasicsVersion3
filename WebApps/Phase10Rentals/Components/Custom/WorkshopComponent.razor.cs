@@ -5,6 +5,10 @@ public partial class WorkshopComponent(IToast toast)
     [EditorRequired]
     public WorkshopView Workshop { get; set; }
 
+    [Parameter]
+    public EventCallback RentalExpired { get; set; }
+
+
     private BasicList<WorkshopRecipeSummary> _recipes = [];
 
     [Parameter]
@@ -19,6 +23,11 @@ public partial class WorkshopComponent(IToast toast)
     private bool _showPowerGloves = false;
 
     private bool _showConfirmation = false;
+    private bool _raisedEvent;
+    private string _lastRentalText = "";
+
+    //private string RentalTimeLeft => RentalManager.GetDurationString(Workshop.Name);
+
     private string GetConfirmationMessage =>
         $"Are you sure you want to use the finish single workshop to complete this?  You have {InventoryManager.Get(CurrencyKeys.FinishSingleWorkshop)} left";
     private void ConfirmCompleteWorkshop(bool allowed)
@@ -38,7 +47,7 @@ public partial class WorkshopComponent(IToast toast)
     protected override void OnParametersSet()
     {
         _showToast = true; //good news is when the readycount increases since something is ready from the parent calls this so i actually get desired behavior.
-
+        _raisedEvent = false;
         _recipes = WorkshopManager.GetRecipesForWorkshop(Workshop);
         WorkshopRecipeSummary? extra = _recipes.FirstOrDefault(x => x.Unlocked == false);
         _recipes.RemoveAllAndObtain(x => x.Unlocked == false); //so only shows ones you can do.  needs next future one if any.
@@ -112,6 +121,25 @@ public partial class WorkshopComponent(IToast toast)
     }
     protected override Task OnTickAsync()
     {
+        if (_raisedEvent)
+        {
+            return base.OnTickAsync();
+        }
+        if (Workshop.IsRental)
+        {
+            if (WorkshopManager.Unlocked(Workshop) == false)
+            {
+                RentalExpired.InvokeAsync();
+                _raisedEvent = true;
+                return base.OnTickAsync();
+            }
+        }
+        
+        if (Workshop.IsRental)
+        {
+            _lastRentalText = RentalManager.GetDurationString(Workshop.Name);
+        }
+
         _capacity = WorkshopManager.GetCapcity(Workshop);
         if (WorkshopManager.CanPickupManually(Workshop))
         {

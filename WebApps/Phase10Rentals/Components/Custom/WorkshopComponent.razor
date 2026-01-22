@@ -116,7 +116,11 @@
     </button>
 
     <div class="workshop-title">
-        @Workshop.Name.GetWords
+        <span class="workshop-name">@Workshop.Name.GetWords</span>
+
+        <span class="rental-pill @(string.IsNullOrWhiteSpace(_lastRentalText) ? "rental-pill-hidden" : "")">
+            Rental: @_lastRentalText
+        </span>
     </div>
 
     <button type="button" class="workshop-nav" @onclick="NextClicked" aria-label="Next workshop">

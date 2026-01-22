@@ -8,7 +8,6 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier,
     public TimeSpan ReducedBy { get; private set; } = TimeSpan.Zero;
     public bool IsSuppressed { get; set; } = false;
     public bool IsRental { get; set; } //this means if it comes from rental, needs to mark so can lock the exact proper one.
-    public bool RentalExpired { get; set; }
     public OutputAugmentationSnapshot? OutputPromise { get; private set; }
     public BasicList<ItemAmount> ExtraRewards { get; private set; } = [];
     public BasicList<AnimalProductionOption> GetUnlockedProductionOptions()
@@ -54,7 +53,6 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier,
         IsSuppressed = animal.IsSuppressed;
         _extrasResolved = animal.ExtrasResolved;
         IsRental = animal.IsRental;
-        RentalExpired = animal.RentalExpired;
         // Restore locked promise only (do NOT overwrite current multiplier)
         _runMultiplier = animal.RunMultiplier;
 
@@ -92,7 +90,6 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier,
                 ExtrasResolved = _extrasResolved,
                 OutputPromise = OutputPromise,
                 IsRental = IsRental,
-                RentalExpired = RentalExpired,
                 // Save the promise only when a run exists; otherwise null
                 RunMultiplier = _selected is null ? null : _runMultiplier
             };
@@ -293,10 +290,6 @@ public class AnimalInstance(AnimalRecipe recipe, double currentMultiplier,
         {
             State = EnumAnimalState.None;
 
-            if (RentalExpired)
-            {
-                Unlocked = false;
-            }
 
             _selected = null;
 

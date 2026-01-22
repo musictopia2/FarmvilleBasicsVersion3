@@ -5,8 +5,12 @@ public partial class WorkshopsComponent(OverlayService overlay, IToast toast) : 
     [Parameter]
     public WorkshopView? SpecificWorkshop { get; set; }
 
-    
-    
+    private async Task OnRentalExpired()
+    {
+        _currentWorkshop = null;   // show list instead
+        await InvokeAsync(StateHasChanged);
+    }
+
     private BasicList<WorkshopView> _workshops = [];
     private WorkshopView? _currentWorkshop;
     override protected void OnInitialized()

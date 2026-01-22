@@ -1,11 +1,12 @@
 ﻿namespace Phase10Rentals.Services.Workshops;
 public class WorkshopInstance
 {
-    public Guid Id { get; private set; } = Guid.NewGuid();
+    public Guid Id { get; private set; }
     public int SelectedRecipeIndex { get; set; } = 0;
     public BasicList<UnlockModel> SupportedItems { get; set; } = [];
     public int Capacity { get; set; } = 2; //for now, always 2.  later will rethink.
     public bool Unlocked { get; set; }
+    public bool IsRental { get; set; } //this means if it comes from rental, needs to mark so can lock the exact proper one.
     public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
     public BasicList<CraftingJobInstance> Queue { get; } = [];
     required public string BuildingName { get; init; }
@@ -33,6 +34,7 @@ public class WorkshopInstance
             throw new CustomBasicException("Must support at least one item.");
         }
         Id = workshop.Id;
+        IsRental = workshop.IsRental;
         Unlocked = workshop.Unlocked;
         SelectedRecipeIndex = workshop.SelectedRecipeIndex;
         ReducedBy = workshop.ReducedBy;
@@ -56,6 +58,8 @@ public class WorkshopInstance
                 Unlocked = Unlocked,
                 SupportedItems = SupportedItems,
                 ReducedBy = ReducedBy,
+                IsRental = IsRental,
+                Id = Id, //somehow even if something did not change, its needed.
                 Queue = Queue.Select(x => x.GetCraftingForSaving).ToBasicList(),
                 SelectedRecipeIndex = SelectedRecipeIndex
             };

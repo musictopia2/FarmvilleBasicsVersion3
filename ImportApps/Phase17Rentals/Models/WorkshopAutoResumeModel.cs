@@ -1,7 +1,7 @@
 ﻿namespace Phase17Rentals.Models;
 public class WorkshopAutoResumeModel
 {
-    public Guid Id { get; set; } = Guid.NewGuid();        // <- persistent GUID
+    public Guid Id { get; set; } = Guid.NewGuid();
     public int SelectedRecipeIndex { get; set; } = 0;
     public string Name { get; set; } = "";
     public BasicList<UnlockModel> SupportedItems { get; set; } = [];

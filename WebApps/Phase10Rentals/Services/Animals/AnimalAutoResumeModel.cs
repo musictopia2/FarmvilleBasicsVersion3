@@ -11,7 +11,6 @@ public class AnimalAutoResumeModel
     public double? RunMultiplier { get; set; }
     public TimeSpan ReducedBy { get; set; } = TimeSpan.Zero;
     public bool IsRental { get; set; } //this means if it comes from rental, needs to mark so can lock the exact proper one.
-    public bool RentalExpired { get; set; }
     public DateTime? StartedAt { get; set; }
     public int? Selected { get; set; }
     public bool ExtrasResolved { get; set; }

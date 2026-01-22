@@ -16,6 +16,7 @@ public class WorkshopManager(InventoryManager inventory,
     private DateTime _lastSave = DateTime.MinValue;
     private double _multiplier;
     public event Action<ItemAmount>? OnAugmentedOutput;
+
     private WorkshopInstance GetWorkshopById(Guid id)
     {
         var workshop = _workshops.SingleOrDefault(t => t.Id == id) ?? throw new CustomBasicException($"Workshop with Id {id} not found.");
@@ -37,6 +38,8 @@ public class WorkshopManager(InventoryManager inventory,
                         Id = t.Id,
                         Name = t.BuildingName,
                         SelectedRecipeIndex = t.SelectedRecipeIndex,
+                        IsRental = t.IsRental,
+                        Unlocked = t.Unlocked,
                         ReadyCount = t.Queue.Count(x => x.State == EnumWorkshopState.ReadyToPickUpManually)
                     };
                     output.Add(summary);
@@ -69,7 +72,7 @@ public class WorkshopManager(InventoryManager inventory,
 
     //if you purchase, must make sure all proper items are unlocked like it should had (?)
 
-
+    public bool Unlocked(WorkshopView workshop) => GetWorkshopById(workshop).Unlocked;
     public void CompleteSingleActiveJobImmediately(WorkshopView workshop)
     {
         if (inventory.Has(CurrencyKeys.FinishSingleWorkshop, 1) == false)
@@ -120,7 +123,7 @@ public class WorkshopManager(InventoryManager inventory,
 
             // CASE 2: Automatic collection policy -> attempt to collect everything in-order.
             // Stop as soon as inventory can’t accept the next output.
-            while (workshop.Queue.Count > 0)
+            while (workshop.Queue.Any(x => x.State != EnumWorkshopState.ReadyToPickUpManually))
             {
                 // Ensure we have an "active" job (for consistency with your model),
                 // but we will still finish + collect instantly.
@@ -155,7 +158,8 @@ public class WorkshopManager(InventoryManager inventory,
                     active.ReadyForManualPickup();
                     _needsSaving = true;
                     NotifyWorkshopsUpdated();
-                    return;
+                    continue;
+                    //return; //if they don't have enough for all of it, can go to waste.
                 }
 
                 // Add output, respecting augmentation rules
@@ -248,6 +252,71 @@ public class WorkshopManager(InventoryManager inventory,
         ApplyPowerGloveToActiveJob(workshop, howMany, PowerGloveRegistry.ReduceBy);
         inventory.Consume(CurrencyKeys.PowerGloveWorkshop, howMany);
     }
+
+    public Guid StartRental(StoreItemRowModel rental)
+    {
+        if (rental.Category != EnumCatalogCategory.Workshop)
+        {
+            throw new CustomBasicException("Only workshops can be rented");
+        }
+        var instance = _workshops.LastOrDefault(x => x.BuildingName == rental.TargetName && x.Unlocked == false)
+            ?? throw new CustomBasicException("No locked building available to rent");
+        instance.Unlocked = true;
+        instance.IsRental = true; //so later can lock the proper one.  also ui can show the details for it as well.
+        _needsSaving = true;
+        return instance.Id;
+    }
+    private void RemovePossibleDuplicateRentals(WorkshopInstance instance)
+    {
+        foreach (var t in _workshops.Where(x => x.IsRental && x.Id != instance.Id))
+        {
+            t.IsRental = false;
+            _needsSaving = true;
+        }
+    }
+    public bool CanDeleteRental(Guid id)
+    {
+        WorkshopInstance instance = _workshops.Single(x => x.Id == id);
+        RemovePossibleDuplicateRentals(instance);
+        if (instance.Unlocked == false)
+        {
+            return true;
+        }
+        if (instance.Queue.Count == 0)
+        {
+            instance.Unlocked = false;
+            _needsSaving = true;
+            NotifyWorkshopsUpdated();
+            return false; //try again in a second.
+        }
+        if (instance.IsRental == false)
+        {
+            instance.IsRental = true; //implies its a rental.
+            NotifyWorkshopsUpdated();
+            _needsSaving = true;
+        }
+        return false;
+    }
+
+    public void DoubleCheckActiveRental(Guid id)
+    {
+        WorkshopInstance instance = _workshops.Single(x => x.Id == id);
+        RemovePossibleDuplicateRentals(instance);
+        if (instance.IsRental == false)
+        {
+            instance.IsRental = true;
+            NotifyWorkshopsUpdated();
+            _needsSaving = true;
+        }
+        if (instance.Unlocked == false)
+        {
+            instance.Unlocked = true;
+            NotifyWorkshopsUpdated();
+            _needsSaving = true;
+        }
+        
+    }
+
 
     public void UnlockWorkshopPaidFor(StoreItemRowModel store)
     {
@@ -523,14 +592,9 @@ public class WorkshopManager(InventoryManager inventory,
                 throw new CustomBasicException("Should had used the CanAddToInventory because you were over the barn limits");
             }
             CraftingJobInstance active = workshop.Queue.First(x => x.State == EnumWorkshopState.ReadyToPickUpManually);
-            //active.Complete();
-
-
-
-
             workshop.Queue.RemoveSpecificItem(active);
             //save something here too.
-
+            
             if (active.OutputPromise is null || rs1.RollHit(active.OutputPromise.Chance) == false)
             {
                 inventory.Add(active.Recipe.Output.Item, active.Recipe.Output.Amount);
@@ -636,6 +700,7 @@ public class WorkshopManager(InventoryManager inventory,
                     }
                     active.Complete();
                     workshop.Queue.RemoveSpecificItem(active);
+                    
                     _needsSaving = true;
                 }
             }

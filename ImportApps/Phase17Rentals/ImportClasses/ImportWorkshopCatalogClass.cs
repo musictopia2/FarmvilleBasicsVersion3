@@ -33,6 +33,14 @@ internal static class ImportWorkshopCatalogClass
         });
         output.Add(new()
         {
+            TargetName = TropicalWorkshopList.HuluHit,
+            LevelRequired = 6,
+            Category = _category,
+            Duration = TimeSpan.FromSeconds(20), //for testing
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10) //this is where i do the balancing.
+        });
+        output.Add(new()
+        {
             TargetName = TropicalWorkshopList.SushiStand,
             LevelRequired = 4,
             Category = _category,
@@ -94,7 +102,14 @@ internal static class ImportWorkshopCatalogClass
             Category = _category,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(10)
         });
-
+        output.Add(new()
+        {
+            TargetName = CountryWorkshopList.Windmill,
+            LevelRequired = 7,
+            Category = _category,
+            Duration = TimeSpan.FromSeconds(20), //for testing.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5)
+        });
 
         output.Add(new()
         {
