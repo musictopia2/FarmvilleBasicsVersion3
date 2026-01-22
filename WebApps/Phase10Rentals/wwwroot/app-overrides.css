@@ -1,0 +1,22 @@
+﻿/* Ensure the wrapper is the positioning context */
+.boost-icon-wrap {
+    position: relative;
+    display: inline-block; /* prevents weird layout stretching */
+    line-height: 0; /* removes inline gaps */
+}
+
+/* Base image sits at z=1 */
+.boost-icon-base {
+   
+    display: block;
+    position: relative;
+}
+
+/* Badge sits on top at z=2 */
+.boost-icon-badge {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    display: block; /* SVG sometimes behaves inline */
+    pointer-events: none; /* avoids intercepting clicks */
+}
