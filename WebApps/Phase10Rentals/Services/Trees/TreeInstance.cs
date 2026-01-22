@@ -17,6 +17,8 @@ public class TreeInstance(
     public EnumTreeState State { get; private set; } = EnumTreeState.Collecting;
     public TimeSpan ReducedBy { get; private set; } = TimeSpan.Zero;
     private TimeSpan ProductionTimePerTree => tree.ProductionTimeForEach;
+    public bool RentalExpired { get; set; }
+    public bool IsRental { get; set; }
 
     // production start time (used mostly for UI/pause semantics)
     private DateTime? StartedAt { get; set; }
@@ -66,9 +68,7 @@ public class TreeInstance(
             return remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero;
         }
     }
-
     public bool CanCollectOneTree => TreesReady > 0;
-
     private void StartCollecting()
     {
         if (State == EnumTreeState.Collecting && !IsCollecting)
@@ -77,7 +77,6 @@ public class TreeInstance(
             StartedAt = null; // pause timer
         }
     }
-
     public TreeAutoResumeModel GetTreeForSaving
     {
         get
@@ -93,6 +92,8 @@ public class TreeInstance(
                 IsSuppressed = IsSuppressed,
                 ReducedBy = ReducedBy,
                 OutputPromise = OutputPromise,
+                RentalExpired = RentalExpired,
+                IsRental = IsRental,
                 // Save the promise ONLY while producing
                 RunMultiplier = State == EnumTreeState.Producing ? _runMultiplier : null
             };
@@ -110,26 +111,28 @@ public class TreeInstance(
         ReducedBy = model.ReducedBy;
         _runMultiplier = model.RunMultiplier;
         OutputPromise = model.OutputPromise;
+        RentalExpired = model.RentalExpired;
+        IsRental = model.IsRental;
         // Back-compat / safety: if producing but multiplier missing, fall back to current
         if (State == EnumTreeState.Producing && _runMultiplier is null)
         {
             _runMultiplier = _currentMultiplier;
         }
     }
-
     public void CollectTree(TimeSpan reducedBy)
     {
         StartCollecting();
-
         if (TreesReady <= 0)
         {
             return;
         }
-
         TreesReady--;
-
         if (TreesReady == 0)
         {
+            if (RentalExpired)
+            {
+                Unlocked = false;
+            }
             // Start production for next batch
             _runMultiplier = _currentMultiplier; // LOCK promise
             State = EnumTreeState.Producing;
@@ -167,7 +170,6 @@ public class TreeInstance(
         {
             RunPossibleAugmentation();
         }
-
         if (State != EnumTreeState.Producing || TempStart is null)
         {
             return;

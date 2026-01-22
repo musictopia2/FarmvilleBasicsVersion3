@@ -30,6 +30,7 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
             IInstantUnlimitedFactory instantUnlimitedFactory = sp.GetRequiredService<IInstantUnlimitedFactory>();
             ITimedBoostFactory timedBoostFactory = sp.GetRequiredService<ITimedBoostFactory>();
             IOutputAugmentationFactory outputAugmentationFactory = sp.GetRequiredService<IOutputAugmentationFactory>();
+            IRentalFactory rentalFactory = sp.GetRequiredService<IRentalFactory>();
             TimedBoostManager timedBoostManager = new();
             OutputAugmentationManager outputAugmentationManager = new();
             CropManager cropManager = new(inventory, baseBalanceProvider, itemRegistry, timedBoostManager, outputAugmentationManager);
@@ -40,14 +41,14 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
             ItemManager itemManager = new();
             CatalogManager catalogManager = new();
             InstantUnlimitedManager instantUnlimitedManager = new(cropManager, treeManager, animalManager, inventory, itemManager);
-            
+            RentalManager rentalManager = new(treeManager);
             var profile = starts.GetInventoryProfile(farm);
             UpgradeManager upgradeManager = new(inventory, profile, workshopManager);
             ProgressionManager progressionManager = new(inventory, cropManager,
                 animalManager, treeManager, workshopManager, worksiteManager, catalogManager);
             StoreManager storeManager = new(progressionManager, treeManager,
                 animalManager, workshopManager, worksiteManager,
-                catalogManager, inventory, instantUnlimitedManager, timedBoostManager
+                catalogManager, inventory, instantUnlimitedManager, timedBoostManager, rentalManager
                 );
             QuestManager questManager = new(inventory, itemManager, progressionManager);
             IGameTimer timer = new BasicGameState(
@@ -55,11 +56,13 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
                 cropFactory, treeFactory, animalFactory, workshopFactory,
                 worksiteFactory, workerFactory, questFactory,
                 upgradeFactory, progressionFactory, catalogFactory, 
-                storeFactory, itemFactory, instantUnlimitedFactory, timedBoostFactory, outputAugmentationFactory,
+                storeFactory, itemFactory, instantUnlimitedFactory, 
+                timedBoostFactory, outputAugmentationFactory, rentalFactory,
                 cropManager, treeManager, animalManager,
                 workshopManager, worksiteManager, questManager,
                 upgradeManager, progressionManager, catalogManager, 
-                storeManager, itemManager, instantUnlimitedManager, timedBoostManager, outputAugmentationManager
+                storeManager, itemManager, instantUnlimitedManager, 
+                timedBoostManager, outputAugmentationManager, rentalManager
                 );
             await gameRegistry.InitializeFarmAsync(timer, farm);
         }

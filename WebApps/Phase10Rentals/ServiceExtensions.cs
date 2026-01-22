@@ -9,6 +9,7 @@ using Phase10Rentals.DataAccess.Items;
 using Phase10Rentals.DataAccess.OutputAugmentation;
 using Phase10Rentals.DataAccess.Progression;
 using Phase10Rentals.DataAccess.Quests; //not common enough.
+using Phase10Rentals.DataAccess.Rentals;
 using Phase10Rentals.DataAccess.Store;
 using Phase10Rentals.DataAccess.TimedBoosts;
 using Phase10Rentals.DataAccess.Trees;
@@ -46,6 +47,7 @@ public static class ServiceExtensions
                 .AddSingleton<IInstantUnlimitedFactory, InstantUnlimitedFactory>()
                 .AddSingleton<ITimedBoostFactory, TimedBoostFactory>()
                 .AddSingleton<IOutputAugmentationFactory, OutputAugmentationFactory>()
+                .AddSingleton<IRentalFactory, RentalFactory>()
                 .AddScoped<ReadyStatusService>()
                 .AddScoped<OverlayService>()
                 .AddScoped<FarmContext>()

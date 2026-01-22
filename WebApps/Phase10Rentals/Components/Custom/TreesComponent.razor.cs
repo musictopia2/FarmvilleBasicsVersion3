@@ -2,16 +2,11 @@ namespace Phase10Rentals.Components.Custom;
 public partial class TreesComponent
 {
     private BasicList<TreeView> _trees = [];
-
     private TimeSpan? _unlimitedSpeedSeedTime;
-
     protected override void OnInitialized()
     {
-
         Refresh();
-
         base.OnInitialized();
-
     }
     protected override Task OnTickAsync()
     {
@@ -22,10 +17,5 @@ public partial class TreesComponent
     {
         _trees = TreeManager.GetUnlockedTrees;
         _unlimitedSpeedSeedTime = TimedBoostManager.GetUnlimitedSpeedSeedTimeLeft();
-        
     }
-
-
-
-
 }

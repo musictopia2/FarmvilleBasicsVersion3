@@ -13,4 +13,6 @@ public class TreeAutoResumeModel
     // Temporary override: something else is taking over the rule, so this tree shouldn't appear / be usable
     public bool IsSuppressed { get; set; } = false;
     public OutputAugmentationSnapshot? OutputPromise { get; set; }
+    public bool IsRental { get; set; } //this means if it comes from rental, needs to mark so can lock the exact proper one.
+    public bool RentalExpired { get; set; }
 }

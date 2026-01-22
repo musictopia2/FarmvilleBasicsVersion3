@@ -10,7 +10,12 @@
 >
     <!-- Base tree -->
     <img src="/Tree.png" width="200" />
-
+    @if (!string.IsNullOrWhiteSpace(_rentalTimeLeft))
+    {
+        <div class="tree-rental-timer">
+            @_rentalTimeLeft
+        </div>
+    }
     @if (_ready > 0)
     {
         <img src="@GetFruitImage"
@@ -55,10 +60,4 @@
                  " />
         }
     }
-
-    <!-- Overlay image -->
-    
-    
-    
-    
 </div>

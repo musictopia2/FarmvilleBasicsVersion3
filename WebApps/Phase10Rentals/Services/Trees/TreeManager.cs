@@ -1,4 +1,6 @@
-﻿namespace Phase10Rentals.Services.Trees;
+﻿using System.Threading.Tasks;
+
+namespace Phase10Rentals.Services.Trees;
 
 public class TreeManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
@@ -28,7 +30,8 @@ public class TreeManager(InventoryManager inventory,
                 {
                     Id = t.Id,
                     ItemName = t.Name,
-                    TreeName = t.TreeName
+                    TreeName = t.TreeName,
+                    IsRental = t.IsRental
                 };
                 output.Add(summary);
             });
@@ -36,6 +39,46 @@ public class TreeManager(InventoryManager inventory,
         }
     }
     public TimeSpan GetTimeForGivenTree(string name) => _recipes.Single(x => x.Item == name).ProductionTimeForEach;
+    public async Task ShowRentalExpireAsync(RentalInstanceModel rental)
+    {
+        if (rental.Category != EnumCatalogCategory.Tree)
+        {
+            throw new CustomBasicException("Only trees can be paid for");
+        }
+        var instance = _trees.Single(x => x.TreeName == rental.TargetName && x.IsRental);
+        instance.RentalExpired = true;
+        await ForceSaveTreesAsync(); //so if i am debugging, won't get hosed.
+    }
+
+    private async Task ForceSaveTreesAsync()
+    {
+        BasicList<TreeAutoResumeModel> list = _trees
+            .Select(tree => tree.GetTreeForSaving)
+            .ToBasicList();
+
+        await _treeRepository.SaveAsync(list);
+
+        lock (_lock)
+        {
+            _needsSaving = false;
+            _lastSave = DateTime.Now;
+        }
+    }
+
+    public void UnlockTreeRental(StoreItemRowModel rental)
+    {
+        //will have to run some tests.
+        if (rental.Category != EnumCatalogCategory.Tree)
+        {
+            throw new CustomBasicException("Only trees can be paid for");
+        }
+        var instance = _trees.First(x => x.TreeName == rental.TargetName && x.Unlocked == false);
+        instance.Unlocked = true;
+        instance.RentalExpired = false; //because you started the rental now.
+        instance.IsRental = true; //so later can lock the proper one.  also ui can show the details for it as well.
+        _needsSaving = true;
+    }
+
     public void UnlockTreePaidFor(StoreItemRowModel store)
     {
         if (store.Category != EnumCatalogCategory.Tree)

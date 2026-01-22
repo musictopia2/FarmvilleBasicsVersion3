@@ -72,7 +72,7 @@ public partial class ShopComponent(IToast toast, IMessageBox message)
         }
         if (StoreManager.CanAcquire(row) == false)
         {
-            toast.ShowUserErrorToast("Unable to purchase because not enough resources"); //not always coins.
+            toast.ShowUserErrorToast("Failed to acquire."); //not always coins.
             return;
         }
         _currentItem = row;

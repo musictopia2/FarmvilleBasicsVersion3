@@ -18,6 +18,7 @@ public class BasicGameState : IGameTimer
     IInstantUnlimitedFactory instantUnlimitedFactory,
     ITimedBoostFactory timedBoostFactory,
     IOutputAugmentationFactory outputAugmentationFactory,
+    IRentalFactory rentalFactory,
     CropManager cropManager,
     TreeManager treeManager,
     AnimalManager animalManager,
@@ -31,7 +32,8 @@ public class BasicGameState : IGameTimer
     ItemManager itemManager,
     InstantUnlimitedManager instantUnlimitedManager,
     TimedBoostManager timedBoostManager,
-    OutputAugmentationManager outputAugmentationManager
+    OutputAugmentationManager outputAugmentationManager,
+    RentalManager rentalManager
 )
     {
         _inventory = inventory;
@@ -51,6 +53,7 @@ public class BasicGameState : IGameTimer
         _instantUnlimitedFactory = instantUnlimitedFactory;
         _timedBoostFactory = timedBoostFactory;
         _outputAugmentationFactory = outputAugmentationFactory;
+        _rentalFactory = rentalFactory;
         _cropManager = cropManager;
         _treeManager = treeManager;
         _animalManager = animalManager;
@@ -65,6 +68,7 @@ public class BasicGameState : IGameTimer
         _instantUnlimitedManager = instantUnlimitedManager;
         _timedBoostManager = timedBoostManager;
         _outputAugmentationManager = outputAugmentationManager;
+        _rentalManager = rentalManager;
         _container = new MainFarmContainer
         {
             InventoryManager = inventory,
@@ -81,7 +85,8 @@ public class BasicGameState : IGameTimer
             InstantUnlimitedManager = instantUnlimitedManager,
             TimedBoostManager = timedBoostManager,
             ItemManager = itemManager,
-            OutputAugmentationManager = outputAugmentationManager
+            OutputAugmentationManager = outputAugmentationManager,
+            RentalManager = rentalManager,
         };
     }
     readonly MainFarmContainer _container;
@@ -102,6 +107,7 @@ public class BasicGameState : IGameTimer
     private readonly IInstantUnlimitedFactory _instantUnlimitedFactory;
     private readonly ITimedBoostFactory _timedBoostFactory;
     private readonly IOutputAugmentationFactory _outputAugmentationFactory;
+    private readonly IRentalFactory _rentalFactory;
     private readonly CropManager _cropManager;
     private readonly TreeManager _treeManager;
     private readonly AnimalManager _animalManager;
@@ -116,6 +122,7 @@ public class BasicGameState : IGameTimer
     private readonly InstantUnlimitedManager _instantUnlimitedManager;
     private readonly TimedBoostManager _timedBoostManager;
     private readonly OutputAugmentationManager _outputAugmentationManager;
+    private readonly RentalManager _rentalManager;
     private FarmKey? _farm;
     FarmKey? IGameTimer.FarmKey => _farm;
     MainFarmContainer IGameTimer.FarmContainer
@@ -142,10 +149,8 @@ public class BasicGameState : IGameTimer
         _inventory.LoadStartingInventory(starts, inventoryStorageProfileModel);
         TimedBoostServicesContext timedBoostContext = _timedBoostFactory.GetTimedBoostServices(farm);
         await _timedBoostManager.SetTimedBoostStyleContextAsync(timedBoostContext);
-
         OutputAugmentationServicesContext augmentationOutputContext = _outputAugmentationFactory.GetOutputAugmentationServices(farm);
         await _outputAugmentationManager.SetOutputAugmentationStyleContextAsync(augmentationOutputContext, farm);
-
         CropServicesContext cropContext = _cropFactory.GetCropServices(farm);
         await _cropManager.SetStyleContextAsync(cropContext, farm);
         TreeServicesContext treeContext = _treeFactory.GetTreeServices(farm);
@@ -169,7 +174,8 @@ public class BasicGameState : IGameTimer
         await _questManager.SetStyleContextAsync(questContext);
         InstantUnlimitedServicesContext instantUnlimitedContext = _instantUnlimitedFactory.GetInstantUnlimitedServices(farm);
         await _instantUnlimitedManager.SetInstantUnlimitedStyleContextAsync(instantUnlimitedContext);
-        
+        RentalsServicesContext rentalContext = _rentalFactory.GetRentalServices(farm);
+        await _rentalManager.SetRentalStyleContextAsync(rentalContext);
         _init = true;
     }
     async Task IGameTimer.TickAsync()
@@ -184,5 +190,6 @@ public class BasicGameState : IGameTimer
         await _workshopManager.UpdateTickAsync();
         await _worksiteManager.UpdateTickAsync();
         await _timedBoostManager.UpdateTickAsync();
+        await _rentalManager.UpdateTickAsync();
     }
 }

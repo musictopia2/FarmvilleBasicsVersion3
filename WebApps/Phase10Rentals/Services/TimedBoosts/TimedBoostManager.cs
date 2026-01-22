@@ -70,18 +70,6 @@ public class TimedBoostManager
         return active?.OutputAugmentationKey;
     }
 
-    //public BasicList<string> GetActiveOutputAugmentationKeysForItem(string itemName)
-    //{
-    //    CleanupExpired();
-
-    //    return _profile.Active
-    //        .Where(a =>
-    //            a.BoostKey == itemName &&
-    //            string.IsNullOrWhiteSpace(a.OutputAugmentationKey) == false)
-    //        .Select(a => a.OutputAugmentationKey!)
-    //        .ToBasicList();
-    //}
-
     public bool CanActivateBoost(TimedBoostCredit credit)
     {
         var active = _profile.Active.SingleOrDefault(a => a.BoostKey == credit.BoostKey);

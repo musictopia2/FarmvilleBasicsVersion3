@@ -38,4 +38,5 @@ global using Phase10Rentals.Services.Items;
 global using Phase10Rentals.Services.InstantUnlimited;
 global using Phase10Rentals.Services.TimedBoosts;
 global using Phase10Rentals.Services.OutputAugmentation;
+global using Phase10Rentals.Services.Rentals;
 global using rs1 = Phase10Rentals.Utilities.RandomUtilities;

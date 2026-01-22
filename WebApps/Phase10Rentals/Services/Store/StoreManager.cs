@@ -8,7 +8,8 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
     CatalogManager catalogManager,
     InventoryManager inventoryManager,
     InstantUnlimitedManager instantUnlimitedManager,
-    TimedBoostManager timedBoostManager
+    TimedBoostManager timedBoostManager,
+    RentalManager rentalManager
     )
 {
     private int _currentLevel;
@@ -448,8 +449,11 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         {
             return false; //because the level progression should had handled this.
         }
-        //once i implement the rental system, then if you cannot, rethink.
-        return true; //i think.
+        if (store.Duration is null)
+        {
+            return true;
+        }
+        return rentalManager.CanRent(store);
     }
     public async Task AcquireAsync(StoreItemRowModel store)
     {
@@ -462,10 +466,12 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         {
             if (store.Duration is not null)
             {
-                Console.WriteLine("Rethink rentals");
-                return;
+                await rentalManager.RentAsync(store);
             }
-            treeManager.UnlockTreePaidFor(store);
+            else
+            {
+                treeManager.UnlockTreePaidFor(store);
+            }
             FinishAcquiring(store);
             return;
         }

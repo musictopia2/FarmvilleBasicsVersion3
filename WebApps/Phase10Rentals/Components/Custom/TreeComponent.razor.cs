@@ -4,20 +4,28 @@ public partial class TreeComponent(IToast toast)
     [Parameter]
     [EditorRequired]
     public TreeView Tree { get; set; }
-
     private int _ready;
     private bool _showpopup = false;
-
-
+    private string _rentalTimeLeft = "";
     protected override void OnInitialized()
     {
-        _ready = TreeManager.TreesReady(Tree);
+        Refresh();
+
         base.OnInitialized();
     }
     private string GetFruitImage => $"/{Tree.ItemName}.png";
-    protected override Task OnTickAsync()
+    private void Refresh()
     {
         _ready = TreeManager.TreesReady(Tree);
+        if (Tree.IsRental)
+        {
+            _rentalTimeLeft = RentalManager.GetDurationString(Tree.TreeName);
+        }
+    }
+
+    protected override Task OnTickAsync()
+    {
+        Refresh();
         return base.OnTickAsync();
     }
     private void Process()

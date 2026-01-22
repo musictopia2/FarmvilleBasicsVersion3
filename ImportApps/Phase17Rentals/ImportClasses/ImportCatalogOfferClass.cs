@@ -1,6 +1,4 @@
-﻿using CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.BasicExtensions;
-
-namespace Phase17Rentals.ImportClasses;
+﻿namespace Phase17Rentals.ImportClasses;
 public static class ImportCatalogOfferClass
 {
     public static async Task ImportCatalogAsync()
@@ -61,7 +59,7 @@ public static class ImportCatalogOfferClass
         output.Add(new()
         {
             Category = category,
-            TargetName= boostKey,
+            TargetName = boostKey,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(2),
             LevelRequired = 4,
             Duration = TimeSpan.FromMinutes(2)
@@ -358,7 +356,7 @@ public static class ImportCatalogOfferClass
             Costs = FarmHelperClass.GetCoinOnlyDictionary(15),
             TargetName = CurrencyKeys.SpeedSeed,
             LevelRequired = levelRequired,
-            
+
         });
         output.Add(new()
         {
@@ -425,7 +423,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             TargetName = CountryItemList.Peach,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
-            Duration = TimeSpan.FromMinutes(1),
+            Duration = TimeSpan.FromMinutes(20),
             ReduceBy = TimeSpan.FromHours(3.5), //this applies to all 4 (so do math to see how it would affect each one).
             LevelRequired = 14
         });
@@ -479,7 +477,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             TargetName = TropicalItemList.Lime,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
-            Duration = TimeSpan.FromMinutes(1),
+            Duration = TimeSpan.FromMinutes(20),
             ReduceBy = TimeSpan.FromHours(2.5), //this applies to all 4 (so do math to see how it would affect each one).
             LevelRequired = 14
         });
