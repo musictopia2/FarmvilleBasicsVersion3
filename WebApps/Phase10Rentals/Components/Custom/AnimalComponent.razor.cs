@@ -1,3 +1,4 @@
+
 namespace Phase10Rentals.Components.Custom;
 
 public partial class AnimalComponent(IToast toast)
@@ -10,11 +11,22 @@ public partial class AnimalComponent(IToast toast)
     private int _selectedIndex;
     private bool _showOptions;
     private AnimalProductionOption? _selectedOption;
-
+    private string _rentalTimeLeft = "";
     protected override void OnParametersSet()
     {
         EnsureSelectedOption();
+        Refresh();
         base.OnParametersSet();
+    }
+
+    private void Refresh()
+    {
+        _rentalTimeLeft = RentalManager.GetDurationString(Animal.Name);
+    }
+
+    protected override Task OnTickAsync()
+    {
+        return base.OnTickAsync();
     }
 
     private void EnsureSelectedOption()

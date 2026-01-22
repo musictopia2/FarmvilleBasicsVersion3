@@ -1,5 +1,8 @@
 ﻿namespace Phase10Rentals.Services.Rentals;
-public class RentalManager(TreeManager treeManager)
+
+public class RentalManager(TreeManager treeManager,
+    AnimalManager animalManager
+    )
 {
     private BasicList<RentalInstanceModel> _rentals = [];
     private IRentalProfile _profile = null!;
@@ -18,15 +21,22 @@ public class RentalManager(TreeManager treeManager)
         {
             throw new CustomBasicException("Unable to rent because already renting.  Should had checked CanRent");
         }
-        if (row.Category != EnumCatalogCategory.Tree)
-        {
-            throw new CustomBasicException("Only trees are supported for now");
-        }
         if (row.Duration is null)
         {
             throw new CustomBasicException("Rentals require a duration");
         }
-        treeManager.UnlockTreeRental(row);
+        if (row.Category == EnumCatalogCategory.Tree)
+        {
+            treeManager.UnlockTreeRental(row);
+        }
+        else if (row.Category == EnumCatalogCategory.Animal)
+        {
+            animalManager.UnlockAnimalRental(row);
+        }
+        else
+        {
+            throw new CustomBasicException("Category not supported");
+        }
         var now = DateTime.Now;
         _rentals.Add(new()
         {
@@ -51,7 +61,6 @@ public class RentalManager(TreeManager treeManager)
         }
         return remaining.GetTimeCompact;
     }
-
     private async Task SaveAsync()
     {
         if (_needsSaving == false)
@@ -65,7 +74,6 @@ public class RentalManager(TreeManager treeManager)
     private async Task RentalProgressAsync()
     {
         var now = DateTime.Now;
-
         var list = _rentals.Where(x => x.EndsAt <= now).ToBasicList();
         foreach (var item in list)
         {
@@ -78,15 +86,18 @@ public class RentalManager(TreeManager treeManager)
                 _rentals.RemoveSpecificItem(item);
                 _needsSaving = true;
             }
+            else if (item.Category == EnumCatalogCategory.Animal)
+            {
+                await animalManager.ShowRentalExpireAsync(item);
+                _rentals.RemoveSpecificItem(item);
+                _needsSaving = true;
+            }
             else
             {
-                throw new CustomBasicException("Only trees are supported for now");
+                throw new CustomBasicException("Not supported for now");
             }
         }
-
     }
-
-
     public async Task UpdateTickAsync()
     {
         if (_rentals.Count == 0)

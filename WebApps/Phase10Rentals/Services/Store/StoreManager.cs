@@ -461,19 +461,19 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         {
             throw new CustomBasicException("Unable to acquire this.  Should had called CanAcquire first");
         }
+
+        if (store.Duration is not null && store.Category != EnumCatalogCategory.Misc && store.Category != EnumCatalogCategory.TimedBoosts)
+        {
+            await rentalManager.RentAsync(store);
+            FinishAcquiring(store);
+            return;
+        }
+
         //now needs to actually unlock the items.
         if (store.Category == EnumCatalogCategory.Tree)
         {
-            if (store.Duration is not null)
-            {
-                await rentalManager.RentAsync(store);
-            }
-            else
-            {
-                treeManager.UnlockTreePaidFor(store);
-            }
-            FinishAcquiring(store);
-            return;
+            treeManager.UnlockTreePaidFor(store);
+
         }
         if (store.Category == EnumCatalogCategory.Animal)
         {

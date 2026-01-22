@@ -50,7 +50,7 @@ public static class ImportTreeCatalogClass
             TargetName = TropicalTreeListClass.Lime,
             LevelRequired = 9,
             Category = _category,
-            Duration = TimeSpan.FromMinutes(1),
+            Duration = TimeSpan.FromHours(3),
             Costs = FarmHelperClass.GetCoinOnlyDictionary(5) //this is where i do the balancing.
         });
         return output;
@@ -91,7 +91,7 @@ public static class ImportTreeCatalogClass
             TargetName = CountryTreeListClass.Peach,
             LevelRequired = 15,
             Category = _category,
-            Duration = TimeSpan.FromMinutes(1),
+            Duration = TimeSpan.FromHours(3),
             Costs = FarmHelperClass.GetCoinOnlyDictionary(5)
         });
         return output;

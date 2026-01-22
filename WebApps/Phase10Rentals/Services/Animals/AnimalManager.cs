@@ -1,4 +1,6 @@
-﻿namespace Phase10Rentals.Services.Animals;
+﻿using Phase10Rentals.Services.Trees;
+
+namespace Phase10Rentals.Services.Animals;
 public class AnimalManager(InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
     ItemRegistry itemRegistry,
@@ -29,14 +31,14 @@ public class AnimalManager(InventoryManager inventory,
                 AnimalView summary = new()
                 {
                     Id = t.Id,
-                    Name = t.Name
+                    Name = t.Name,
+                    IsRental = t.IsRental
                 };
                 output.Add(summary);
             });
             return output;
         }
     }
-
     public AnimalProductionOption NextProductionOption(string animal)
     {
         var instance = _animals.First(x => x.Name == animal);
@@ -69,14 +71,42 @@ public class AnimalManager(InventoryManager inventory,
                 x.IsSuppressed = supressed;
             }
         });
-
-        //_animals.ForConditionalItems(x => x.Name == itemName, item =>
-        //{
-        //    item.IsSuppressed = supressed;
-        //});
         _needsSaving = true;
     }
-
+    public void UnlockAnimalRental(StoreItemRowModel rental)
+    {
+        if (rental.Category != EnumCatalogCategory.Animal)
+        {
+            throw new CustomBasicException("Only animals can be rented");
+        }
+        var instance = _animals.First(x => x.Name == rental.TargetName && x.Unlocked == false);
+        instance.Unlocked = true;
+        instance.RentalExpired = false; //because you started the rental now.
+        instance.IsRental = true; //so later can lock the proper one.  also ui can show the details for it as well.
+        _needsSaving = true;
+    }
+    public async Task ShowRentalExpireAsync(RentalInstanceModel rental)
+    {
+        if (rental.Category != EnumCatalogCategory.Tree)
+        {
+            throw new CustomBasicException("Only animals can show it expired");
+        }
+        var instance = _animals.Single(x => x.Name == rental.TargetName && x.IsRental);
+        instance.RentalExpired = true;
+        await ForceSaveAnimalsAsync(); //don't trust it.
+    }
+    private async Task ForceSaveAnimalsAsync()
+    {
+        BasicList<AnimalAutoResumeModel> list = _animals
+             .Select(animal => animal.GetAnimalForSaving)
+             .ToBasicList();
+        await _animalRepository.SaveAsync(list);
+        lock (_lock)
+        {
+            _needsSaving = false;
+            _lastSave = DateTime.Now;
+        }
+    }
     public void UnlockAnimalPaidFor(StoreItemRowModel store)
     {
         if (store.Category != EnumCatalogCategory.Animal)
@@ -267,7 +297,6 @@ public class AnimalManager(InventoryManager inventory,
         return inventory.CanAcceptRewards(list);
 
     }
-
     public void GrantUnlimitedAnimalItems(GrantableItem item)
     {
         if (item.Category != EnumItemCategory.Animal)

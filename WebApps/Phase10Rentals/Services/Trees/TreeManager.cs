@@ -43,7 +43,7 @@ public class TreeManager(InventoryManager inventory,
     {
         if (rental.Category != EnumCatalogCategory.Tree)
         {
-            throw new CustomBasicException("Only trees can be paid for");
+            throw new CustomBasicException("Only trees can show it expired");
         }
         var instance = _trees.Single(x => x.TreeName == rental.TargetName && x.IsRental);
         instance.RentalExpired = true;
@@ -70,7 +70,7 @@ public class TreeManager(InventoryManager inventory,
         //will have to run some tests.
         if (rental.Category != EnumCatalogCategory.Tree)
         {
-            throw new CustomBasicException("Only trees can be paid for");
+            throw new CustomBasicException("Only trees can be rented");
         }
         var instance = _trees.First(x => x.TreeName == rental.TargetName && x.Unlocked == false);
         instance.Unlocked = true;
