@@ -1,6 +1,7 @@
 ﻿namespace Phase10Rentals.Services.Trees;
 public class TreeAutoResumeModel
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string TreeName { get; set; } = "";
     public bool Unlocked { get; set; } = true;
     public int TreesReady { get; set; }

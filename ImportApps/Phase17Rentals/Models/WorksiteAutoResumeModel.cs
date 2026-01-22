@@ -1,6 +1,7 @@
 ﻿namespace Phase17Rentals.Models;
 public class WorksiteAutoResumeModel
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = "";
     public bool Unlocked { get; set; } = true;
     public DateTime? StartedAt { get; set; }

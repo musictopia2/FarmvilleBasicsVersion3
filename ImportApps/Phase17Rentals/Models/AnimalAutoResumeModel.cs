@@ -1,6 +1,7 @@
 ﻿namespace Phase17Rentals.Models;
 public class AnimalAutoResumeModel
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = "";
     public EnumAnimalState State { get; set; } = EnumAnimalState.None;
     public bool Unlocked { get; set; } = true;

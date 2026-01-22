@@ -1,6 +1,7 @@
 ﻿namespace Phase17Rentals.Models;
 public class TreeAutoResumeModel
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     required public string TreeName { get; set; } = "";
     public bool Unlocked { get; set; } = true;
     public int TreesReady { get; set; } = 4; //i think.

@@ -73,56 +73,80 @@ public class AnimalManager(InventoryManager inventory,
         });
         _needsSaving = true;
     }
-    public void UnlockAnimalRental(StoreItemRowModel rental)
-    {
+    public Guid StartRental(StoreItemRowModel rental)
+    { 
         if (rental.Category != EnumCatalogCategory.Animal)
         {
             throw new CustomBasicException("Only animals can be rented");
         }
-        var instance = _animals.Last(x => x.Name == rental.TargetName && x.Unlocked == false);
+        var instance = _animals.LastOrDefault(x => x.Name == rental.TargetName && x.Unlocked == false)
+            ?? throw new CustomBasicException("No locked animal available to rent");
         instance.Unlocked = true;
         instance.RentalExpired = false; //because you started the rental now.
         instance.IsRental = true; //so later can lock the proper one.  also ui can show the details for it as well.
         _needsSaving = true;
+        return instance.Id;
     }
-    public async Task ShowRentalExpireAsync(RentalInstanceModel rental)
+    private void RemovePossibleDuplicateRentals(AnimalInstance instance)
     {
-        if (rental.Category != EnumCatalogCategory.Animal)
+        foreach (var t in _animals.Where(x => x.IsRental && x.Id != instance.Id))
         {
-            throw new CustomBasicException("Only animals can show it expired");
+            t.IsRental = false;
+            t.RentalExpired = false; 
+            _needsSaving = true;
         }
-        var instance = _animals.Single(x => x.Name == rental.TargetName && x.IsRental);
+    }
+    public bool CanDeleteRental(Guid id)
+    {
+        AnimalInstance animal = _animals.Single(x => x.Id == id);
+        RemovePossibleDuplicateRentals(animal);
+        if (animal.Unlocked == false)
+        {
+            return true;
+        }
+        if (animal.IsRental == false)
+        {
+            animal.IsRental = true; //implies its a rental.
+            _needsSaving = true;
+        }
+        if (animal.RentalExpired == false)
+        {
+            animal.RentalExpired = true;
+            _needsSaving = true;
+            return false;
+        }
+        return false;
+    }
 
-        if (instance.State == EnumAnimalState.None)
-        {
-            instance.Unlocked = false;
-            OnAnimalsUpdated?.Invoke();
-        }
-        else
-        {
-            instance.RentalExpired = true;
-        }
-        await ForceSaveAnimalsAsync(); //don't trust it.
-    }
-    private async Task ForceSaveAnimalsAsync()
+    public void DoubleCheckActiveRental(Guid id)
     {
-        BasicList<AnimalAutoResumeModel> list = _animals
-             .Select(animal => animal.GetAnimalForSaving)
-             .ToBasicList();
-        await _animalRepository.SaveAsync(list);
-        lock (_lock)
+        AnimalInstance animal = _animals.Single(x => x.Id == id);
+        RemovePossibleDuplicateRentals(animal);
+        if (animal.IsRental == false)
         {
-            _needsSaving = false;
-            _lastSave = DateTime.Now;
+            animal.IsRental = true;
+            _needsSaving = true;
+        }
+        if (animal.Unlocked == false)
+        {
+            animal.Unlocked = true;
+            _needsSaving = true;
+        }
+        if (animal.RentalExpired)
+        {
+            animal.RentalExpired = false;
+            _needsSaving = true;
         }
     }
+
+    
     public void UnlockAnimalPaidFor(StoreItemRowModel store)
     {
         if (store.Category != EnumCatalogCategory.Animal)
         {
             throw new CustomBasicException("Only animals can be paid for");
         }
-        var instance = _animals.First(x => x.Name == store.TargetName && x.Unlocked == false);
+        var instance = _animals.First(x => x.Name == store.TargetName && x.Unlocked == false && x.IsRental == false);
         instance.Unlocked = true;
 
 

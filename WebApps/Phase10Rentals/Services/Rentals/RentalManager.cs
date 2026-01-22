@@ -1,5 +1,4 @@
 ﻿namespace Phase10Rentals.Services.Rentals;
-
 public class RentalManager(TreeManager treeManager,
     AnimalManager animalManager
     )
@@ -25,13 +24,14 @@ public class RentalManager(TreeManager treeManager,
         {
             throw new CustomBasicException("Rentals require a duration");
         }
+        Guid id;
         if (row.Category == EnumCatalogCategory.Tree)
         {
-            treeManager.UnlockTreeRental(row);
+            id = treeManager.StartRental(row);
         }
         else if (row.Category == EnumCatalogCategory.Animal)
         {
-            animalManager.UnlockAnimalRental(row);
+            id = animalManager.StartRental(row);
         }
         else
         {
@@ -40,10 +40,12 @@ public class RentalManager(TreeManager treeManager,
         var now = DateTime.Now;
         _rentals.Add(new()
         {
+            TargetInstanceId = id,
             Category = row.Category,
             TargetName = row.TargetName,
             StartedAt = DateTime.Now,
-            EndsAt = now.Add(row.Duration.Value)
+            EndsAt = now.Add(row.Duration.Value),
+            State = EnumRentalState.Active
         });
         _needsSaving = true;
     }
@@ -74,28 +76,76 @@ public class RentalManager(TreeManager treeManager,
     private async Task RentalProgressAsync()
     {
         var now = DateTime.Now;
-        var list = _rentals.Where(x => x.EndsAt <= now).ToBasicList();
-        foreach (var item in list)
+        bool changed = false;
+
+        // iterate over a copy because we may remove items
+        foreach (var item in _rentals.ToBasicList())
         {
-            //these are all the ones that has to be processed actively because they expired.
+            
+
+            bool isExpiredByTime = item.EndsAt <= now;
+
+            // Move state forward (never backward)
+            if (isExpiredByTime && item.State == EnumRentalState.Active)
+            {
+                item.State = EnumRentalState.ExpiredPending;
+                changed = true;
+            }
+
             if (item.Category == EnumCatalogCategory.Tree)
             {
-                //use the tree manager
-                //if it was able to do, then take off.
-                await treeManager.ShowRentalExpireAsync(item);
-                _rentals.RemoveSpecificItem(item);
-                _needsSaving = true;
+                if (item.State == EnumRentalState.Active)
+                {
+                    treeManager.DoubleCheckActiveRental(item.TargetInstanceId!.Value);
+                    // treeManager may set its own _needsSaving; RentalManager only tracks its own here
+                }
+                else // ExpiredPending
+                {
+                    // Ensure expired/pending in tree domain, and delete ONLY when domain is finalized
+                    bool canDelete = treeManager.CanDeleteRental(item.TargetInstanceId!.Value);
+                    if (canDelete)
+                    {
+                        _rentals.RemoveSpecificItem(item);
+                        changed = true;
+                    }
+                }
             }
             else if (item.Category == EnumCatalogCategory.Animal)
             {
-                await animalManager.ShowRentalExpireAsync(item);
-                _rentals.RemoveSpecificItem(item);
-                _needsSaving = true;
+                // TEMP approach: keep your existing method but do NOT remove record immediately.
+                // You should eventually mirror the Tree pattern with id-based methods.
+                if (item.State == EnumRentalState.Active)
+                {
+
+                    // If you have an "ensure active" method for animals, call it here.
+                    animalManager.DoubleCheckActiveRental(item.TargetInstanceId!.Value);
+                }
+                else
+                {
+                    // Ensure expired pending in animal domain
+                    //await animalManager.ShowRentalExpireAsync(item);
+                    bool canDelete = animalManager.CanDeleteRental(item.TargetInstanceId!.Value);
+                    if (canDelete)
+                    {
+                        _rentals.RemoveSpecificItem(item);
+                        changed = true;
+                    }
+                    // DO NOT delete until you have a finalized check.
+                    // Once you implement animalManager.CanDeleteRental(id), switch to it.
+                    // bool canDelete = animalManager.CanDeleteRental(item.TargetInstanceId);
+                    // if (canDelete) { _rentals.RemoveSpecificItem(item); changed = true; }
+                }
             }
             else
             {
-                throw new CustomBasicException("Not supported for now");
+                // no throw in tick loop; just ignore/log so game doesn't die
+                // (unless you're in dev and want to crash fast)
             }
+        }
+
+        if (changed)
+        {
+            _needsSaving = true;
         }
     }
     public async Task UpdateTickAsync()
@@ -107,6 +157,4 @@ public class RentalManager(TreeManager treeManager,
         await RentalProgressAsync();
         await SaveAsync();
     }
-
-
 }

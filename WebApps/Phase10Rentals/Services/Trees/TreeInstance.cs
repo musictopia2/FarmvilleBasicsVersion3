@@ -7,7 +7,7 @@ public class TreeInstance(
     OutputAugmentationManager outputAugmentationManager
 )
 {
-    public Guid Id { get; } = Guid.NewGuid();
+    public Guid Id { get; private set; } = Guid.NewGuid();
     public bool Unlocked { get; set; }
 
     public string Name => tree.Item;
@@ -94,6 +94,7 @@ public class TreeInstance(
                 OutputPromise = OutputPromise,
                 RentalExpired = RentalExpired,
                 IsRental = IsRental,
+                Id = Id,
                 // Save the promise ONLY while producing
                 RunMultiplier = State == EnumTreeState.Producing ? _runMultiplier : null
             };
@@ -113,6 +114,7 @@ public class TreeInstance(
         OutputPromise = model.OutputPromise;
         RentalExpired = model.RentalExpired;
         IsRental = model.IsRental;
+        Id = model.Id;
         // Back-compat / safety: if producing but multiplier missing, fall back to current
         if (State == EnumTreeState.Producing && _runMultiplier is null)
         {

@@ -91,7 +91,7 @@ public static class ImportTreeCatalogClass
             TargetName = CountryTreeListClass.Peach,
             LevelRequired = 15,
             Category = _category,
-            Duration = TimeSpan.FromHours(3),
+            Duration = TimeSpan.FromSeconds(30),
             Costs = FarmHelperClass.GetCoinOnlyDictionary(5)
         });
         return output;

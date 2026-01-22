@@ -5,4 +5,6 @@ public class RentalInstanceModel
     public DateTime StartedAt { get; set; }
     public DateTime EndsAt { get; set; }
     public EnumCatalogCategory Category { get; set; } //this is needed so this can use the proper managers.
+    public EnumRentalState State { get; set; } = EnumRentalState.Active;
+    public Guid? TargetInstanceId { get; set; }
 }
