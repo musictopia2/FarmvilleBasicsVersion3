@@ -54,8 +54,8 @@
 /* Make the status column big enough for 30px icons */
 .shop-card-top {
     display: grid;
-    grid-template-columns: 34px minmax(0, 1fr); /* key change */
-    align-items: center;
+    grid-template-columns: 34px minmax(0, 1fr);
+    align-items: start; /* <-- change this */
     column-gap: 8px;
 }
 
