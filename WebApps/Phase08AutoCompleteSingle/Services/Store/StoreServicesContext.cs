@@ -1,5 +1,0 @@
-﻿namespace Phase08AutoCompleteSingle.Services.Store;
-public class StoreServicesContext
-{
-    public required IStoreUiStateRepository UiStateRepository { get; init; }
-}
