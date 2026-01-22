@@ -94,6 +94,7 @@
                                             Quantity To Add: @row.Quantity
                                         </div>
                                     }
+                                    
                                 </div>
                             </div>
 
@@ -131,9 +132,13 @@
                                         <span class="shop-owned-label">Qty </span>
                                         <span class="shop-owned-value">@row.OwnedCount</span>
                                     }
-                                    else
+                                    else if (row.Duration is null)
                                     {
                                         @($"{row.OwnedCount}/{row.TotalPossible}")
+                                    }
+                                    else
+                                    {
+                                        <span class="shop-owned-label">Rental</span>
                                     }
                                 </div>
 

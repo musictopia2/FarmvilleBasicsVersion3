@@ -220,6 +220,21 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
             EnumCatalogCategory.Tree
         );
     }
+
+    private static string GetOfferVariantKey(CatalogOfferModel offer)
+    {
+        // This should uniquely represent what the player is buying.
+        // If Duration differs -> separate entry (your requirement).
+        string dur = offer.Duration is null ? "PERM" : $"D{offer.Duration.Value.TotalSeconds:0}";
+        string red = offer.ReduceBy is null ? "" : $"R{offer.ReduceBy.Value.TotalSeconds:0}";
+        string qty = offer.Quantity <= 1 ? "" : $"Q{offer.Quantity}";
+        string aug = string.IsNullOrWhiteSpace(offer.OutputAugmentationKey) ? "" : $"A{offer.OutputAugmentationKey}";
+        // Repeatable usually matters for display/limits, but include it anyway to be safe.
+        string rep = offer.Repeatable ? "REP" : "ONCE";
+
+        return $"{offer.TargetName}|{dur}|{red}|{qty}|{aug}|{rep}";
+    }
+
     private BasicList<StoreItemRowModel> GetWorkshops()
     {
         var offers = _workshopOffers;
@@ -290,19 +305,32 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
 
         BasicList<StoreItemRowModel> rows = [];
 
-        foreach (var group in offers.GroupBy(x => x.TargetName))
+        foreach (var group in offers.GroupBy(GetOfferVariantKey))
         {
-            string targetName = group.Key;
+            
 
             var tiers = group
                 .OrderBy(x => x.LevelRequired)
                 .ToBasicList();
-
-            int totalPossible = tiers.Count;
-            int ownedCount = ownedCountProvider(targetName);
+            // IMPORTANT: TargetName is still the actual thing being unlocked
+            string targetName = tiers.First().TargetName;
+            TimeSpan? duration = tiers.First().Duration;
+            int ownedCount;
+            int totalPossible;
+            if (duration is not null)
+            {
+                ownedCount = 0;
+                totalPossible = 0;
+            }
+            else
+            {
+                ownedCount = ownedCountProvider(targetName);
+                totalPossible = tiers.Count;
+            }
+            
 
             // maxed out row
-            if (ownedCount >= totalPossible)
+            if (ownedCount >= totalPossible && duration is null)
             {
                 rows.Add(new StoreItemRowModel
                 {
@@ -323,8 +351,17 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
             {
                 continue;
             }
+            CatalogOfferModel nextTier;
 
-            var nextTier = tiers[ownedCount];
+            if (duration is null)
+            {
+                nextTier = tiers[ownedCount];
+            }
+            else
+            {
+                nextTier = tiers.First();
+            }
+
 
             // OPTIONAL: if you never want free tiers to appear in store at all:
             if (IsFreeTier(nextTier))
@@ -336,14 +373,15 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
 
             rows.Add(new StoreItemRowModel
             {
-                TargetName = targetName,
+                TargetName = nextTier.TargetName,
                 TotalPossible = totalPossible,
                 OwnedCount = ownedCount,
                 LevelRequired = nextTier.LevelRequired,
                 Costs = nextTier.Costs,
                 IsLocked = isLocked,
                 IsMaxedOut = false,
-                Category = category
+                Category = category,
+                Duration = nextTier.Duration
             });
         }
 
@@ -410,6 +448,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         {
             return false; //because the level progression should had handled this.
         }
+        //once i implement the rental system, then if you cannot, rethink.
         return true; //i think.
     }
     public async Task AcquireAsync(StoreItemRowModel store)
@@ -421,6 +460,11 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         //now needs to actually unlock the items.
         if (store.Category == EnumCatalogCategory.Tree)
         {
+            if (store.Duration is not null)
+            {
+                Console.WriteLine("Rethink rentals");
+                return;
+            }
             treeManager.UnlockTreePaidFor(store);
             FinishAcquiring(store);
             return;
