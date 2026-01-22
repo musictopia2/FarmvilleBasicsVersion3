@@ -22,7 +22,18 @@
             @actionPickerService.SideContent
         }
     </IntegerInputModal>
-
+    @if (_showAllWorkshops)
+    {
+        <ConfirmationBlazor Title="Complete All Workshops"
+                            Message="@ShowAllWorkshopsConfirmation"
+                            Results="ProcessAllWorkshops" />
+    }
+    @if (_showAllWorksites)
+    {
+        <ConfirmationBlazor Title="Complete Active Item"
+                            Message="@ShowAllWorksitesConfirmation"
+                            Results="ProcessAllWorksites" />
+    }
 
     <PopupViewport GapLeftPx="10"
                    GapRightPx="10"
@@ -163,6 +174,8 @@
                     <span class="activefx-badge" aria-hidden="true"></span>
                 </button>
 
+                <ImageButtonComponent OnClick="PossibleAllWorkshops" Name="@CurrencyKeys.FinishAllWorkshops" Height="100" />
+                <ImageButtonComponent OnClick="PossibleAllWorksites" Name="@CurrencyKeys.FinishAllWorksites" Height="100" />
                 <InstantUnlimitedInstancesComponent />
             </div>
 

@@ -28,6 +28,7 @@ public static class ImportCatalogOfferClass
         list.AddRange(ImportUnlimitedSpeedSeeds());
         list.AddRange(ImportNoWorksiteSuppliesNeeded());
         list.AddRange(ImportSingleCompletionOffers());
+        list.AddRange(ImportAllCompletionOffers());
         if (farm.Theme == FarmThemeList.Country)
         {
             list.AddRange(ImportCountryUnlimitedItems());
@@ -208,6 +209,51 @@ public static class ImportCatalogOfferClass
             OutputAugmentationKey = TropicalAugmentationKeys.ChickenDoubleEggsGuaranteed,
             LevelRequired = 11
         });
+        return output;
+    }
+    private static BasicList<CatalogOfferModel> ImportAllCompletionOffers()
+    {
+        BasicList<CatalogOfferModel> output = [];
+        EnumCatalogCategory category = EnumCatalogCategory.Misc;
+        int levelRequired = 4;
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 10,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
+            TargetName = CurrencyKeys.FinishAllWorkshops,
+            LevelRequired = levelRequired,
+
+        });
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 20,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20), //you pay less per item if doing bulk.
+            TargetName = CurrencyKeys.FinishAllWorkshops,
+            LevelRequired = levelRequired
+
+        });
+
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 10,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(15),
+            TargetName = CurrencyKeys.FinishAllWorksites,
+            LevelRequired = levelRequired,
+
+        });
+        output.Add(new()
+        {
+            Category = category,
+            Quantity = 20,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20), //you pay less per item if doing bulk.
+            TargetName = CurrencyKeys.FinishAllWorksites,
+            LevelRequired = levelRequired
+
+        });
+
         return output;
     }
     private static BasicList<CatalogOfferModel> ImportSingleCompletionOffers()

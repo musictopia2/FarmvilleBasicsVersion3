@@ -80,6 +80,113 @@ public class WorkshopManager(InventoryManager inventory,
         inventory.Consume(CurrencyKeys.FinishSingleWorkshop, 1);
     }
 
+    public void CompleteAllJobsImmediately()
+    {
+        if (inventory.Has(CurrencyKeys.FinishAllWorkshops, 1) == false)
+        {
+            throw new CustomBasicException("You do not have any finish all workshop consumables left.");
+        }
+        foreach (var item in _workshops)
+        {
+            CompleteAllJobsImmediately(item);
+        }
+        inventory.Consume(CurrencyKeys.FinishAllWorkshops, 1);
+    }
+
+
+    private void CompleteAllJobsImmediately(WorkshopInstance workshop)
+    {
+        lock (_lock)
+        {
+            if (workshop.Queue.Count == 0)
+            {
+                return;
+            }
+
+            var now = DateTime.Now;
+
+            // CASE 1: Manual collection policy -> mark EVERYTHING ready, do not remove anything.
+            if (_automateCollection == false)
+            {
+                foreach (var job in workshop.Queue)
+                {
+                    job.ReadyForManualPickup();
+                }
+
+                _needsSaving = true;
+                NotifyWorkshopsUpdated();
+                return;
+            }
+
+            // CASE 2: Automatic collection policy -> attempt to collect everything in-order.
+            // Stop as soon as inventory can’t accept the next output.
+            while (workshop.Queue.Count > 0)
+            {
+                // Ensure we have an "active" job (for consistency with your model),
+                // but we will still finish + collect instantly.
+                var active = workshop.Queue.FirstOrDefault(j => j.State == EnumWorkshopState.Active);
+                if (active == null)
+                {
+                    var next = workshop.Queue.FirstOrDefault(j => j.State == EnumWorkshopState.Waiting);
+                    if (next == null)
+                    {
+                        return;
+                    }
+                    next.Start();
+                    active = next;
+                    _needsSaving = true;
+                }
+
+                // Ensure augmentation promise exists if applicable (so we can roll correctly)
+                if (active.OutputPromise is null)
+                {
+                    bool promised = active.RunPossibleAugmentation();
+                    if (promised)
+                    {
+                        _needsSaving = true;
+                    }
+                }
+
+                // If we can't add, STOP immediately.
+                // (You can optionally flip to manual-ready here so UI explains why it stopped.)
+                if (CanAddToInventory(active) == false)
+                {
+                    // Optional: make it obvious to the player why it halted.
+                    active.ReadyForManualPickup();
+                    _needsSaving = true;
+                    NotifyWorkshopsUpdated();
+                    return;
+                }
+
+                // Add output, respecting augmentation rules
+                if (active.OutputPromise is null)
+                {
+                    inventory.Add(active.Recipe.Output.Item, active.Recipe.Output.Amount);
+                }
+                else
+                {
+                    if (rs1.RollHit(active.OutputPromise.Chance))
+                    {
+                        inventory.Add(active.Recipe.Output.Item, active.Recipe.Output.Amount + 1);
+                        OnAugmentedOutput?.Invoke(active.Recipe.Output);
+                    }
+                    else
+                    {
+                        inventory.Add(active.Recipe.Output.Item, active.Recipe.Output.Amount);
+                    }
+                }
+
+                // Complete + remove, then loop for next job
+                active.Complete();
+                workshop.Queue.RemoveSpecificItem(active);
+                _needsSaving = true;
+            }
+
+            NotifyWorkshopsUpdated();
+        }
+    }
+
+
     private void CompleteActiveJobImmediately(WorkshopView summary)
     {
         lock (_lock)

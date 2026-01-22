@@ -59,6 +59,20 @@ public class WorksiteManager(
         CompleteActiveJobImmediately(location);
         inventory.Consume(CurrencyKeys.FinishSingleWorksite, 1);
     }
+
+    public void CompleteAllJobsImmediately()
+    {
+        if (inventory.Has(CurrencyKeys.FinishAllWorksites, 1) == false)
+        {
+            throw new CustomBasicException("You do not have any Finish All Worksites consumabes left.  Should had called inventory.Has function");
+        }
+        foreach (var item in _worksites)
+        {
+            CompleteActiveJobImmediately(item.Location);
+        }
+        inventory.Consume(CurrencyKeys.FinishAllWorkshops, 1);
+    }
+
     private void CompleteActiveJobImmediately(string location)
     {
         lock (_lock)
