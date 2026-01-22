@@ -45,6 +45,14 @@ public static class ImportTreeCatalogClass
             Category = _category,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(10) //this is where i do the balancing.
         });
+        output.Add(new()
+        {
+            TargetName = TropicalTreeListClass.Lime,
+            LevelRequired = 9,
+            Category = _category,
+            Duration = TimeSpan.FromMinutes(2),
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5) //this is where i do the balancing.
+        });
         return output;
     }
     private static BasicList<CatalogOfferModel> GetCatalogForCountry()
@@ -77,6 +85,14 @@ public static class ImportTreeCatalogClass
             LevelRequired = 14,
             Category = _category,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(20)
+        });
+        output.Add(new()
+        {
+            TargetName = CountryTreeListClass.Peach,
+            LevelRequired = 15,
+            Category = _category,
+            Duration = TimeSpan.FromMinutes(2),
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5)
         });
         return output;
     }

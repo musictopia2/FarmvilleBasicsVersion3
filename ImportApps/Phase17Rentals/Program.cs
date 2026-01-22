@@ -29,5 +29,6 @@ await ii1.ImportBalanceMultiplierClass.ImportBalanceMultiplierAsync(); //done
 await ii1.ImportStoreUiStateClass.ImportUiStoreStateAsync();
 await ii1.ImportItemPlanClass.ImportItemsAsync();
 await ii1.ImportResetQuestsClass.ResetQuestsAsync();
+await ii1.ImportRentalsClass.ImportRentalsAsync();
 //await ii1.ImportQuestInstancesClass.ImportQuestsAsync(); //iffy
 Console.WriteLine("Completed");

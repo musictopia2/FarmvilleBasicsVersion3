@@ -426,7 +426,7 @@ public static class ImportCatalogOfferClass
             TargetName = CountryItemList.Peach,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromMinutes(1),
-            ReduceBy = TimeSpan.FromHours(2), //this applies to all 4 (so do math to see how it would affect each one).
+            ReduceBy = TimeSpan.FromHours(3.5), //this applies to all 4 (so do math to see how it would affect each one).
             LevelRequired = 14
         });
         output.Add(new()
@@ -480,7 +480,7 @@ public static class ImportCatalogOfferClass
             TargetName = TropicalItemList.Lime,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
             Duration = TimeSpan.FromMinutes(1),
-            ReduceBy = TimeSpan.FromHours(2), //this applies to all 4 (so do math to see how it would affect each one).
+            ReduceBy = TimeSpan.FromHours(2.5), //this applies to all 4 (so do math to see how it would affect each one).
             LevelRequired = 14
         });
         output.Add(new()
