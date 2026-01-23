@@ -6,13 +6,18 @@
     <PowerGloveWorksiteComponent Location="@Location"
                                  OnClose="ClosePowerGloves" />
 </PopupViewport>
-@if (_showConfirmation)
+@if (_showCompleteConfirmation)
 {
     <ConfirmationBlazor Title="Complete Active Item"
-                        Message="@GetConfirmationMessage"
+                        Message="@GetCompleteConfirmationMessage"
                         Results="ConfirmCompleteWorksite" />
 }
-
+@if (_showFocusedConfirmation)
+{
+    <ConfirmationBlazor Title="Focused Run"
+                        Message="Are you sure you want to change to focused run.  You will lose any worker benefit and doubles the time.   However, will guaranteed the rare items"
+                        Results="ConfirmFocusedRun" />
+}
 @if (string.IsNullOrWhiteSpace(Location))
 {
     return;

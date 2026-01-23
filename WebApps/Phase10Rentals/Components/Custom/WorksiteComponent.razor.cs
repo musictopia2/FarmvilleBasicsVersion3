@@ -27,19 +27,27 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
 
     private bool _showPowerGloves = false;
 
-    private bool _showConfirmation = false;
+    private bool _showCompleteConfirmation = false;
     private string? _currentRentalTime;
-
-    private string GetConfirmationMessage =>
+    private bool _showFocusedConfirmation = false;
+    private string GetCompleteConfirmationMessage =>
         $"Are you sure you want to use the finish single worksite to complete this?  You have {InventoryManager.Get(CurrencyKeys.FinishSingleWorksite)} left";
     private void ConfirmCompleteWorksite(bool allowed)
     {
-        _showConfirmation = false;
+        _showCompleteConfirmation = false;
         if (allowed)
         {
             WorksiteManager.CompleteSingleWorksiteImmediately(Location);
             //WorkshopManager.CompleteSingleActiveJobImmediately(Workshop);
             return;
+        }
+    }
+    private void ConfirmFocusedRun(bool allowed)
+    {
+        _showFocusedConfirmation = false;
+        if (allowed)
+        {
+            WorksiteManager.ResetToFocused(Location);
         }
     }
 
@@ -58,7 +66,7 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
             toast.ShowUserErrorToast("You do not have enough Finish Single Worksite consumable to do this.  Try purchasing more");
             return;
         }
-        _showConfirmation = true;
+        _showCompleteConfirmation = true;
     }
 
     //private bool _showWorkshops;
@@ -73,7 +81,8 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
 
     void ResetToFocused()
     {
-        WorksiteManager.ResetToFocused(Location);
+        _showFocusedConfirmation = true;
+        //WorksiteManager.ResetToFocused(Location);
     }
     private async Task AttemptWorkshopAsync(string name)
     {
