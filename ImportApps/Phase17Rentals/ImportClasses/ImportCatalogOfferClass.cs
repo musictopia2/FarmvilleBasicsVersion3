@@ -541,6 +541,16 @@ public static class ImportCatalogOfferClass
             Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
             TargetName = CountryItemList.Milk,
         });
+
+        output.Add(new()
+        {
+            Category = category,
+            LevelRequired = 13,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            Duration = TimeSpan.FromSeconds(20),
+            TargetName = CountryItemList.Strawberry,
+        });
+
         return output;
     }
     private static BasicList<CatalogOfferModel> ImportTropicalUnlimitedItems()
@@ -568,6 +578,14 @@ public static class ImportCatalogOfferClass
             LevelRequired = 12,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
             TargetName = TropicalItemList.Fish,
+        });
+        output.Add(new()
+        {
+            Category = category,
+            LevelRequired = 13,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            Duration = TimeSpan.FromSeconds(10),
+            TargetName = TropicalItemList.Lime,
         });
         return output;
     }

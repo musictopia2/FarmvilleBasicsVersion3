@@ -1,7 +1,7 @@
 ﻿namespace Phase10Rentals.Services.Rentals;
 public class RentalManager(TreeManager treeManager,
     AnimalManager animalManager, WorkshopManager workshopManager,
-    WorksiteManager worksiteManager
+    WorksiteManager worksiteManager, InstantUnlimitedManager instantUnlimitedManager
     )
 {
     private BasicList<RentalInstanceModel> _rentals = [];
@@ -41,6 +41,10 @@ public class RentalManager(TreeManager treeManager,
         else if (row.Category == EnumCatalogCategory.Worker)
         {
             await worksiteManager.UnlockWorkerAcquiredAsync(row); //workers don't need ids.
+        }
+        else if (row.Category == EnumCatalogCategory.InstantUnlimited)
+        {
+            await instantUnlimitedManager.SetLockStateAsync(row.TargetName, true);
         }
         else
         {
@@ -179,6 +183,22 @@ public class RentalManager(TreeManager treeManager,
                 else
                 {
                     bool canDelete = await worksiteManager.CanDeleteWorkerRentalAsync(item);
+                    if (canDelete)
+                    {
+                        _rentals.RemoveSpecificItem(item);
+                        changed = true;
+                    }
+                }
+            }
+            else if (item.Category == EnumCatalogCategory.InstantUnlimited)
+            {
+                if (item.State == EnumRentalState.Active)
+                {
+                    await instantUnlimitedManager.DoubleCheckActiveRentalAsync(item.TargetName);
+                }
+                else
+                {
+                    bool canDelete = await instantUnlimitedManager.CanDeleteRentalAsync(item.TargetName);
                     if (canDelete)
                     {
                         _rentals.RemoveSpecificItem(item);

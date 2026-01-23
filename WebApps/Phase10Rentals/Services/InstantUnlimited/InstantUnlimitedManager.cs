@@ -1,5 +1,4 @@
 ﻿namespace Phase10Rentals.Services.InstantUnlimited;
-
 public class InstantUnlimitedManager(CropManager cropManager,
     TreeManager treeManager, AnimalManager animalManager,
     InventoryManager inventoryManager,
@@ -14,6 +13,20 @@ public class InstantUnlimitedManager(CropManager cropManager,
         _items = await context.InstantUnlimitedProfile.LoadAsync();
         _profile = context.InstantUnlimitedProfile;
     }
+    public async Task DoubleCheckActiveRentalAsync(string item)
+    {
+        await SetLockStateAsync(item, true);
+    }
+    public async Task<bool> CanDeleteRentalAsync(string item)
+    {
+        var model = _items.SingleOrDefault(x => x.Name == item) ?? throw new CustomBasicException($"Instant Unlimited item '{item}' was not found.");
+        if (model.Unlocked == false)
+        {
+            return true;
+        }
+        await SetLockStateAsync(item, false);
+        return false;
+    }
     public async Task SetLockStateAsync(string item, bool unlocked)
     {
         var model = _items.SingleOrDefault(x => x.Name == item) ?? throw new CustomBasicException($"Instant Unlimited item '{item}' was not found.");
@@ -21,9 +34,7 @@ public class InstantUnlimitedManager(CropManager cropManager,
         {
             return; // no-op
         }
-
         model.Unlocked = unlocked;
-
         //has to do other things too.
         EnumItemCategory category = itemManager.GetItemCategory(item);
         if (category == EnumItemCategory.Tree)

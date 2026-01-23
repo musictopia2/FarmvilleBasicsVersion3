@@ -41,7 +41,7 @@ public class GameTimerService(IStartFarmRegistry farmRegistry,
             ItemManager itemManager = new();
             CatalogManager catalogManager = new();
             InstantUnlimitedManager instantUnlimitedManager = new(cropManager, treeManager, animalManager, inventory, itemManager);
-            RentalManager rentalManager = new(treeManager, animalManager, workshopManager, worksiteManager);
+            RentalManager rentalManager = new(treeManager, animalManager, workshopManager, worksiteManager, instantUnlimitedManager);
             var profile = starts.GetInventoryProfile(farm);
             UpgradeManager upgradeManager = new(inventory, profile, workshopManager);
             ProgressionManager progressionManager = new(inventory, cropManager,
