@@ -318,10 +318,21 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
             TimeSpan? duration = tiers.First().Duration;
             int ownedCount;
             int totalPossible;
+            string? rentalDetails = null;
+            EnumRentalState? rentalState = null;
             if (duration is not null)
             {
                 ownedCount = 0;
                 totalPossible = 0;
+                rentalState = rentalManager.GetRentalState(tiers.First().TargetName);
+                if (rentalState == EnumRentalState.Active)
+                {
+                    rentalDetails = rentalManager.GetDurationString(tiers.First().TargetName);
+                }
+                else
+                {
+                    rentalDetails = "Collect."; //not enough room for more details.
+                }
             }
             else
             {
@@ -369,9 +380,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
             {
                 continue;
             }
-
             bool isLocked = _currentLevel < nextTier.LevelRequired;
-
             rows.Add(new StoreItemRowModel
             {
                 TargetName = nextTier.TargetName,
@@ -382,7 +391,9 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
                 IsLocked = isLocked,
                 IsMaxedOut = false,
                 Category = category,
-                Duration = nextTier.Duration
+                Duration = nextTier.Duration,
+                RentalDetails = rentalDetails,
+                RentalState = rentalState
             });
         }
 

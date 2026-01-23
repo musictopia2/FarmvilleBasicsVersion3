@@ -67,6 +67,15 @@ public class RentalManager(TreeManager treeManager,
         }
         return remaining.GetTimeCompact;
     }
+    public EnumRentalState? GetRentalState(string targetName)
+    {
+        var item = _rentals.SingleOrDefault(x => x.TargetName == targetName);
+        if (item is null)
+        {
+            return null;
+        }
+        return item.State;
+    }
     private async Task SaveAsync()
     {
         if (_needsSaving == false)

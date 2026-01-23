@@ -101,7 +101,11 @@
                             <!-- Bottom row: costs (left), owned/max (middle), item image (right) -->
                             <div class="shop-card-bottom">
                                 <div class="shop-costs">
-                                    @if (row.IsMaxedOut)
+                                    @if (row.RentalState is not null)
+                                    {
+                                        <span class="shop-muted">@row.RentalDetails</span>
+                                    }
+                                    else if (row.IsMaxedOut)
                                     {
                                         <span class="shop-muted">Maxed</span>
                                     }
@@ -113,6 +117,7 @@
                                     {
                                         <span class="shop-muted">Free</span>
                                     }
+                                    
                                     else
                                     {
                                         @foreach (var cost in row.Costs)
