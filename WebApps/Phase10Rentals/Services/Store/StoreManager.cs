@@ -507,7 +507,7 @@ public class StoreManager(IFarmProgressionReadOnly levelProgression,
         }
         if (store.Category == EnumCatalogCategory.Worker)
         {
-            await worksiteManager.UnlockWorkerPaidForAsync(store);
+            await worksiteManager.UnlockWorkerAcquiredAsync(store);
             FinishAcquiring(store);
             return;
         }

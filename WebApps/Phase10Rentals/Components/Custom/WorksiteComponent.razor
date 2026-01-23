@@ -194,8 +194,15 @@
             
             @if (_currentWorker is not null)
             {
-                <!-- Centered worker -->
+                <!-- Centered worker and possible rental time -->
                 <div class="worksite-worker-center">
+                    @if (string.IsNullOrWhiteSpace(_currentRentalTime) == false)
+                    {
+                        <div class="rental-timer rental-above-worker">
+                            @_currentRentalTime
+                        </div>
+                    }
+                    
                     <img class="worksite-worker-img"
                          src="@Image(_currentWorker.WorkerName)"
                          alt="@_currentWorker.WorkerName" />

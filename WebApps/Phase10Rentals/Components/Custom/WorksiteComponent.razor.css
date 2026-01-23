@@ -290,7 +290,12 @@
     align-items: center;
     justify-content: center;
 }
-
+.rental-above-worker {
+    position: absolute;
+    left: 50%;
+    top: -14px; /* lift above the circle */
+    transform: translateX(-50%);
+}
 .worksite-worker-img {
     width: 120px;
     height: 120px;

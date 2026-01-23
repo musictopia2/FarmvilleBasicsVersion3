@@ -1,7 +1,4 @@
-﻿using System;
-
-namespace Phase10Rentals.Services.Worksites;
-
+﻿namespace Phase10Rentals.Services.Worksites;
 public class WorksiteManager(
     InventoryManager inventory,
     IBaseBalanceProvider baseBalanceProvider,
@@ -114,14 +111,47 @@ public class WorksiteManager(
         ApplyPowerGloveToWorksite(location, howMany, PowerGloveRegistry.ReduceBy);
         inventory.Consume(CurrencyKeys.PowerGloveWorksite, howMany);
     }
-
-    public async Task UnlockWorkerPaidForAsync(StoreItemRowModel store)
+    public async Task UnlockWorkerAcquiredAsync(StoreItemRowModel store)
     {
         if (store.Category != EnumCatalogCategory.Worker)
         {
-            throw new CustomBasicException("Only workers can be paid for");
+            throw new CustomBasicException("Only workers can be acquired");
         }
-        var item = _workerStates.First(x => x.Name == store.TargetName && x.Unlocked == false);
+        var item = _workerStates.Single(x => x.Name == store.TargetName && x.Unlocked == false);
+        item.Unlocked = true;
+        await _workerRepository.SaveAsync(_workerStates);
+    }
+    public async Task<bool> CanDeleteWorkerRentalAsync(RentalInstanceModel rental)
+    {
+        if (rental.Category != EnumCatalogCategory.Worker)
+        {
+            throw new CustomBasicException("Only workers can possibly delete the rental");
+        }
+        var item = _workerStates.Single(x => x.Name == rental.TargetName);
+        if (item.Unlocked == false)
+        {
+            return true;
+        }
+        var instance = _allWorkers.Single(x => x.WorkerName == rental.TargetName);
+        if (instance.WorkerStatus == EnumWorkerStatus.Working)
+        {
+            return false;
+        }
+        item.Unlocked = false;
+        await _workerRepository.SaveAsync(_workerStates);
+        return false; //unlock but wait until next cycle to delete
+    }
+    public async Task DoubleCheckActiveWorkerRentalAsync(RentalInstanceModel rental)
+    {
+        if (rental.Category != EnumCatalogCategory.Worker)
+        {
+            throw new CustomBasicException("Only workers can possibly double check rentals");
+        }
+        var item = _workerStates.Single(x => x.Name == rental.TargetName);
+        if (item.Unlocked)
+        {
+            return;
+        }
         item.Unlocked = true;
         await _workerRepository.SaveAsync(_workerStates);
     }
@@ -131,7 +161,7 @@ public class WorksiteManager(
         {
             throw new CustomBasicException("Only worksites can be paid for");
         }
-        var item = _worksites.First(x => x.Unlocked == false && x.Location == store.TargetName);
+        var item = _worksites.Single(x => x.Unlocked == false && x.Location == store.TargetName);
         item.Unlocked = true;
         _needsSaving = true;
     }

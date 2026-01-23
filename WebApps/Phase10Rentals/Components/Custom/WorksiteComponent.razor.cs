@@ -28,6 +28,7 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
     private bool _showPowerGloves = false;
 
     private bool _showConfirmation = false;
+    private string? _currentRentalTime;
 
     private string GetConfirmationMessage =>
         $"Are you sure you want to use the finish single worksite to complete this?  You have {InventoryManager.Get(CurrencyKeys.FinishSingleWorksite)} left";
@@ -89,6 +90,10 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
     {
         _workers = WorksiteManager.GetUnlockedWorkers(Location);
         _currentWorker = _workers.FirstOrDefault();
+        if (_currentWorker is not null)
+        {
+            _currentRentalTime = RentalManager.GetDurationString(_currentWorker.WorkerName);
+        }
         _totalPossibleWorkers = WorksiteManager.TotalWorkersAllowed(Location);
         _shownList = GetOrderedWorkers();
         base.OnInitialized();
@@ -118,11 +123,13 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
     {
         _workerIndex--;
         _currentWorker = _workers[_workerIndex];
+        _currentRentalTime = RentalManager.GetDurationString(_currentWorker.WorkerName);
     }
     private void GoDown()
     {
         _workerIndex++;
         _currentWorker = _workers[_workerIndex];
+        _currentRentalTime = RentalManager.GetDurationString(_currentWorker.WorkerName);
     }
     protected override async Task OnTickAsync()
     {
@@ -131,7 +138,8 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
     }
     private async Task RunProcessAsync()
     {
-        if (WorksiteManager.GetStatus(Location) == EnumWorksiteState.Collecting && _rewards.Count == 0)
+        EnumWorksiteState status = WorksiteManager.GetStatus(Location);
+        if (status == EnumWorksiteState.Collecting && _rewards.Count == 0)
         {
             _rewards = WorksiteManager.GetRewards(Location);
 
@@ -145,9 +153,13 @@ public partial class WorksiteComponent(IToast toast, OverlayService overlay)
                 return;
             }
         }
-        if (WorksiteManager.GetStatus(Location) != EnumWorksiteState.Collecting)
+        if (status != EnumWorksiteState.Collecting)
         {
             _rewards.Clear();
+        }
+        if (status == EnumWorksiteState.None && _currentWorker is not null)
+        {
+            _currentRentalTime = RentalManager.GetDurationString(_currentWorker.WorkerName);
         }
     }
     //if you cannot add worker, then disabled but can still view details about that worker.

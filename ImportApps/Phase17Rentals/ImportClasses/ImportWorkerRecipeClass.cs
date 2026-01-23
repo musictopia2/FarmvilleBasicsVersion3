@@ -110,7 +110,7 @@ internal static class ImportWorkerRecipeClass
         worker = new()
         {
             WorkerName = CountryWorkerListClass.Whiskers,
-            Details = "Gets extra tin and bass from the pond",
+            Details = "Gets extra mint and bass from the pond",
             Theme = theme
         };
         benefit = new()

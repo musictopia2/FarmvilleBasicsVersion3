@@ -107,7 +107,7 @@ internal static class ImportWorkerCatalogClass
             TargetName = CountryWorkerListClass.Whiskers,
             LevelRequired = 12,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
-            Duration = TimeSpan.FromMinutes(2),
+            Duration = TimeSpan.FromSeconds(30),
             Category = _category
         });
         output.Add(new()

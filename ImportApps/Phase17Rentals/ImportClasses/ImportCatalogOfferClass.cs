@@ -381,7 +381,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             LevelRequired = 10,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
-            Duration = TimeSpan.FromSeconds(10),
+            Duration = TimeSpan.FromMinutes(5),
             TargetName = BoostKeys.UnlimitedSpeedSeed
         });
 
@@ -390,7 +390,7 @@ public static class ImportCatalogOfferClass
             Category = category,
             LevelRequired = 10,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
-            Duration = TimeSpan.FromMinutes(4),
+            Duration = TimeSpan.FromMinutes(15),
             TargetName = BoostKeys.UnlimitedSpeedSeed
         });
         return output;

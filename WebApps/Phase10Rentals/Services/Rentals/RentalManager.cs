@@ -1,6 +1,7 @@
 ﻿namespace Phase10Rentals.Services.Rentals;
 public class RentalManager(TreeManager treeManager,
-    AnimalManager animalManager, WorkshopManager workshopManager
+    AnimalManager animalManager, WorkshopManager workshopManager,
+    WorksiteManager worksiteManager
     )
 {
     private BasicList<RentalInstanceModel> _rentals = [];
@@ -24,7 +25,7 @@ public class RentalManager(TreeManager treeManager,
         {
             throw new CustomBasicException("Rentals require a duration");
         }
-        Guid id;
+        Guid? id = null;
         if (row.Category == EnumCatalogCategory.Tree)
         {
             id = treeManager.StartRental(row);
@@ -36,6 +37,10 @@ public class RentalManager(TreeManager treeManager,
         else if (row.Category == EnumCatalogCategory.Workshop)
         {
             id = workshopManager.StartRental(row);
+        }
+        else if (row.Category == EnumCatalogCategory.Worker)
+        {
+            await worksiteManager.UnlockWorkerAcquiredAsync(row); //workers don't need ids.
         }
         else
         {
@@ -158,6 +163,22 @@ public class RentalManager(TreeManager treeManager,
                 else
                 {
                     bool canDelete = workshopManager.CanDeleteRental(item.TargetInstanceId!.Value);
+                    if (canDelete)
+                    {
+                        _rentals.RemoveSpecificItem(item);
+                        changed = true;
+                    }
+                }
+            }
+            else if (item.Category == EnumCatalogCategory.Worker)
+            {
+                if (item.State == EnumRentalState.Active)
+                {
+                    await worksiteManager.DoubleCheckActiveWorkerRentalAsync(item);
+                }
+                else
+                {
+                    bool canDelete = await worksiteManager.CanDeleteWorkerRentalAsync(item);
                     if (canDelete)
                     {
                         _rentals.RemoveSpecificItem(item);
