@@ -24,7 +24,7 @@ public static class ImportWorkerInstanceClass
         int level = profile.Level;
         foreach (var item in plan)
         {
-            bool unlocked = level >= item.LevelRequired;
+            bool unlocked = level >= item.LevelRequired && item.Costs.Count == 0;
             workers.Add(new()
             {
                 Name = item.TargetName,

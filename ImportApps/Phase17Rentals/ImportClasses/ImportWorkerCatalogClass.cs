@@ -17,7 +17,13 @@ internal static class ImportWorkerCatalogClass
     private static BasicList<CatalogOfferModel> GetCatalogForTropical()
     {
         BasicList<CatalogOfferModel> output = [];
-
+        output.Add(new()
+        {
+            TargetName = TropicalWorkerListClass.Toby,
+            LevelRequired = 5,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10), //has to charge at least one or can't test the charging of a worker.
+            Category = _category
+        });
         output.Add(new()
         {
             TargetName = TropicalWorkerListClass.George,
@@ -27,9 +33,31 @@ internal static class ImportWorkerCatalogClass
         });
         output.Add(new()
         {
+            TargetName = TropicalWorkerListClass.Zazu,
+            LevelRequired = 6,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(15),
+            Category = _category
+        });
+        output.Add(new()
+        {
+            TargetName = TropicalWorkerListClass.Kai,
+            LevelRequired = 10,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20), 
+            Duration = TimeSpan.FromMinutes(2), //for testing.
+            Category = _category
+        });
+        output.Add(new()
+        {
             TargetName = TropicalWorkerListClass.Ethan,
             LevelRequired = 12,
             Costs = FarmHelperClass.GetFreeCosts,
+            Category = _category
+        });
+        output.Add(new()
+        {
+            TargetName = TropicalWorkerListClass.Luna,
+            LevelRequired = 12,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(15),
             Category = _category
         });
         output.Add(new()
@@ -41,9 +69,10 @@ internal static class ImportWorkerCatalogClass
         });
         output.Add(new()
         {
-            TargetName = TropicalWorkerListClass.Toby,
-            LevelRequired = 8,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(10), //has to charge at least one or can't test the charging of a worker.
+            TargetName = TropicalWorkerListClass.Kilo,
+            LevelRequired = 18,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            Duration = TimeSpan.FromMinutes(2), //for testing.
             Category = _category
         });
         return output;
@@ -65,11 +94,35 @@ internal static class ImportWorkerCatalogClass
             Costs = FarmHelperClass.GetFreeCosts,
             Category = _category
         });
+        
         output.Add(new()
         {
             TargetName = CountryWorkerListClass.Clara,
             LevelRequired = 12,
             Costs = FarmHelperClass.GetFreeCosts,
+            Category = _category
+        });
+        output.Add(new()
+        {
+            TargetName = CountryWorkerListClass.Whiskers,
+            LevelRequired = 12,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
+            Duration = TimeSpan.FromMinutes(2),
+            Category = _category
+        });
+        output.Add(new()
+        {
+            TargetName = CountryWorkerListClass.Baxter,
+            LevelRequired = 12,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
+            Duration = TimeSpan.FromMinutes(2),
+            Category = _category
+        });
+        output.Add(new()
+        {
+            TargetName = CountryWorkerListClass.Mittens,
+            LevelRequired = 12,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
             Category = _category
         });
         output.Add(new()
@@ -86,6 +139,14 @@ internal static class ImportWorkerCatalogClass
             Costs = FarmHelperClass.GetFreeCosts,
             Category = _category
         });
+        output.Add(new()
+        {
+            TargetName = CountryWorkerListClass.Rusty,
+            LevelRequired = 16,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            Category = _category
+        });
+        
         return output;
     }
 }
