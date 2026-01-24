@@ -1,9 +1,0 @@
-﻿
-namespace Phase08AutoCompleteSingle.Services.Trees;
-public class TreeGatherAllPolicy : ITreeGatheringPolicy
-{
-    Task<bool> ITreeGatheringPolicy.CollectAllAsync()
-    {
-        return Task.FromResult(true);
-    }
-}
