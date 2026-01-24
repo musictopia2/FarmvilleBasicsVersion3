@@ -26,9 +26,13 @@ public static class ImportCropProgressionClass
         //here is where i specify the slot levels.
         document.SlotLevelRequired = [];
         AddSlots(document.SlotLevelRequired, 8, 1);
+        AddSlots(document.SlotLevelRequired, 4, 3);
         AddSlots(document.SlotLevelRequired, 4, 6);
+        AddSlots(document.SlotLevelRequired, 4, 8);
         AddSlots(document.SlotLevelRequired, 4, 10);
+        AddSlots(document.SlotLevelRequired, 4, 13);
         AddSlots(document.SlotLevelRequired, 4, 15);
+        AddSlots(document.SlotLevelRequired, 4, 18);
         if (farm.Theme == FarmThemeList.Tropical)
         {
             document.UnlockRules = GetUnlockRulesForTropical();

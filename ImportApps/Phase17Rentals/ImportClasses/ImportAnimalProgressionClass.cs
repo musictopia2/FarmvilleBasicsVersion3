@@ -46,12 +46,12 @@ public static class ImportAnimalProgressionClass
         output.Add(new()
         {
             ItemName = TropicalAnimalListClass.Dolphin,
-            LevelRequired = 6
+            LevelRequired = 3
         });
         output.Add(new()
         {
             ItemName = TropicalAnimalListClass.Dolphin,
-            LevelRequired = 12
+            LevelRequired = 4
         });
         //output.Add(new()
         //{
@@ -61,12 +61,12 @@ public static class ImportAnimalProgressionClass
         output.Add(new()
         {
             ItemName = TropicalAnimalListClass.Chicken,
-            LevelRequired = 10
+            LevelRequired = 5
         });
         output.Add(new()
         {
             ItemName = TropicalAnimalListClass.Chicken,
-            LevelRequired = 15
+            LevelRequired = 6
         });
         //output.Add(new()
         //{
@@ -76,12 +76,12 @@ public static class ImportAnimalProgressionClass
         output.Add(new()
         {
             ItemName = TropicalAnimalListClass.Boar,
-            LevelRequired = 16
+            LevelRequired = 12
         });
         output.Add(new()
         {
             ItemName = TropicalAnimalListClass.Boar,
-            LevelRequired = 19
+            LevelRequired = 13
         });
         return output;
     }
@@ -96,12 +96,12 @@ public static class ImportAnimalProgressionClass
         output.Add(new()
         {
             ItemName = CountryAnimalListClass.Cow,
-            LevelRequired = 6
+            LevelRequired = 3
         });
         output.Add(new()
         {
             ItemName = CountryAnimalListClass.Cow,
-            LevelRequired = 10
+            LevelRequired = 4
         });
 
         //output.Add(new()
@@ -112,12 +112,12 @@ public static class ImportAnimalProgressionClass
         output.Add(new()
         {
             ItemName = CountryAnimalListClass.Goat,
-            LevelRequired = 15
+            LevelRequired = 13
         });
         output.Add(new()
         {
             ItemName = CountryAnimalListClass.Goat,
-            LevelRequired = 19
+            LevelRequired = 14
         });
         //output.Add(new()
         //{
@@ -127,12 +127,12 @@ public static class ImportAnimalProgressionClass
         output.Add(new()
         {
             ItemName = CountryAnimalListClass.Sheep,
-            LevelRequired = 16
+            LevelRequired = 15
         });
         output.Add(new()
         {
             ItemName = CountryAnimalListClass.Sheep,
-            LevelRequired = 20
+            LevelRequired = 16
         });
         return output;
     }

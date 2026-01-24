@@ -17,6 +17,7 @@ public static class ImportAnimalCatalogClass
     private static BasicList<CatalogOfferModel> GetCatalogForTropical()
     {
         BasicList<CatalogOfferModel> output = [];
+        TimeSpan duration = TimeSpan.FromHours(1);
         output.Add(new()
         {
             TargetName = TropicalAnimalListClass.Dolphin,
@@ -27,9 +28,10 @@ public static class ImportAnimalCatalogClass
         output.Add(new()
         {
             TargetName = TropicalAnimalListClass.Dolphin,
-            LevelRequired = 10,
+            LevelRequired = 4,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(50) //this is where i do the balancing.
+            Duration = duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20) //this is where i do the balancing.
         });
         output.Add(new()
         {
@@ -41,18 +43,12 @@ public static class ImportAnimalCatalogClass
         output.Add(new()
         {
             TargetName = TropicalAnimalListClass.Chicken,
-            LevelRequired = 10,
+            LevelRequired = 5,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(60) //this is where i do the balancing.
+            Duration = duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20) //this is where i do the balancing.
         });
-        output.Add(new()
-        {
-            TargetName = TropicalAnimalListClass.Chicken,
-            LevelRequired = 10,
-            Category = _category,
-            Duration = TimeSpan.FromHours(4),
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(30) //this is where i do the balancing.
-        });
+        
         output.Add(new()
         {
             TargetName = TropicalAnimalListClass.Boar,
@@ -63,15 +59,17 @@ public static class ImportAnimalCatalogClass
         output.Add(new()
         {
             TargetName = TropicalAnimalListClass.Boar,
-            LevelRequired = 11,
+            LevelRequired = 12,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(80) //this is where i do the balancing.
+            Duration = duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20) //this is where i do the balancing.
         });
         return output;
     }
     private static BasicList<CatalogOfferModel> GetCatalogForCountry()
     {
         BasicList<CatalogOfferModel> output = [];
+        TimeSpan duration = TimeSpan.FromHours(1);
         output.Add(new()
         {
             TargetName = CountryAnimalListClass.Cow,
@@ -82,9 +80,10 @@ public static class ImportAnimalCatalogClass
         output.Add(new()
         {
             TargetName = CountryAnimalListClass.Cow,
-            LevelRequired = 5,
+            LevelRequired = 4,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(20)
+            Duration = duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10)
         });
 
 
@@ -98,18 +97,12 @@ public static class ImportAnimalCatalogClass
         output.Add(new()
         {
             TargetName = CountryAnimalListClass.Goat,
-            LevelRequired = 14,
+            LevelRequired = 11,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(30)
-        });
-        output.Add(new()
-        {
-            TargetName = CountryAnimalListClass.Goat,
-            LevelRequired = 14,
-            Category = _category,
-            Duration = TimeSpan.FromHours(4),
+            Duration = duration,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(10)
         });
+        
         output.Add(new()
         {
             TargetName = CountryAnimalListClass.Sheep,
@@ -120,9 +113,10 @@ public static class ImportAnimalCatalogClass
         output.Add(new()
         {
             TargetName = CountryAnimalListClass.Sheep,
-            LevelRequired = 14,
+            LevelRequired = 15,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(40)
+            Duration = duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10)
         });
         return output;
     }

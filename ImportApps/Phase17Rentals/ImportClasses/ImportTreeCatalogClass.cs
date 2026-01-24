@@ -17,6 +17,7 @@ public static class ImportTreeCatalogClass
     private static BasicList<CatalogOfferModel> GetCatalogForTropical()
     {
         BasicList<CatalogOfferModel> output = [];
+        TimeSpan duration = TimeSpan.FromHours(2);
         output.Add(new()
         {
             TargetName = TropicalTreeListClass.Coconut,
@@ -27,9 +28,10 @@ public static class ImportTreeCatalogClass
         output.Add(new()
         {
             TargetName = TropicalTreeListClass.Coconut,
-            LevelRequired = 3,
+            LevelRequired = 2,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(5) //this is where i do the balancing.
+            Duration = duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(2) //this is where i do the balancing.
         });
         output.Add(new()
         {
@@ -43,15 +45,15 @@ public static class ImportTreeCatalogClass
             TargetName = TropicalTreeListClass.Lime,
             LevelRequired = 9,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(10) //this is where i do the balancing.
+            Duration = duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(4) //this is where i do the balancing.
         });
         output.Add(new()
         {
             TargetName = TropicalTreeListClass.Lime,
             LevelRequired = 9,
             Category = _category,
-            Duration = TimeSpan.FromHours(3),
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(5) //this is where i do the balancing.
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(40) //this is where i do the balancing.
         });
         return output;
     }
@@ -65,6 +67,7 @@ public static class ImportTreeCatalogClass
             Category = _category,
             Costs = FarmHelperClass.GetFreeCosts
         });
+        TimeSpan duration = TimeSpan.FromHours(2);
         output.Add(new()
         {
             TargetName = CountryTreeListClass.Peach,
@@ -75,24 +78,26 @@ public static class ImportTreeCatalogClass
         output.Add(new()
         {
             TargetName = CountryTreeListClass.Peach,
+            LevelRequired = 11,
+            Category = _category,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(50),
+            Duration = duration
+        });
+        output.Add(new()
+        {
+            TargetName = CountryTreeListClass.Peach,
             LevelRequired = 10,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(10)
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(5),
+            Duration = duration
         });
         output.Add(new()
         {
             TargetName = CountryTreeListClass.Peach,
-            LevelRequired = 14,
+            LevelRequired = 11,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(20)
-        });
-        output.Add(new()
-        {
-            TargetName = CountryTreeListClass.Peach,
-            LevelRequired = 15,
-            Category = _category,
-            Duration = TimeSpan.FromHours(4),
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(5)
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(50),
+            Duration = duration
         });
         return output;
     }

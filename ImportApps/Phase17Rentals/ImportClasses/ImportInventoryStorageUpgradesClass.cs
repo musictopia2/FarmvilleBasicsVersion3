@@ -26,8 +26,8 @@ internal static class ImportInventoryStorageUpgradesClass
     {
         UpgradeTier tier;
         BasicList<UpgradeTier> output = [];
-        int currentValue = 300; //must start with low number so you have to test it.
-        int increment = 5;
+        int currentValue = 400;
+        int increment = 100;
         tier = new()
         {
             Cost = FarmHelperClass.GetFreeCosts,
@@ -43,7 +43,6 @@ internal static class ImportInventoryStorageUpgradesClass
         };
         output.Add(tier);
         currentCost += 1;
-        increment += 1;
         currentValue += increment;
         tier = new()
         {
@@ -74,8 +73,8 @@ internal static class ImportInventoryStorageUpgradesClass
     {
         UpgradeTier tier;
         BasicList<UpgradeTier> output = [];
-        int currentValue = 200;
-        int increment = 40; //a person is going to run out quickly this time.
+        int currentValue = 500;
+        int increment = 200; //a person is going to run out quickly this time.
         tier = new()
         {
             Cost = FarmHelperClass.GetFreeCosts,
@@ -91,7 +90,6 @@ internal static class ImportInventoryStorageUpgradesClass
         };
         output.Add(tier);
         currentCost += 3;
-        //increment += 1;
         currentValue += increment;
         tier = new()
         {

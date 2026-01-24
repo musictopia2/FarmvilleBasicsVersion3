@@ -109,12 +109,12 @@ public static class ImportWorkshopProgressionClass
         output.Add(new()
         {
             ItemName = CountryItemList.Butter,
-            LevelRequired = 8
+            LevelRequired = 9
         });
         output.Add(new()
         {
             ItemName = CountryItemList.HerbButter,
-            LevelRequired = 9
+            LevelRequired = 10
         });
         output.Add(new()
         {

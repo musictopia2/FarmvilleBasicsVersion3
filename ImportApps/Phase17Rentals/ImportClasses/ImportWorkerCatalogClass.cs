@@ -2,6 +2,7 @@
 internal static class ImportWorkerCatalogClass
 {
     private static EnumCatalogCategory _category = EnumCatalogCategory.Worker;
+    private static TimeSpan _duration = TimeSpan.FromHours(2);
     public static BasicList<CatalogOfferModel> GetWorkerOffers(FarmKey farm)
     {
         if (farm.Theme == FarmThemeList.Tropical)
@@ -43,7 +44,7 @@ internal static class ImportWorkerCatalogClass
             TargetName = TropicalWorkerListClass.Kai,
             LevelRequired = 10,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(20), 
-            Duration = TimeSpan.FromMinutes(2), //for testing.
+            Duration = _duration,
             Category = _category
         });
         output.Add(new()
@@ -72,7 +73,7 @@ internal static class ImportWorkerCatalogClass
             TargetName = TropicalWorkerListClass.Kilo,
             LevelRequired = 18,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
-            Duration = TimeSpan.FromMinutes(2), //for testing.
+            Duration = _duration,
             Category = _category
         });
         return output;
@@ -107,7 +108,7 @@ internal static class ImportWorkerCatalogClass
             TargetName = CountryWorkerListClass.Whiskers,
             LevelRequired = 12,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
-            Duration = TimeSpan.FromSeconds(30),
+            Duration = _duration,
             Category = _category
         });
         output.Add(new()
@@ -115,7 +116,7 @@ internal static class ImportWorkerCatalogClass
             TargetName = CountryWorkerListClass.Baxter,
             LevelRequired = 12,
             Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
-            Duration = TimeSpan.FromMinutes(2),
+            Duration = _duration,
             Category = _category
         });
         output.Add(new()

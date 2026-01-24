@@ -12,7 +12,7 @@ public static class ImportLevelProgressionClass
             LevelProgressionPlanDocument plan = new()
             {
                 Farm = farm,
-                IsEndless = true //this time needs to be endless.
+                IsEndless = false //this time needs to be endless.
             };
 
             20.Times(x =>
@@ -20,27 +20,27 @@ public static class ImportLevelProgressionClass
                 //pretend like i get 1 at 10 and 2 at 50 and 1 at 80 for testing.
                 LevelProgressionTier tier = new()
                 {
-                    RequiredPoints = 15,
-                    RewardsOnLevelComplete = FarmHelperClass.GetCoinOnlyDictionary(10)
+                    RequiredPoints = 10,
+                    RewardsOnLevelComplete = FarmHelperClass.GetCoinOnlyDictionary(100)
                 };
-                ProgressMilestoneReward mile = new()
-                {
-                    Percent = 10,
-                    Rewards = FarmHelperClass.GetCoinOnlyDictionary(1)
-                };
-                tier.ProgressMilestoneRewards.Add(mile);
-                mile = new()
-                {
-                    Percent = 50,
-                    Rewards = FarmHelperClass.GetCoinOnlyDictionary(2)
-                };
-                tier.ProgressMilestoneRewards.Add(mile);
-                mile = new()
-                {
-                    Percent = 80,
-                    Rewards = FarmHelperClass.GetCoinOnlyDictionary(1)
-                };
-                tier.ProgressMilestoneRewards.Add(mile);
+                //ProgressMilestoneReward mile = new()
+                //{
+                //    Percent = 10,
+                //    Rewards = FarmHelperClass.GetCoinOnlyDictionary(1)
+                //};
+                //tier.ProgressMilestoneRewards.Add(mile);
+                //mile = new()
+                //{
+                //    Percent = 50,
+                //    Rewards = FarmHelperClass.GetCoinOnlyDictionary(2)
+                //};
+                //tier.ProgressMilestoneRewards.Add(mile);
+                //mile = new()
+                //{
+                //    Percent = 80,
+                //    Rewards = FarmHelperClass.GetCoinOnlyDictionary(1)
+                //};
+                //tier.ProgressMilestoneRewards.Add(mile);
                 plan.Tiers.Add(tier);
             });
             list.Add(plan);

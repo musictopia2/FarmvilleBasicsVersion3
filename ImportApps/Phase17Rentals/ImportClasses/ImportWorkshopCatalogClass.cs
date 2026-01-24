@@ -2,6 +2,7 @@
 internal static class ImportWorkshopCatalogClass
 {
     private static EnumCatalogCategory _category = EnumCatalogCategory.Workshop;
+    private static TimeSpan _duration = TimeSpan.FromHours(2);
     public static BasicList<CatalogOfferModel> GetWorkshopOffers(FarmKey farm)
     {
         if (farm.Theme == FarmThemeList.Tropical)
@@ -27,18 +28,12 @@ internal static class ImportWorkshopCatalogClass
         output.Add(new()
         {
             TargetName = TropicalWorkshopList.HuluHit,
-            LevelRequired = 5,
+            LevelRequired = 4,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(50) //this is where i do the balancing.
+            Duration = _duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20) //this is where i do the balancing.
         });
-        output.Add(new()
-        {
-            TargetName = TropicalWorkshopList.HuluHit,
-            LevelRequired = 6,
-            Category = _category,
-            Duration = TimeSpan.FromSeconds(20), //for testing
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(10) //this is where i do the balancing.
-        });
+        
         output.Add(new()
         {
             TargetName = TropicalWorkshopList.SushiStand,
@@ -49,9 +44,10 @@ internal static class ImportWorkshopCatalogClass
         output.Add(new()
         {
             TargetName = TropicalWorkshopList.SushiStand,
-            LevelRequired = 8,
+            LevelRequired = 5,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(60)
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            Duration = _duration
         });
         output.Add(new()
         {
@@ -64,9 +60,10 @@ internal static class ImportWorkshopCatalogClass
         output.Add(new()
         {
             TargetName = TropicalWorkshopList.Grill,
-            LevelRequired = 9,
+            LevelRequired = 6,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(80)
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20),
+            Duration = _duration
         });
 
         output.Add(new()
@@ -79,9 +76,10 @@ internal static class ImportWorkshopCatalogClass
         output.Add(new()
         {
             TargetName = TropicalWorkshopList.BeachfrontKitchen,
-            LevelRequired = 13,
+            LevelRequired = 12,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(90) //this is where i do the balancing.
+            Duration = _duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(20) //this is where i do the balancing.
         });
         return output;
     }
@@ -98,19 +96,12 @@ internal static class ImportWorkshopCatalogClass
         output.Add(new()
         {
             TargetName = CountryWorkshopList.Windmill,
-            LevelRequired = 6,
+            LevelRequired = 3,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(10)
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
+            Duration = _duration
         });
-        output.Add(new()
-        {
-            TargetName = CountryWorkshopList.Windmill,
-            LevelRequired = 7,
-            Category = _category,
-            Duration = TimeSpan.FromSeconds(20), //for testing.
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(5)
-        });
-
+        
         output.Add(new()
         {
             TargetName = CountryWorkshopList.PastryOven,
@@ -121,9 +112,10 @@ internal static class ImportWorkshopCatalogClass
         output.Add(new()
         {
             TargetName = CountryWorkshopList.PastryOven,
-            LevelRequired = 8,
+            LevelRequired = 5,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(20)
+            Duration = _duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10)
         });
 
         output.Add(new()
@@ -135,11 +127,13 @@ internal static class ImportWorkshopCatalogClass
         });
         output.Add(new()
         {
-            TargetName = CountryWorkshopList.PastryOven,
-            LevelRequired = 12,
+            TargetName = CountryWorkshopList.Dairy,
+            LevelRequired = 10,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(30)
+            Duration = _duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10)
         });
+       
 
         output.Add(new()
         {
@@ -151,9 +145,10 @@ internal static class ImportWorkshopCatalogClass
         output.Add(new()
         {
             TargetName = CountryWorkshopList.StovetopOven,
-            LevelRequired = 14,
+            LevelRequired = 12,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(40)
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10),
+            Duration = _duration
         });
         
         output.Add(new()
@@ -166,9 +161,10 @@ internal static class ImportWorkshopCatalogClass
         output.Add(new()
         {
             TargetName = CountryWorkshopList.Loom,
-            LevelRequired = 16,
+            LevelRequired = 15,
             Category = _category,
-            Costs = FarmHelperClass.GetCoinOnlyDictionary(50)
+            Duration = _duration,
+            Costs = FarmHelperClass.GetCoinOnlyDictionary(10)
         });
         return output;
     }

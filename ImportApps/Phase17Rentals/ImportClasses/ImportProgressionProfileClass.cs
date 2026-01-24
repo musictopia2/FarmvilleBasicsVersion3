@@ -12,7 +12,7 @@ public static class ImportProgressionProfileClass
             { 
                 Farm = farm,
                 PointsThisLevel = 0,
-                Level = 18
+                Level = 1
             }
             );
         }
